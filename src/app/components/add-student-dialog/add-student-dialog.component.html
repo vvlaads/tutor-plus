@@ -1,0 +1,53 @@
+<div class="form-container">
+    <h2 class="form-title">Добавить ученика</h2>
+
+    <form class="student-form">
+        <div class="form-group">
+            <label for="input-name" class="form-label">Имя:</label>
+            <input [(ngModel)]="studentName" name="studentName" id="input-name" class="form-input"
+                placeholder="Введите имя ученика">
+        </div>
+
+        <div class="form-group">
+            <label for="input-phone" class="form-label">Телефон:</label>
+            <input [(ngModel)]="studentPhone" name="studentPhone" id="input-phone" class="form-input" type="tel"
+                placeholder="+7 (XXX) XXX-XX-XX">
+        </div>
+
+        <div class="form-group">
+            <label for="input-subject" class="form-label">Предмет:</label>
+            <input [(ngModel)]="studentSubject" name="studentSubject" id="input-subject" class="form-input"
+                placeholder="История, Экономика...">
+        </div>
+
+        <div class="form-group">
+            <label for="select-communication" class="form-label">Где общаемся:</label>
+            <app-custom-select [options]="communicationOptions"
+                (selected)="onSelect($event, 'communication')"></app-custom-select>
+        </div>
+
+        <div class="form-group">
+            <label for="select-platform" class="form-label">Где проходит:</label>
+            <app-custom-select [options]="platformOptions"
+                (selected)="onSelect($event, 'platform')"></app-custom-select>
+        </div>
+
+        <div class="form-group">
+            <label for="input-cost" class="form-label">Стоимость за час:</label>
+            <div class="input-with-symbol">
+                <input [(ngModel)]="studentCost" name="studentCost" id="input-cost" class="form-input" type="number"
+                    placeholder="1000">
+                <span class="currency-symbol">₽</span>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" (click)="addStudent()" class="submit-button">
+                Добавить ученика
+            </button>
+            <button type="button" (click)="close()" class="cancel-button">
+                Отмена
+            </button>
+        </div>
+    </form>
+</div>

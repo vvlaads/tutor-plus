@@ -1,0 +1,50 @@
+<app-navigation></app-navigation>
+<main class="content-wrapper" [style.margin-left]="marginLeft">
+    <div class="change-schedule-status-buttons">
+        <button class="change-schedule-status-button" (click)="resetDate()"> Вернуться к сегодня</button>
+        <button class="change-schedule-status-button" (click)="setShortFormat(true)">Один день</button>
+        <button class="change-schedule-status-button" (click)="setShortFormat(false)">На неделю</button>
+        <button class="date-button" id="prev-date-button" (click)="goToPrev()">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon%20Swap.png"
+                class="button-icon">
+        </button>
+        <button class="date-button" id="find-date-button" (click)="findDate()">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Magnifier%20Icon.png"
+                class="button-icon">
+        </button>
+        <button class="date-button" id="next-date-button" (click)="goToNext()">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon.png"
+                class="button-icon">
+        </button>
+    </div>
+    <hr>
+
+    <div class="calendar">
+        <div>{{currentDay.getFullYear()}}</div>
+        <div class="calendar-header">
+            <div *ngIf="!isShort" class="wrapper">
+                <div class="time-label"></div>
+                <div *ngFor="let day of week; let i = index" class="day-header" [class.today]="isToday(day)">
+                    {{days[i]}}
+                    <br>
+                    {{ day.getDate() }}
+                    {{monthNames[day.getMonth()]}}
+                </div>
+            </div>
+            <div *ngIf="isShort" class="wrapper">
+                <div class="time-label"></div>
+                <div class="one-day" [class.today]="isToday(currentDay)">
+                    {{days[((currentDay.getDay()-1)+7)%7]}}
+                    <br>
+                    {{currentDay.getDate()}}
+                    {{monthNames[currentDay.getMonth()]}}
+                </div>
+            </div>
+
+        </div>
+
+        <div class="calendar-body">
+            Hi
+        </div>
+    </div>
+</main>

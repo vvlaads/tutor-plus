@@ -1,0 +1,33 @@
+import { Injectable } from '@angular/core';
+import { Auth, GoogleAuthProvider, signInWithPopup, User, signOut } from '@angular/fire/auth';
+import { Router } from '@angular/router';
+import { BehaviorSubject } from 'rxjs';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private currentUserSubject = new BehaviorSubject<User | null>(null);
+  currentUser$ = this.currentUserSubject.asObservable();
+
+  constructor(private auth: Auth, private router: Router) {
+    this.auth.onAuthStateChanged(user => {
+      this.currentUserSubject.next(user);
+    });
+  }
+
+  async googleSignIn() {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(this.auth, provider);
+      this.router.navigate(['']);
+    } catch (error) {
+      console.error('Ошибка входа:', error);
+    }
+  }
+
+  async signOut() {
+    await signOut(this.auth);
+    this.router.navigate(['/login']);
+  }
+}

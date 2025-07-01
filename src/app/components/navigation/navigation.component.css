@@ -1,0 +1,120 @@
+.navigation-panel {
+    background: linear-gradient(to bottom, #3498db, #2c3e50);
+    width: 20%;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.navigation-panel.collapsed {
+    width: 5%;
+}
+
+.panel-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.profile-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 15px;
+}
+
+.profile-icon {
+    width: 80%;
+}
+
+.nav-buttons {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0 10px;
+    margin-top: 20px;
+}
+
+.nav-button {
+    width: 100%;
+    height: 50px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    background: transparent;
+    color: white;
+    padding: 0 15px;
+    cursor: pointer;
+}
+
+.nav-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.button-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.button-text {
+    font-family: 'Arial', sans-serif;
+    font-size: 16px;
+    white-space: nowrap;
+}
+
+hr {
+    width: 80%;
+    margin: 20px auto;
+    border: none;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.exit-section {
+    padding: 15px 10px;
+}
+
+.exit-button {
+    width: 100%;
+    height: 50px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    background-color: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0 15px;
+    cursor: pointer;
+}
+
+.exit-button:hover {
+    color: rgba(255, 0, 0, 0.8);
+    background: rgba(255, 0, 0, 0.2);
+    transform: scale(1.01);
+}
+
+.exit-button:hover .button-icon {
+    filter: brightness(0) saturate(100%) invert(16%) sepia(99%) saturate(2590%) hue-rotate(0deg) brightness(98%) contrast(97%);
+}
+
+
+.collapsed .button-text {
+    display: none;
+}
+
+.collapsed .nav-button,
+.collapsed .exit-button {
+    justify-content: center;
+    padding: 0;
+}
+
+.collapsed .nav-buttons {
+    padding: 0 5px;
+}

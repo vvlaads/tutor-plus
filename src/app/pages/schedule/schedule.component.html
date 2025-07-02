@@ -43,8 +43,31 @@
 
         </div>
 
+        <div *ngFor="let lesson of lessons">
+            {{lesson.date}}
+        </div>
+
         <div class="calendar-body">
-            Hi
+            <div *ngFor="let time of times" class="calendar-row">
+                <div class="time-value">
+                    {{time}}
+                    <div class="time-block"></div>
+                </div>
+                <div *ngFor="let day of days" class="cell" (click)="cellIsClicked(time, day)">
+                    <span class="hover-only">
+                        <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
+                            class="cell-icon">
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="fixed-block">
+            <button (click)="addLesson()" class="add-lesson-button">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
+                    class="add-lesson-icon">
+                Добавить занятие
+            </button>
         </div>
     </div>
 </main>

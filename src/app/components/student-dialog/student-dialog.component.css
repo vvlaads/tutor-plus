@@ -112,6 +112,7 @@
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-size: 20px;
+    font-family: sans-serif;
 }
 
 .submit-button:hover {
@@ -128,6 +129,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     font-size: 20px;
+    font-family: sans-serif;
 }
 
 .cancel-button:hover {

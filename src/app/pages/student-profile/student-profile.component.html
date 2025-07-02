@@ -1,0 +1,42 @@
+<app-navigation></app-navigation>
+<main class="content-wrapper" [style.margin-left]="marginLeft">
+    <div *ngIf="student" class="profile-container">
+        <h1>{{ student.name }}</h1>
+        <hr>
+        <div class="student-lessons">
+            <h2>История занятий:</h2>
+            <app-lesson-slider [lessons]="studentLessons"></app-lesson-slider>
+        </div>
+        <hr>
+
+        <div class="profile-details">
+            <p><strong>Телефон:</strong> {{ student.phone }}</p>
+            <p><strong>Предмет:</strong> {{ student.subject }}</p>
+            <p><strong>Способ связи:</strong> {{ student.communication }}</p>
+            <p><strong>Платформа:</strong> {{ student.platform }}</p>
+            <p><strong>Стоимость:</strong> {{ student.cost }} ₽</p>
+            <p><strong>Статус:</strong> {{ student.isActual ? 'Активный' : 'Завершен' }}</p>
+        </div>
+        <div class="change-student-buttons">
+            <button class="change-student-button" mat-button (click)="goBack()">
+                <img class="button-icon"
+                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png">
+                <span class="button-content">Назад</span>
+            </button>
+            <button class="change-student-button" (click)="updateStudent(student.id)">
+                <img class="button-icon"
+                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png">
+                <span class="button-content">Изменить</span>
+            </button>
+            <button class="delete-button" (click)="deleteStudent(student.id)">
+                <img class="button-icon"
+                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png">
+                <span class="button-content">Удалить</span>
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="!student" class="loading">
+        <p>Пусто</p>
+    </div>
+</main>

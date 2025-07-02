@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, HostListener } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
 interface SelectOption {
   value: string;
@@ -9,31 +10,73 @@ interface SelectOption {
 
 @Component({
   selector: 'app-custom-select',
+  standalone: true,
   imports: [CommonModule],
   templateUrl: './custom-select.component.html',
-  styleUrl: './custom-select.component.css'
+  styleUrls: ['./custom-select.component.css'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => CustomSelectComponent),
+      multi: true
+    }
+  ]
 })
-export class CustomSelectComponent {
+export class CustomSelectComponent implements ControlValueAccessor {
   @Input() options: SelectOption[] = [];
   @Input() placeholder: string = 'Выберите...';
+  @Input() selectedValue: string | null = null;
+  @Input() disabled = false;
   @Output() selected = new EventEmitter<SelectOption>();
 
   selectedOption: SelectOption | null = null;
   isOpen = false;
 
+  // Функции для ControlValueAccessor
+  private onChange: (value: string) => void = () => { };
+  private onTouched: () => void = () => { };
+  ngOnInit() {
+    if (this.selectedValue) {
+      this.selectedOption = this.options.find(opt => opt.value === this.selectedValue) || null;
+    }
+  }
   toggleDropdown(event: Event) {
-    event.stopPropagation(); // Предотвращаем всплытие события
+    if (this.disabled) return;
+    event.stopPropagation();
     this.isOpen = !this.isOpen;
+    if (this.isOpen) {
+      this.onTouched();
+    }
   }
 
   selectOption(option: SelectOption, event: Event) {
     event.stopPropagation();
     this.selectedOption = option;
-    this.selected.emit(option);
+    this.selected.emit(option); // Здесь передается весь объект option
     this.closeDropdown();
   }
 
-  // Закрываем dropdown при клике вне компонента
+  // ControlValueAccessor методы
+  writeValue(value: string): void {
+    if (value) {
+      this.selectedOption = this.options.find(opt => opt.value === value) || null;
+    } else {
+      this.selectedOption = null;
+    }
+  }
+
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState?(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
+
   @HostListener('document:click', ['$event'])
   onClickOutside(event: Event) {
     if (!this.isOpen) return;
@@ -43,7 +86,6 @@ export class CustomSelectComponent {
     }
   }
 
-  // Закрываем dropdown при нажатии ESC
   @HostListener('document:keydown.escape')
   onEscapePress() {
     this.closeDropdown();

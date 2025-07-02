@@ -1,17 +1,21 @@
-/* Основные стили формы */
-
-
 .form-container {
-    width: 100%;
-    max-width: 100%;
-    margin: 0 0;
-    padding: 20px 10px;
-    box-sizing: border-box;
+    height: 600px;
+    margin: 0;
     padding: 24px;
-    background: #ffffff;
-    border-radius: 0px;
-    box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
-    font-family: 'Inter', Arial, sans-serif;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.form-content {
+    overflow-y: auto;
+    flex-grow: 1;
+    padding-right: 8px;
 }
 
 .form-title {
@@ -22,7 +26,7 @@
     font-size: 24px;
 }
 
-.student-form {
+.lesson-form {
     display: flex;
     flex-direction: column;
     gap: 16px;
@@ -133,23 +137,6 @@
     border-color: #cbd5e0;
 }
 
-/* Адаптивность */
-@media (max-width: 600px) {
-    .form-container {
-        padding: 16px;
-        border-radius: 8px;
-    }
-
-    .form-title {
-        font-size: 20px;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
-
-    .submit-button,
-    .cancel-button {
-        width: 100%;
-    }
+.error-message {
+    color: #e74646;
 }

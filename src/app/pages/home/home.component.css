@@ -1,0 +1,9 @@
+.content-wrapper {
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    padding: 10px;
+}
+
+p {
+    line-height: 1.5;
+}

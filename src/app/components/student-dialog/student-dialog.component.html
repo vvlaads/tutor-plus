@@ -1,0 +1,91 @@
+<div class="form-container">
+    <h2 class="form-title">{{title}}</h2>
+    <div class="form-content">
+        <form [formGroup]="studentForm" class="student-form" (ngSubmit)="submit()">
+            <div class="form-group">
+                <label for="input-name" class="form-label">Имя:</label>
+                <input formControlName="name" id="input-name" class="form-input" placeholder="Введите имя ученика">
+                <div *ngIf="studentForm.get('name')?.invalid && studentForm.get('name')?.touched" class="error-message">
+                    Обязательное поле
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="input-phone" class="form-label">Телефон:</label>
+                <input formControlName="phone" id="input-phone" class="form-input" type="tel"
+                    placeholder="+7 (XXX) XXX-XX-XX">
+                <div *ngIf="studentForm.get('phone')?.invalid && studentForm.get('phone')?.touched"
+                    class="error-message">
+                    Введите корректный телефон
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="input-subject" class="form-label">Предмет:</label>
+                <input formControlName="subject" id="input-subject" class="form-input"
+                    placeholder="История, Экономика...">
+                <div *ngIf="studentForm.get('subject')?.invalid && studentForm.get('subject')?.touched"
+                    class="error-message">
+                    Обязательное поле
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Где общаемся:</label>
+                <app-custom-select [options]="communicationOptions"
+                    [selectedValue]="studentForm.get('communication')?.value"
+                    (selected)="onSelectCommunication($event.value)">
+                </app-custom-select>
+                <div *ngIf="studentForm.get('communication')?.invalid && studentForm.get('communication')?.touched"
+                    class="error-message">
+                    Выберите из списка
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Где занимаемся:</label>
+                <app-custom-select [options]="platformOptions" [selectedValue]="studentForm.get('platform')?.value"
+                    (selected)="onSelectPlatform($event.value)">
+                </app-custom-select>
+                <div *ngIf="studentForm.get('platform')?.invalid && studentForm.get('platform')?.touched"
+                    class="error-message">
+                    Выберите из списка
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="input-cost" class="form-label">Стоимость за час:</label>
+                <div class="input-with-symbol">
+                    <input formControlName="cost" id="input-cost" class="form-input" type="number" placeholder="1000">
+                    <span class="currency-symbol">₽</span>
+                </div>
+                <div *ngIf="studentForm.get('cost')?.invalid && studentForm.get('cost')?.touched" class="error-message">
+                    Введите корректную сумму
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Статус:</label>
+                <select formControlName="isActual" [compareWith]="compareFn">
+                    <option *ngFor="let option of statusOptions" [ngValue]="option.value">
+                        {{ option.text }}
+                    </option>
+                </select>
+                <div *ngIf="studentForm.get('isActual')?.invalid && studentForm.get('isActual')?.touched"
+                    class="error-message">
+                    Выберите из списка
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-button" [disabled]="studentForm.invalid">
+                   {{submitMessage}}
+                </button>
+                <button type="button" (click)="close()" class="cancel-button">
+                    Отмена
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>

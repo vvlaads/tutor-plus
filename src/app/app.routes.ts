@@ -1,14 +1,16 @@
 import { Routes } from '@angular/router';
-import { HomeComponent } from './components/home/home.component';
-import { StudentsComponent } from './components/students/students.component';
-import { LoginComponent } from './components/login/login.component';
-import { ScheduleComponent } from './components/schedule/schedule.component';
+import { StudentsComponent } from './pages/students/students.component';
+import { LoginComponent } from './pages/login/login.component';
+import { ScheduleComponent } from './pages/schedule/schedule.component';
 import { authGuard } from './guards/auth.guard';
+import { StudentProfileComponent } from './pages/student-profile/student-profile.component';
+import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent, canActivate: [authGuard] },
     { path: 'login', component: LoginComponent },
     { path: 'students', component: StudentsComponent, canActivate: [authGuard] },
     { path: 'schedule', component: ScheduleComponent, canActivate: [authGuard] },
+    { path: 'student/:id', component: StudentProfileComponent, canActivate: [authGuard] },
     { path: '**', redirectTo: 'login' }
 ];

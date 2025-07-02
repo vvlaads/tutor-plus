@@ -1,0 +1,22 @@
+<div class="slider-wrapper">
+    <div class="slide-button-wrapper" id="left-block">
+        <button class="slide-button" (click)="slideLeft()"><img class="button-icon"
+                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png"></button>
+    </div>
+
+    <div class="lessons-container">
+        <div *ngFor="let lesson of visibleLessons" class="lesson-block" (click)="changeLesson(lesson)">
+            <p>Дата: {{lesson.date}}</p>
+            <p>Время начала: {{lesson.startTime}}</p>
+            <p>Время конца: {{lesson.endTime}}</p>
+            <p>Стоимость: {{lesson.cost}}</p>
+            <p>Оплачено: <span *ngIf="lesson.isPaid">Да</span><span *ngIf="!lesson.isPaid">Нет</span></p>
+        </div>
+    </div>
+
+    <div class="slide-button-wrapper" id="right-block">
+
+        <button class="slide-button" (click)="slideRight()"><img class="button-icon"
+                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Right%20Arrow.png"></button>
+    </div>
+</div>

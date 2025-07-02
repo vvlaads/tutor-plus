@@ -1,5 +1,5 @@
-<div class="custom-select" [class.active]="isOpen">
-    <div class="selected-option" (click)="toggleDropdown($event)">
+<div class="custom-select" [class.active]="isOpen" [class.disabled]="disabled">
+    <div class="selected-option" (click)="toggleDropdown($event)" [title]="selectedOption?.text || placeholder">
         <img [src]="selectedOption?.icon" class="option-icon" *ngIf="selectedOption?.icon" [alt]="selectedOption?.text">
         <span>{{ selectedOption?.text || placeholder }}</span>
         <span class="arrow">{{ isOpen ? '▲' : '▼' }}</span>
@@ -7,7 +7,7 @@
 
     <div class="dropdown" *ngIf="isOpen">
         <div class="option" *ngFor="let option of options" (click)="selectOption(option, $event)"
-            [class.selected]="option.value === selectedOption?.value">
+            [class.selected]="option.value === selectedOption?.value" [title]="option.text">
             <img [src]="option.icon" class="option-icon" *ngIf="option.icon" [alt]="option.text">
             <span>{{ option.text }}</span>
         </div>

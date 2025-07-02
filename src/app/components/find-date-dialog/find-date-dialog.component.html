@@ -1,4 +1,19 @@
-<label for="input-date" class="form-label">Имя:</label>
-<input [(ngModel)]="date" name="date" id="input-date" class="form-input" placeholder="Введите дату">
-<button (click)="send()">Подтвердить</button>
-<button (click)="close()">Закрыть</button>
+<div class="form-container">
+    <h2 class="form-title">Поиск по дате</h2>
+    <div class="form-content">
+        <form [formGroup]="findDateForm" class="lesson-form" (ngSubmit)="submit()">
+            <div class="form-group">
+                <label for="input-date" class="form-label">Дата:</label>
+                <input [(ngModel)]="date" name="date" id="input-date" class="form-input" placeholder="Введите дату">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="submit-button" [disabled]="findDateForm.invalid">
+                    Найти
+                </button>
+                <button type="button" (click)="close()" class="cancel-button">
+                    Отмена
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

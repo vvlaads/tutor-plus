@@ -1,0 +1,71 @@
+<div class="form-container">
+    <h2 class="form-title">{{title}}</h2>
+    <div class="form-content">
+        <form [formGroup]="lessonForm" class="lesson-form" (ngSubmit)="submit()">
+            <div class="form-group">
+                <label for="input-date" class="form-label">Дата:</label>
+                <input formControlName="date" id="input-date" class="form-input" placeholder="02.07.2025">
+                <div *ngIf="lessonForm.get('date')?.invalid && lessonForm.get('date')?.touched" class="error-message">
+                    Обязательное поле
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-startTime" class="form-label">Время начала:</label>
+                <input formControlName="startTime" id="input-startTime" class="form-input" placeholder="08:00">
+                <div *ngIf="lessonForm.get('startTime')?.invalid && lessonForm.get('startTime')?.touched"
+                    class="error-message">
+                    Обязательное поле
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-endTime" class="form-label">Время конца:</label>
+                <input formControlName="endTime" id="input-endTime" class="form-input" placeholder="12:30">
+                <div *ngIf="lessonForm.get('endTime')?.invalid && lessonForm.get('endTime')?.touched"
+                    class="error-message">
+                    Обязательное поле
+                </div>
+                <div *ngIf="lessonForm.hasError('timeRangeInvalid')" class="error-message">
+                    Конец занятия должен быть позже начала!
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-cost" class="form-label">Стоимость:</label>
+                <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000">
+                <div *ngIf="lessonForm.get('cost')?.invalid && lessonForm.get('cost')?.touched" class="error-message">
+                    Обязательное поле
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="input-isPaid" class="form-label">Оплачено:</label>
+                <input type="checkbox" id="input-isPaid" formControlName="isPaid">
+                <div *ngIf="lessonForm.get('isPaid')?.invalid && lessonForm.get('isPaid')?.touched"
+                    class="error-message">
+                    Обязательное поле
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Ученик:</label>
+                <select formControlName="studentId">
+                    <option *ngFor="let option of options" [ngValue]="option.value">
+                        {{ option.text }}
+                    </option>
+                </select>
+                <div *ngIf="lessonForm.get('isActual')?.invalid && lessonForm.get('isActual')?.touched"
+                    class="error-message">
+                    Выберите из списка
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-button" [disabled]="lessonForm.invalid">
+                    {{submitMessage}}
+                </button>
+                <button type="button" (click)="close()" class="cancel-button">
+                    Отмена
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>

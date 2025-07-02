@@ -1,3 +1,9 @@
+.content-wrapper {
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    padding: 10px;
+}
+
 hr {
     width: 80%;
 }
@@ -12,15 +18,22 @@ hr {
     margin-right: 20px;
     height: 50px;
     width: 30%;
-    font-family: sans-serif;
     font-size: large;
     border-radius: 20px;
     background-color: white;
 }
 
+.change-student-status-button.isActive {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+
 .change-student-status-button:hover {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(0, 0, 0, 0.05);
     transform: scale(1.01);
+}
+
+.change-student-status-button.isActive:hover {
+    background-color: rgba(0, 0, 0, 0.3);
 }
 
 .student-list {
@@ -62,6 +75,11 @@ hr {
     margin: 20px 0;
     display: flex;
     justify-content: center;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: transparent;
 }
 
 .add-student-button {
@@ -145,16 +163,11 @@ hr {
     }
 }
 
-/* Адаптивность */
-@media (max-width: 480px) {
-    .add-student-button {
-        width: 240px;
-        height: 50px;
-        font-size: 15px;
-    }
+.student-block-content {
+    display: flex;
+    flex-direction: row;
+}
 
-    .add-icon {
-        width: 20px;
-        height: 20px;
-    }
+.student-block-info {
+    margin-right: 10%;
 }

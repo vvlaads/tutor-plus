@@ -140,3 +140,15 @@
 .error-message {
     color: #e74646;
 }
+
+input[type="checkbox"] {
+  transform: scale(1.8);       /* увеличить размер */
+  transform-origin: top left;  /* точка масштабирования — левый верхний угол, чтобы не съезжало */
+  cursor: pointer;
+  width: 20px;                 /* базовый размер input */
+  height: 20px;                /* базовый размер input */
+  margin: 0;                   /* убрать внешние отступы */
+  padding: 0;
+  display: inline-block;       /* НЕ flex, чтобы не занимал лишнее */
+  vertical-align: middle;      /* для выравнивания по вертикали */
+}

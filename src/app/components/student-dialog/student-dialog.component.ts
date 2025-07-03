@@ -25,14 +25,20 @@ export class StudentDialogComponent {
   communicationOptions: SelectOptionWithIcon[] = [
     { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' },
     { value: 'WhatsApp', text: 'WhatsApp', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Whatsapp%20Icon.png' },
-    { value: 'Microsoft Teams', text: 'Microsoft Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
+    { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
     { value: 'Profi', text: 'Profi', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Profi%20Icon.png' },
     { value: 'Телефон', text: 'Телефон', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' }
   ];
 
   platformOptions: SelectOptionWithIcon[] = [
     { value: 'Zoom', text: 'Zoom', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Zoom%20Icon.png' },
-    { value: 'Microsoft Teams', text: 'Microsoft Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
+    { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
+    { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' }
+  ];
+
+  fromOptions: SelectOptionWithIcon[] = [
+    { value: 'Repetit.ru', text: 'Repetit.ru', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png' },
+    { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
     { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' }
   ];
 
@@ -42,7 +48,7 @@ export class StudentDialogComponent {
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, student: Student | null }
   ) {
     this.mode = data.mode;
-    var isActual = true;
+    var isActive = true;
     switch (this.mode) {
       case DialogMode.Add:
         this.title = 'Добавление ученика'
@@ -52,7 +58,7 @@ export class StudentDialogComponent {
         this.title = 'Обновить ученика'
         this.submitMessage = 'Сохранить'
         if (data.student) {
-          isActual = data.student.isActual
+          isActive = data.student.isActive
         }
         break;
     }
@@ -63,7 +69,8 @@ export class StudentDialogComponent {
       communication: [data.student?.communication, Validators.required],
       platform: [data.student?.platform, Validators.required],
       cost: [data.student?.cost, [Validators.required, Validators.min(0)]],
-      isActual: [isActual, [Validators.required]]
+      isActive: [isActive, [Validators.required]],
+      from: [data.student?.from, [Validators.required]]
     });
   }
 
@@ -73,6 +80,10 @@ export class StudentDialogComponent {
 
   onSelectPlatform(optionValue: string) {
     this.studentForm.get('platform')?.setValue(optionValue);
+  }
+
+  onSelectFrom(optionValue: string) {
+    this.studentForm.get('from')?.setValue(optionValue);
   }
 
   submit() {
@@ -94,9 +105,13 @@ export class StudentDialogComponent {
     const newStudent: Student = {
       ...this.studentForm.value
     };
-    this.studentService.addStudent(newStudent)
-      .catch(error => { console.error('Ошибка при добавлении:', error); });
-    this.close();
+    this.studentService.addStudent(newStudent).then(_ => {
+      this.close(true);
+    })
+      .catch(error => {
+        console.error('Ошибка при добавлении:', error);
+        this.close(false);
+      });
   }
 
   updateStudent() {
@@ -105,16 +120,18 @@ export class StudentDialogComponent {
       ...this.studentForm.value
     };
 
-    this.studentService.updateStudent(updatedStudent.id, updatedStudent)
-      .catch(error => { console.error('Ошибка при обновлении:', error); });
-    this.close();
+    this.studentService.updateStudent(updatedStudent.id, updatedStudent).then(_ => {
+      this.close(true);
+    })
+      .catch(error => { console.error('Ошибка при обновлении:', error); this.close(false); });
+
   }
 
   compareFn(option1: boolean, option2: boolean): boolean {
     return option1 === option2;
   }
 
-  close() {
-    this.dialogRef.close();
+  close(status: boolean) {
+    this.dialogRef.close(status);
   }
 }

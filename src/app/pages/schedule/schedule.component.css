@@ -1,28 +1,36 @@
 .content-wrapper {
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
-    padding: 10px;
+    color: #2c3e50;
+    padding-right: 10px;
 }
 
-hr {
-    width: 80%;
+.calendar {
+    width: 100%;
+}
+
+.calendar-sticky-header {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1000;
+    width: 100%;
 }
 
 .change-schedule-status-buttons {
     display: flex;
     flex-direction: row;
     justify-content: center;
-    margin-top: 20px;
 }
 
 .change-schedule-status-button {
     margin-right: 20px;
-    height: 50px;
+    height: 30px;
     width: 30%;
-    font-family: sans-serif;
     font-size: large;
     border-radius: 20px;
     background-color: white;
+    cursor: pointer;
 }
 
 .change-schedule-status-button:hover {
@@ -31,18 +39,23 @@ hr {
 }
 
 .date-button {
-    width: 40px;
-    height: 40px;
+    width: 30px;
+    height: 30px;
     justify-content: center;
     background: linear-gradient(135deg, #3498db, #2c3e50);
     color: white;
     border-radius: 5px;
     border: none;
     margin-right: 20px;
+    cursor: pointer;
 }
 
 .date-button:hover {
     transform: scale(1.05);
+}
+
+.date-button:active {
+    transform: scale(0.98);
 }
 
 .button-icon {
@@ -51,14 +64,19 @@ hr {
     object-fit: cover;
 }
 
-.calendar {
-    width: 90%;
+.info {
+    font-weight: 400;
+    font-size: 20px;
+    margin-bottom: 5px;
 }
 
 .calendar-header {
     width: 100%;
     display: flex;
     flex-direction: row;
+    border: 1px solid #2c3e50;
+    box-sizing: content-box;
+    height: 20px;
 }
 
 .time-label {
@@ -69,20 +87,23 @@ hr {
 }
 
 .day-header {
-    width: 13%;
+    width: calc(13% - 1px);
     border: 1px solid rgba(0, 0, 0, 0.4);
     justify-content: center;
     text-align: center;
+    font-weight: 500;
+    font-size: small;
 }
 
 .day-header.today {
-    background-color: #3498db;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .wrapper {
     width: 100%;
     display: flex;
     flex-direction: row;
+    height: 80px;
 }
 
 .one-day {
@@ -90,29 +111,34 @@ hr {
     border: 1px solid rgba(0, 0, 0, 0.4);
     justify-content: center;
     text-align: center;
+    font-weight: 500;
 }
 
 .one-day.today {
-    background-color: #3498db;
-}
-
-.time-block {
-    height: 100px;
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .calendar-body {
     width: 100%;
+    position: relative;
+    border: 1px solid #2c3e50;
+    border-top: 0;
+    border-right: 0;
+    box-sizing: border-box;
 }
 
 .calendar-row {
-    border: 1px solid black;
     width: 100%;
     display: flex;
     flex-direction: row;
+    border-bottom: 1px solid #2c3e50;
+    border-right: 1px solid #2c3e50;
+    box-sizing: content-box;
 }
 
 .time-value {
     width: 9%;
+    justify-items: center;
 }
 
 .cell:hover {
@@ -120,15 +146,20 @@ hr {
     cursor: pointer;
 }
 
+.cell.disabled:hover {
+    background-color: transparent;
+    cursor: auto
+}
+
 .cell {
     position: relative;
     justify-content: center;
     text-align: center;
-    border: 1px solid black;
     border-top: 0;
-    width: 13%;
     display: flex;
     align-items: center;
+    box-sizing: border-box;
+    border-left: 1px solid #2c3e50;
 }
 
 .hover-only {
@@ -138,13 +169,12 @@ hr {
     left: 0;
     right: 0;
     bottom: 0;
-    display: flex;
     justify-content: center;
     align-items: center;
-    background-color: rgba(0, 0, 0, 0.0);
+    background-color: rgb(44, 62, 80, 0.05);
 }
 
-.cell:hover .hover-only {
+.cell:not(.disabled):hover .hover-only {
     display: flex;
 }
 
@@ -152,6 +182,85 @@ hr {
     width: 24px;
     height: 24px;
     object-fit: contain;
+}
+
+.lesson {
+    font-size: small;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    position: absolute;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.lesson-content {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.lesson:hover {
+    height: auto;
+    min-height: inherit;
+    z-index: 200;
+    overflow: visible;
+    height: auto;
+}
+
+.lesson:hover .lesson-content {
+    white-space: normal;
+    overflow: visible;
+    height: auto;
+    min-height: initial;
+}
+
+.lesson:hover .student-name {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: unset;
+}
+
+.lesson:hover::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.15);
+    pointer-events: none;
+    height: auto;
+}
+
+.lesson-content {
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+    overflow: visible;
+}
+
+.lesson-time {
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.student-name {
+    font-weight: 500;
+    color: #555;
+    font-size: small;
+
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.one-day-table {
+    border: 1px solid #2c3e50;
 }
 
 .fixed-block {
@@ -174,7 +283,6 @@ hr {
     border: none;
     background: linear-gradient(135deg, #3498db, #2c3e50);
     color: white;
-    font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 500;
     display: flex;
@@ -187,4 +295,14 @@ hr {
     padding: 0 25px;
     position: relative;
     overflow: hidden;
+}
+
+.add-lesson-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(41, 128, 185, 0.4);
+}
+
+.add-lesson-button:active {
+    transform: translateY(0);
+    box-shadow: 0 3px 8px rgba(41, 128, 185, 0.3);
 }

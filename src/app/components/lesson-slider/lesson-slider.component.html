@@ -7,9 +7,7 @@
     <div class="lessons-container">
         <div *ngFor="let lesson of visibleLessons" class="lesson-block" (click)="changeLesson(lesson)">
             <p>Дата: {{lesson.date}}</p>
-            <p>Время начала: {{lesson.startTime}}</p>
-            <p>Время конца: {{lesson.endTime}}</p>
-            <p>Стоимость: {{lesson.cost}}</p>
+            <p>Стоимость: {{lesson.cost}} ₽</p>
             <p>Оплачено: <span *ngIf="lesson.isPaid">Да</span><span *ngIf="!lesson.isPaid">Нет</span></p>
         </div>
     </div>

@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { LessonDialogComponent } from '../lesson-dialog/lesson-dialog.component';
 import { DialogMode } from '../../app.enums';
+import { LessonService } from '../../services/lesson.service';
 
 @Component({
   selector: 'app-lesson-slider',
@@ -13,6 +14,7 @@ import { DialogMode } from '../../app.enums';
 })
 export class LessonSliderComponent implements OnInit {
   @Input()
+  studentId: string = ''
   lessons: Lesson[] = []
 
   visibleLessons: Lesson[] = []
@@ -21,11 +23,16 @@ export class LessonSliderComponent implements OnInit {
 
   private dialog = inject(MatDialog);
 
+  constructor(private lessonService: LessonService) { }
+
   ngOnInit() {
+    this.loadLessons();
+  }
+
+  async loadLessons() {
+    this.lessons = await this.lessonService.getLessonsByStudent(this.studentId);
     this.lessons = this.sortLessonsByDate();
     this.visibleLessons = this.lessons.slice(-3);
-    console.log(this.lessons)
-    console.log(this.visibleLessons)
     this.rightPos = this.lessons.length;
     if (this.lessons.length > 3) {
       this.leftPos = this.rightPos - 3;
@@ -58,6 +65,12 @@ export class LessonSliderComponent implements OnInit {
       data: {
         mode: DialogMode.Edit,
         lesson: lesson
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((updated) => {
+      if (updated) {
+        this.loadLessons();
       }
     });
   }

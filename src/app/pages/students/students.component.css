@@ -4,8 +4,26 @@
     padding: 10px;
 }
 
+.work-panel {
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 1000;
+}
+
 hr {
-    width: 80%;
+    width: auto;
+}
+
+.search-block {
+    width: 100%;
+    margin-bottom: 20px;
+    justify-content: center;
+    display: flex;
+}
+
+app-search {
+    width: 60%;
 }
 
 .change-student-status-buttons {
@@ -15,25 +33,50 @@ hr {
 }
 
 .change-student-status-button {
+    justify-items: center;
+    justify-content: center;
     margin-right: 20px;
     height: 50px;
     width: 30%;
     font-size: large;
-    border-radius: 20px;
-    background-color: white;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    color: rgba(0, 0, 0, 0.5);
+    padding: 0 15px;
+    cursor: pointer;
+    border: 1px solid #e0e0e0;
 }
 
 .change-student-status-button.isActive {
-    background-color: rgba(0, 0, 0, 0.2);
+    background-color: #7091f4;
+    color: white;
 }
 
 .change-student-status-button:hover {
-    background-color: rgba(0, 0, 0, 0.05);
     transform: scale(1.01);
+    background-color: rgba(147, 174, 255, 0.5);
+    color: white;
+}
+
+.change-student-status-button:active {
+    transform: scale(0.98);
+    background-color: rgba(147, 174, 255, 0.8);
 }
 
 .change-student-status-button.isActive:hover {
-    background-color: rgba(0, 0, 0, 0.3);
+    transform: scale(1.01);
+    background-color: #7091f4;
+    color: white;
+}
+
+.change-student-status-button.isActive:active {
+    transform: scale(0.98);
+    background-color: #5d83f4;
+    color: white;
 }
 
 .student-list {
@@ -104,7 +147,6 @@ hr {
     overflow: hidden;
 }
 
-/* Эффекты при наведении */
 .add-student-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(41, 128, 185, 0.4);

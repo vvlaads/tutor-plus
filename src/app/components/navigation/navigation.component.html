@@ -10,19 +10,21 @@
                     class="button-icon">
                 <span class="button-text">Скрыть меню</span>
             </button>
-            <button class="nav-button" (click)="redirectToTarget('')">
+            <button class="nav-button" (click)="redirectToTarget('')" [class.isActive]="targetIsSelected('')">
                 <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Home%20Icon.png"
                     class="button-icon">
                 <span class="button-text">Главная</span>
             </button>
 
-            <button class="nav-button" (click)="redirectToTarget('students')">
+            <button class="nav-button" (click)="redirectToTarget('students')"
+                [class.isActive]="targetIsSelected('students')">
                 <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Students%20Icon.png"
                     class="button-icon">
                 <span class="button-text">Ученики</span>
             </button>
 
-            <button class="nav-button" (click)="redirectToTarget('schedule')">
+            <button class="nav-button" (click)="redirectToTarget('schedule')"
+                [class.isActive]="targetIsSelected('schedule')">
                 <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Calendar%20Icon.png"
                     class="button-icon">
                 <span class="button-text">Расписание</span>

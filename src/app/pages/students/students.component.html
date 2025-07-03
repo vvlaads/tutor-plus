@@ -1,16 +1,17 @@
-<app-navigation></app-navigation>
 <main class="content-wrapper" [style.margin-left]="marginLeft">
-    <div class="change-student-status-buttons">
-        <button class="change-student-status-button" (click)="setActual(true)"
-            [class.isActive]="isActual">Актуальные</button>
-        <button class="change-student-status-button" (click)="setActual(false)"
-            [class.isActive]="!isActual">Завершённые</button>
-    </div>
+    <div class="work-panel">
+        <div class="change-student-status-buttons">
+            <button class="change-student-status-button" (click)="setActual(true)"
+                [class.isActive]="isActive">Актуальные</button>
+            <button class="change-student-status-button" (click)="setActual(false)"
+                [class.isActive]="!isActive">Завершённые</button>
+        </div>
 
-    <hr>
+        <hr>
 
-    <div class="serach-block">
-        <app-search (searchChange)="handleSearch($event)"></app-search>
+        <div class="search-block">
+            <app-search (searchChange)="handleSearch($event)"></app-search>
+        </div>
     </div>
 
     <div class="student-list">

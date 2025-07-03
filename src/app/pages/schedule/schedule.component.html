@@ -1,73 +1,89 @@
-<app-navigation></app-navigation>
-<main class="content-wrapper" [style.margin-left]="marginLeft">
-    <div class="change-schedule-status-buttons">
-        <button class="change-schedule-status-button" (click)="resetDate()"> Вернуться к сегодня</button>
-        <button class="change-schedule-status-button" (click)="setShortFormat(true)">Один день</button>
-        <button class="change-schedule-status-button" (click)="setShortFormat(false)">На неделю</button>
-        <button class="date-button" id="prev-date-button" (click)="goToPrev()">
-            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon%20Swap.png"
-                class="button-icon">
-        </button>
-        <button class="date-button" id="find-date-button" (click)="findDate()">
-            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Magnifier%20Icon.png"
-                class="button-icon">
-        </button>
-        <button class="date-button" id="next-date-button" (click)="goToNext()">
-            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon.png"
-                class="button-icon">
-        </button>
-    </div>
-    <hr>
-
-    <div class="calendar">
-        <div>{{currentDay.getFullYear()}}</div>
-        <div class="calendar-header">
-            <div *ngIf="!isShort" class="wrapper">
-                <div class="time-label"></div>
-                <div *ngFor="let day of week; let i = index" class="day-header" [class.today]="isToday(day)">
-                    {{days[i]}}
-                    <br>
-                    {{ day.getDate() }}
-                    {{monthNames[day.getMonth()]}}
-                </div>
-            </div>
-            <div *ngIf="isShort" class="wrapper">
-                <div class="time-label"></div>
-                <div class="one-day" [class.today]="isToday(currentDay)">
-                    {{days[((currentDay.getDay()-1)+7)%7]}}
-                    <br>
-                    {{currentDay.getDate()}}
-                    {{monthNames[currentDay.getMonth()]}}
-                </div>
+<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
+    <div class=calendar>
+        <div class="calendar-sticky-header">
+            <div class="change-schedule-status-buttons">
+                <button class="change-schedule-status-button" (click)="resetCurrentDate()"> Вернуться к сегодня</button>
+                <button class="change-schedule-status-button" (click)="setOneDayFormat(true)">Один день</button>
+                <button class="change-schedule-status-button" (click)="setOneDayFormat(false)">На неделю</button>
+                <button class="date-button" id="prev-date-button" (click)="goToPrev()">
+                    <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon%20Swap.png"
+                        class="button-icon">
+                </button>
+                <button class="date-button" id="find-date-button" (click)="findDate()">
+                    <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Magnifier%20Icon.png"
+                        class="button-icon">
+                </button>
+                <button class="date-button" id="next-date-button" (click)="goToNext()">
+                    <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon.png"
+                        class="button-icon">
+                </button>
             </div>
 
+            <div class="info">
+                <span id="year-info">{{currentDate.getFullYear()}} </span>
+                <span id="today-info" *ngIf="showTodayMessage()">Сегодня</span>
+                <span id="week-info" *ngIf="showWeekMessage()">Текущая неделя</span>
+            </div>
+
+            <div class="calendar-header" *ngIf="!isOneDayFormat">
+                <div class="time-label"></div>
+                <div *ngFor="let date of currentWeekDates; let i = index" class="day-header"
+                    [class.today]="dateIsToday(date)">
+                    {{weekDayNames[i]}},
+                    {{ date.getDate() }}
+                    {{monthNames[date.getMonth()]}}
+                </div>
+            </div>
         </div>
 
-        <div *ngFor="let lesson of lessons">
-            {{lesson.date}}
-        </div>
-
-        <div class="calendar-body">
-            <div *ngFor="let time of times" class="calendar-row">
+        <div class="calendar-body" *ngIf="!isOneDayFormat">
+            <div *ngFor="let time of times" class="calendar-row" [style.height.px]="blockHeightPixels">
                 <div class="time-value">
                     {{time}}
-                    <div class="time-block"></div>
+                    <div class="time-block" [style.height.px]="blockHeightPixels"></div>
                 </div>
-                <div *ngFor="let day of days" class="cell" (click)="cellIsClicked(time, day)">
+                <div *ngFor="let dayName of weekDayNames" class="cell" (click)="cellIsClicked(time, dayName)"
+                    [class.disabled]="isCellDisabled(time, dayName)" [style.width.%]="blockWidthPercentage">
                     <span class="hover-only">
                         <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
                             class="cell-icon">
                     </span>
                 </div>
             </div>
+
+            <div *ngFor="let lesson of lessons" class="lesson" [style.min-height]="getLessonHeight(lesson)"
+                [style.height]="getLessonHeight(lesson)" [style.width.%]=" blockWidthPercentage"
+                [style.top.px]="getLessonTop(lesson)" [style.left.%]="getLessonLeft(lesson)"
+                (click)="editLesson(lesson)">
+                <div class="lesson-content" [style.background-color]="getColorByLesson(lesson)">
+                    <span class="lesson-time">{{lesson.startTime}} - {{lesson.endTime}}</span>
+                    <br />
+                    <span class="student-name">{{getStudentByLesson(lesson)?.name}}</span>
+                </div>
+            </div>
         </div>
 
-        <div class="fixed-block">
-            <button (click)="addLesson()" class="add-lesson-button">
-                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
-                    class="add-lesson-icon">
-                Добавить занятие
-            </button>
+        <div class="one-day-calendar" *ngIf="isOneDayFormat">
+            <table class="one-day-table">
+                <tr>
+                    <th>Ученик</th>
+                    <th>Где общаемся</th>
+                    <th>Где занимаемся</th>
+                </tr>
+                <tr>
+                    <td>Саша</td>
+                    <td>Саша</td>
+                    <td>Саша</td>
+                </tr>
+            </table>
         </div>
+    </div>
+
+    <div class="fixed-block">
+        <button (click)="addLesson()" class="add-lesson-button">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
+                class="add-lesson-icon">
+            <span>Добавить занятие</span>
+        </button>
     </div>
 </main>

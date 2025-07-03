@@ -70,14 +70,14 @@ export class LessonDialogComponent implements OnInit {
       startTime: [data.lesson?.startTime, [Validators.required, Validators.pattern(/^[0-2]\d:[0-6]\d$/)]],
       endTime: [data.lesson?.endTime, [Validators.required, Validators.pattern(/^[0-2]\d:[0-6]\d$/)]],
       cost: [data.lesson?.cost, [Validators.required, Validators.min(0)]],
-      isPaid: [data.lesson?.isPaid],
+      isPaid: [data.lesson == null ? false : data.lesson.isPaid],
     }, { validators: timeRangeValidator });
   }
 
   ngOnInit() {
     this.studentService.students$.subscribe(students => {
       this.students = students;
-      this.students.filter(student => student.isActual == true).forEach(student => {
+      this.students.filter(student => student.isActive == true).forEach(student => {
         this.options.push({ value: student.id, text: `${student.name} ${student.phone}` });
       })
     });
@@ -103,9 +103,8 @@ export class LessonDialogComponent implements OnInit {
     const newLesson: Lesson = {
       ...this.lessonForm.value
     };
-    this.lessonService.addLesson(newLesson)
-      .catch(error => { console.error('Ошибка при добавлении:', error); });
-    this.close();
+    this.lessonService.addLesson(newLesson).then(_ => { this.close(true); })
+      .catch(error => { console.error('Ошибка при добавлении:', error); this.close(false); });
   }
 
   updateLesson() {
@@ -114,12 +113,27 @@ export class LessonDialogComponent implements OnInit {
       ...this.lessonForm.value
     };
 
-    this.lessonService.updateLesson(updatedLesson.id, updatedLesson)
-      .catch(error => { console.error('Ошибка при обновлении:', error); });
-    this.close();
+    this.lessonService.updateLesson(updatedLesson.id, updatedLesson).then(_ => { this.close(true); })
+      .catch(error => { console.error('Ошибка при обновлении:', error); this.close(false); });
+
   }
 
-  close() {
-    this.dialogRef.close();
+  close(status: boolean) {
+    this.dialogRef.close(status);
+  }
+
+  deleteLesson() {
+    if (this.data.lesson) {
+      const confirmDelete = confirm('Вы уверены, что хотите удалить это занятие?');
+      if (confirmDelete) {
+        this.lessonService.deleteLesson(this.data.lesson.id).then(_ => {
+          this.close(true);
+        })
+      }
+    }
+  }
+
+  isEditMode(): boolean {
+    return this.mode == DialogMode.Edit;
   }
 }

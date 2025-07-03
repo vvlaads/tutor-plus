@@ -16,7 +16,8 @@ export interface Student {
     communication: string;
     platform: string;
     cost: number;
-    isActual: boolean;
+    isActive: boolean;
+    from: string;
 }
 
 export interface SelectOptionWithIcon {

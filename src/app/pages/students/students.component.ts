@@ -17,7 +17,6 @@ import { SearchComponent } from '../../components/search/search.component';
   standalone: true,
   imports: [
     CommonModule,
-    NavigationComponent,
     MatButtonModule,
     MatCardModule,
     MatProgressSpinnerModule,
@@ -33,7 +32,7 @@ export class StudentsComponent implements OnInit {
   students: any[] = [];
   isLoading = true;
   marginLeft = '25%';
-  isActual = true;
+  isActive = true;
 
   constructor(private layoutService: LayoutService, private router: Router) {
     this.layoutService.isHide$.subscribe(isHide => {
@@ -43,20 +42,20 @@ export class StudentsComponent implements OnInit {
 
   async ngOnInit() {
     this.studentService.students$.subscribe(students => {
-      this.students = this.isActual
-        ? students.filter(s => s.isActual)
-        : students.filter(s => !s.isActual);
+      this.students = this.isActive
+        ? students.filter(s => s.isActive)
+        : students.filter(s => !s.isActive);
       this.isLoading = false;
     });
     await this.studentService.loadStudents();
   }
 
-  setActual(isActual: boolean) {
-    this.isActual = isActual;
+  setActual(isActive: boolean) {
+    this.isActive = isActive;
     this.studentService.students$.subscribe(students => {
-      this.students = this.isActual
-        ? students.filter(s => s.isActual)
-        : students.filter(s => !s.isActual);
+      this.students = this.isActive
+        ? students.filter(s => s.isActive)
+        : students.filter(s => !s.isActive);
     });
   }
 
@@ -82,6 +81,8 @@ export class StudentsComponent implements OnInit {
   }
 
   handleSearch(query: string) {
+    query = query.toLowerCase();
+    query = query.replace('+', '');
     this.studentService.students$.subscribe(students => {
       this.students = students.filter(s => s.name.toLowerCase().match(query) || s.phone.match(query));
     })

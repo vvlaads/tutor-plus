@@ -54,6 +54,16 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Откуда пришел:</label>
+                <app-custom-select [options]="fromOptions" [selectedValue]="studentForm.get('from')?.value"
+                    (selected)="onSelectFrom($event.value)">
+                </app-custom-select>
+                <div *ngIf="studentForm.get('from')?.invalid && studentForm.get('from')?.touched" class="error-message">
+                    Выберите из списка
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="input-cost" class="form-label">Стоимость за час:</label>
                 <div class="input-with-symbol">
                     <input formControlName="cost" id="input-cost" class="form-input" type="number" placeholder="1000">
@@ -66,12 +76,12 @@
 
             <div class="form-group">
                 <label class="form-label">Статус:</label>
-                <select formControlName="isActual" [compareWith]="compareFn">
+                <select formControlName="isActive" [compareWith]="compareFn">
                     <option *ngFor="let option of statusOptions" [ngValue]="option.value">
                         {{ option.text }}
                     </option>
                 </select>
-                <div *ngIf="studentForm.get('isActual')?.invalid && studentForm.get('isActual')?.touched"
+                <div *ngIf="studentForm.get('isActive')?.invalid && studentForm.get('isActive')?.touched"
                     class="error-message">
                     Выберите из списка
                 </div>
@@ -79,9 +89,9 @@
 
             <div class="form-actions">
                 <button type="submit" class="submit-button" [disabled]="studentForm.invalid">
-                   {{submitMessage}}
+                    {{submitMessage}}
                 </button>
-                <button type="button" (click)="close()" class="cancel-button">
+                <button type="button" (click)="close(false)" class="cancel-button">
                     Отмена
                 </button>
             </div>

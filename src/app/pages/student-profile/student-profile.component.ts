@@ -4,7 +4,6 @@ import { doc, Firestore, getDoc } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { MatDialog } from '@angular/material/dialog';
-import { NavigationComponent } from "../../components/navigation/navigation.component";
 import { LayoutService } from '../../services/layout.service';
 import { StudentDialogComponent } from '../../components/student-dialog/student-dialog.component';
 import { DialogMode } from '../../app.enums';
@@ -14,7 +13,7 @@ import { LessonSliderComponent } from '../../components/lesson-slider/lesson-sli
 
 @Component({
   selector: 'app-student-profile',
-  imports: [CommonModule, NavigationComponent, LessonSliderComponent],
+  imports: [CommonModule, LessonSliderComponent],
   templateUrl: './student-profile.component.html',
   styleUrl: './student-profile.component.css'
 })
@@ -41,25 +40,12 @@ export class StudentProfileComponent implements OnInit {
       await this.loadStudent(studentId);
       this.studentLessons = await this.lessonService.getLessonsByStudent(studentId);
     }
-
   }
+
   async loadStudent(studentId: string) {
-    try {
-      const studentDoc = doc(this.firestore, 'students', studentId);
-      const studentSnapshot = await getDoc(studentDoc);
-
-      if (studentSnapshot.exists()) {
-        this.student = {
-          id: studentSnapshot.id,
-          ...studentSnapshot.data()
-        };
-      } else {
-        console.log('Студент не найден');
-      }
-    } catch (error) {
-      console.error('Ошибка при загрузке студента:', error);
-    }
+    this.student = await this.studentService.getStudentById(studentId);
   }
+
   goBack() {
     window.history.back();
   }
@@ -84,6 +70,12 @@ export class StudentProfileComponent implements OnInit {
       data: {
         mode: DialogMode.Edit,
         student: this.student
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((updated) => {
+      if (updated) {
+        this.loadStudent(this.student.id);
       }
     });
   }

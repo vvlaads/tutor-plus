@@ -127,7 +127,8 @@ export class StudentService implements OnDestroy {
       communication: data['communication'],
       platform: data['platform'],
       cost: data['cost'],
-      isActual: data['isActual']
+      isActive: data['isActive'],
+      from: data['from']
     };
   }
 }

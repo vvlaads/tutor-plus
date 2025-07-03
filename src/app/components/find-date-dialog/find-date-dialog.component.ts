@@ -1,38 +1,40 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { DateService } from '../../services/date.service';
 
 @Component({
   selector: 'app-find-date-dialog',
-  imports: [FormsModule, CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './find-date-dialog.component.html',
   styleUrl: './find-date-dialog.component.css'
 })
 export class FindDateDialogComponent {
-
   findDateForm: FormGroup;
   public dialogRef = inject(MatDialogRef<FindDateDialogComponent>);
-  constructor(
-    private fb: FormBuilder,
-    private dateService: DateService
-  ) {
 
+  constructor(private fb: FormBuilder, private dateService: DateService) {
     this.findDateForm = this.fb.group({
-      date: [[Validators.required]]
+      date: ['', [Validators.required]]
     })
   }
+
   submit() {
     if (this.findDateForm.invalid) {
       this.findDateForm.markAllAsTouched();
       return;
     }
-    this.dateService.currentDate = this.date;
-    this.close();
+
+    let selectedDate = this.findDateForm.value.date;
+    const parts = selectedDate.split('-');
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+    this.close(`${day}.${month}.${year}`);
   }
-  date: string = '';
-  close(): void {
-    this.dialogRef.close();
+
+  close(date: string | null) {
+    this.dialogRef.close(date);
   }
 }

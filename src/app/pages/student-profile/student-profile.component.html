@@ -1,11 +1,10 @@
-<app-navigation></app-navigation>
 <main class="content-wrapper" [style.margin-left]="marginLeft">
     <div *ngIf="student" class="profile-container">
-        <h1>{{ student.name }}</h1>
+        <h2>{{ student.name }}</h2>
         <hr>
         <div class="student-lessons">
             <h2>История занятий:</h2>
-            <app-lesson-slider [lessons]="studentLessons"></app-lesson-slider>
+            <app-lesson-slider [studentId]="student.id"></app-lesson-slider>
         </div>
         <hr>
 
@@ -14,8 +13,9 @@
             <p><strong>Предмет:</strong> {{ student.subject }}</p>
             <p><strong>Способ связи:</strong> {{ student.communication }}</p>
             <p><strong>Платформа:</strong> {{ student.platform }}</p>
-            <p><strong>Стоимость:</strong> {{ student.cost }} ₽</p>
-            <p><strong>Статус:</strong> {{ student.isActual ? 'Активный' : 'Завершен' }}</p>
+            <p><strong>Стоимость часа:</strong> {{ student.cost }} ₽</p>
+            <p><strong>Откуда пришел:</strong> {{ student.from }}</p>
+            <p><strong>Статус:</strong> {{ student.isActual ? 'Активный' : 'Завершенный' }}</p>
         </div>
         <div class="change-student-buttons">
             <button class="change-student-button" mat-button (click)="goBack()">

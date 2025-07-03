@@ -1,10 +1,9 @@
 import { Component } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
-import { NavigationComponent } from '../../components/navigation/navigation.component';
 
 @Component({
   selector: 'app-home',
-  imports: [NavigationComponent],
+  imports: [],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

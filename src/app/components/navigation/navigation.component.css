@@ -57,6 +57,24 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
+.nav-button:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button.isActive {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.nav-button.isActive:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.nav-button.isActive:active {
+    transform: scale(0.98);
+    background: rgba(255, 255, 255, 0.1);
+}
+
 .button-icon {
     width: 24px;
     height: 24px;

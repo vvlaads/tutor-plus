@@ -51,18 +51,26 @@
                         {{ option.text }}
                     </option>
                 </select>
-                <div *ngIf="lessonForm.get('isActual')?.invalid && lessonForm.get('isActual')?.touched"
+                <div *ngIf="lessonForm.get('isActive')?.invalid && lessonForm.get('isActive')?.touched"
                     class="error-message">
                     Выберите из списка
                 </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Повторять еженедельно:</label>
+                <input type="checkbox" id="input-isRepeat">
             </div>
 
             <div class="form-actions">
                 <button type="submit" class="submit-button" [disabled]="lessonForm.invalid">
                     {{submitMessage}}
                 </button>
-                <button type="button" (click)="close()" class="cancel-button">
+                <button type="button" (click)="close(false)" class="cancel-button">
                     Отмена
+                </button>
+                <button type="button" (click)="deleteLesson()" class="delete-button" *ngIf="isEditMode()">
+                    Удалить
                 </button>
             </div>
         </form>

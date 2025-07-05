@@ -109,18 +109,20 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
   private subscribeToStudents(): void {
     this.isLoading = true;
-    this.studentsSubscription = this.studentService.students$
-      .subscribe({
-        next: async (students) => {
-          await this.updateStudents(students);
-          this.applySearchFilter();
-          this.isLoading = false;
-        },
-        error: (err) => {
-          console.error('Error loading students', err);
-          this.isLoading = false;
-        }
-      });
+
+    this.studentService.loadStudents();
+
+    this.studentsSubscription = this.studentService.students$.subscribe({
+      next: (students) => {
+        this.updateStudents(students);
+        this.applySearchFilter();
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error loading students', err);
+        this.isLoading = false;
+      }
+    });
   }
 
   private async updateStudents(students: Student[]): Promise<void> {

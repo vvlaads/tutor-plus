@@ -53,6 +53,12 @@ export class StudentService implements OnDestroy {
     };
   }
 
+  public loadStudents(): void {
+    getDocs(collection(this.firestore, 'students')).then(() => {
+      console.log('Загрузка данных учеников');
+    });
+  }
+
   public async getStudents(): Promise<Student[]> {
     const snapshot = await getDocs(collection(this.firestore, 'students'));
     return snapshot.docs.map(this.createStudent);

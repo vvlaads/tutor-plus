@@ -12,19 +12,19 @@ import { CommonModule } from '@angular/common';
 })
 export class AppComponent implements OnInit {
   public title = 'tutor-plus';
-  public isLogin = true;
+  public isLoginPage = true;
 
   public constructor(private router: Router) { }
 
-  public ngOnInit() {
+  public ngOnInit(): void {
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       const fullUrl = event.urlAfterRedirects;
       if (fullUrl.includes('login')) {
-        this.isLogin = true;
+        this.isLoginPage = true;
       } else {
-        this.isLogin = false;
+        this.isLoginPage = false;
       }
     });
   }

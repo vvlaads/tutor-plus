@@ -44,8 +44,7 @@ export class ScheduleComponent implements OnInit {
   public lessons: Lesson[] = []
   public slots: Slot[] = []
   public oneDayLessons: Lesson[] = []
-  private students: Map<string, Student> = new Map<string, Student>()
-  private colors: Map<string, string[]> = new Map<string, string[]>()
+  private students: Map<string, Student> = new Map<string, Student>();
 
 
   public constructor(
@@ -64,7 +63,6 @@ export class ScheduleComponent implements OnInit {
     this.subscribeToLessons();
     this.subscribeToStudents();
     this.subscribeToSlots();
-    this.generateColors();
   }
 
   private updateCurrentWeek(): void {
@@ -122,7 +120,6 @@ export class ScheduleComponent implements OnInit {
 
   private updateStudents(student: Student) {
     this.students.set(student.id, student);
-    this.checkStudent(student.id);
   }
 
   private subscribeToSlots(): void {
@@ -141,55 +138,6 @@ export class ScheduleComponent implements OnInit {
         return false;
       }
     });
-  }
-
-  private checkStudent(id: string) {
-    const student = this.students.get(id)
-    if (student) {
-      if (!student.isActive) {
-        for (let [color, studentIds] of this.colors) {
-          if (studentIds.includes(id)) {
-            studentIds = studentIds.filter(studentId => studentId !== id);
-            console.log(`Цвет ${color} больше не привязан к ученику ${id}`)
-          }
-        }
-      }
-    }
-  }
-
-  private generateColors(seed: number = 115, count: number = 80): void {
-    const colorsArray: string[] = [];
-
-    const random = this.seededRandom(seed);
-
-    for (let i = 0; i < count; i++) {
-      const hue = Math.floor((360 / count) * i);
-      const saturation = 60 + Math.floor(random() * 15);
-      const lightness = 70 + Math.floor(random() * 15);
-      const color = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
-      colorsArray.push(color);
-    }
-
-    this.shuffleArray(colorsArray, random);
-
-    this.colors = new Map();
-    for (let color of colorsArray) {
-      this.colors.set(color, []);
-    }
-  }
-
-  private shuffleArray<T>(array: T[], random: () => number): void {
-    for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
-    }
-  }
-
-  private seededRandom(seed: number): () => number {
-    return function () {
-      const x = Math.sin(seed++) * 10000;
-      return x - Math.floor(x);
-    };
   }
 
   private updateCurrentDate(newDate: Date): void {
@@ -295,30 +243,6 @@ export class ScheduleComponent implements OnInit {
     return hours - c;
   }
 
-  public getColorByLesson(lesson: Lesson): string {
-    for (const [color, studentIds] of this.colors) {
-      if (studentIds.includes(lesson.studentId)) {
-        return color;
-      }
-    }
-    for (const [color, studentIds] of this.colors) {
-      if (studentIds.length == 0) {
-        studentIds.push(lesson.studentId);
-        return color;
-      }
-    }
-
-    let minLength = 100
-    let savedColor = '#000000'
-    for (const [color, studentIds] of this.colors) {
-      if (studentIds.length < minLength) {
-        minLength = studentIds.length;
-        savedColor = color;
-      }
-    }
-    return savedColor;
-  }
-
   public getLessonHeight(lesson: Lesson): string {
     let startTime = this.dateService.stringToMinutes(lesson.startTime);
     let endTime = this.dateService.stringToMinutes(lesson.endTime);
@@ -415,17 +339,17 @@ export class ScheduleComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((option) => {
       switch (option) {
-      case ScheduleObject.Slot:
-        this.openSlotDialog(DialogMode.Add, null);
-        break;
-      case ScheduleObject.Lesson:
-        var endTime = this.getNextTime(time);
-        const lesson = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
-        this.openLessonDialog(DialogMode.Add, lesson)
-        break;
-    }
+        case ScheduleObject.Slot:
+          this.openSlotDialog(DialogMode.Add, null);
+          break;
+        case ScheduleObject.Lesson:
+          var endTime = this.getNextTime(time);
+          const lesson = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
+          this.openLessonDialog(DialogMode.Add, lesson)
+          break;
+      }
     });
-    
+
   }
 
   public isCellDisabled(time: string, dayName: string): boolean {

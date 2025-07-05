@@ -1,7 +1,7 @@
 export const PAGE_MARGIN_LEFT_PERCENTAGE = 25;
 export const PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN = 7;
 
-export const STATUS_OPTIONS = [{ value: true, text: 'Активный' }, { value: false, text: 'Завершенный' }]
+export const STATUS_OPTIONS = [{ value: true, text: 'Активный' }, { value: false, text: 'Завершенный' }];
 
 export const COMMUNICATION_OPTIONS = [
     { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' },
@@ -23,3 +23,5 @@ export const FROM_OPTIONS = [
     { value: 'Авито', text: 'Авито', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Avito%20Icon.png' },
     { value: 'Сарафан', text: 'Сарафан', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' }
 ];
+
+export const MONTH_NAMES = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];

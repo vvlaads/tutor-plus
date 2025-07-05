@@ -1,6 +1,6 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc } from '@angular/fire/firestore';
-import { BehaviorSubject, Observable, Subject, takeUntil } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Lesson } from '../app.interfaces';
 import { DateService } from './date.service';
 
@@ -9,246 +9,147 @@ import { DateService } from './date.service';
 })
 export class LessonService implements OnDestroy {
   private firestore = inject(Firestore);
+  private unsubscribe!: () => void;
   private lessonsSubject = new BehaviorSubject<Lesson[]>([]);
-  private destroy$ = new Subject<void>();
-  public lessons$: Observable<Lesson[]> = this.lessonsSubject.asObservable();
+  private prevLessonsSubject = new BehaviorSubject<Map<string, Lesson>>(new Map());
+  private nextLessonsSubject = new BehaviorSubject<Map<string, Lesson>>(new Map());
 
-  private prevLessonsCache = new BehaviorSubject<Map<string, Lesson | null>>(new Map());
-  private nextLessonsCache = new BehaviorSubject<Map<string, Lesson | null>>(new Map());
-
-  public prevLessons$ = this.prevLessonsCache.asObservable();
-  public nextLessons$ = this.nextLessonsCache.asObservable();
+  public lessons$ = this.lessonsSubject.asObservable();
+  public prevLessons$ = this.prevLessonsSubject.asObservable();
+  public nextLessons$ = this.nextLessonsSubject.asObservable();
 
   public constructor(private dateService: DateService) {
-    this.setupLessonsListener();
-    this.setupLessonsCacheUpdater();
-  }
-
-  private setupLessonsCacheUpdater(): void {
-    this.lessons$.subscribe(lessons => {
-      this.updateLessonsCache(lessons);
-    });
-  }
-
-  private updateLessonsCache(lessons: Lesson[]): void {
-    try {
-      const studentIds = [...new Set(lessons.map(l => l.studentId))];
-      const now = new Date();
-
-      const newPrevMap = new Map<string, Lesson | null>();
-      const newNextMap = new Map<string, Lesson | null>();
-
-      // Обрабатываем случай, когда lessons пустой
-      if (lessons.length === 0) {
-        this.prevLessonsCache.next(newPrevMap);
-        this.nextLessonsCache.next(newNextMap);
-        return;
-      }
-
-      studentIds.forEach(studentId => {
-        try {
-          const studentLessons = lessons.filter(l => l.studentId === studentId);
-
-          // Явно обрабатываем случай, когда у студента нет занятий
-          if (studentLessons.length === 0) {
-            newPrevMap.set(studentId, null);
-            newNextMap.set(studentId, null);
-            return;
-          }
-
-          const prevLesson = this.findPrevLesson(studentLessons, now);
-          newPrevMap.set(studentId, prevLesson);
-
-          const nextLesson = this.findNextLesson(studentLessons, now);
-          newNextMap.set(studentId, nextLesson);
-        } catch (error) {
-          console.error(`Error processing lessons for student ${studentId}:`, error);
-          newPrevMap.set(studentId, null);
-          newNextMap.set(studentId, null);
-        }
-      });
-
-      this.prevLessonsCache.next(newPrevMap);
-      this.nextLessonsCache.next(newNextMap);
-    } catch (error) {
-      console.error('Error updating lessons cache:', error);
-      // В случае ошибки инициализируем пустые кэши
-      this.prevLessonsCache.next(new Map());
-      this.nextLessonsCache.next(new Map());
-    }
-  }
-
-
-  private findPrevLesson(lessons: Lesson[], now: Date): Lesson | null {
-    if (!lessons || lessons.length === 0) return null;
-
-    try {
-      const lessonsWithTimestamps = lessons
-        .filter(lesson => !!lesson.date && !!lesson.startTime) // Фильтруем некорректные данные
-        .map(lesson => ({
-          lesson,
-          timestamp: this.getLessonTimestamp(lesson)
-        }));
-
-      if (lessonsWithTimestamps.length === 0) return null;
-
-      lessonsWithTimestamps.sort((a, b) => b.timestamp - a.timestamp);
-      const prevLesson = lessonsWithTimestamps.find(item => {
-        try {
-          return new Date(item.timestamp) < now;
-        } catch {
-          return false;
-        }
-      });
-
-      return prevLesson?.lesson || null;
-    } catch (error) {
-      console.error('Error finding previous lesson:', error);
-      return null;
-    }
-  }
-
-  private findNextLesson(lessons: Lesson[], now: Date): Lesson | null {
-    if (!lessons || lessons.length === 0) return null;
-
-    try {
-      const lessonsWithTimestamps = lessons
-        .filter(lesson => !!lesson.date && !!lesson.startTime) // Фильтруем некорректные данные
-        .map(lesson => ({
-          lesson,
-          timestamp: this.getLessonTimestamp(lesson)
-        }));
-
-      if (lessonsWithTimestamps.length === 0) return null;
-
-      lessonsWithTimestamps.sort((a, b) => a.timestamp - b.timestamp);
-      const nextLesson = lessonsWithTimestamps.find(item => {
-        try {
-          return new Date(item.timestamp) > now;
-        } catch {
-          return false;
-        }
-      });
-
-      return nextLesson?.lesson || null;
-    } catch (error) {
-      console.error('Error finding next lesson:', error);
-      return null;
-    }
+    this.startListening();
   }
 
   public ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    this.stopListening();
   }
 
-  private setupLessonsListener(): void {
+  private startListening(): void {
     const lessonsRef = collection(this.firestore, 'lessons');
 
-    const unsubscribe = onSnapshot(lessonsRef,
-      (querySnapshot) => {
-        const lessons = querySnapshot.docs.map(doc =>
-          this.mapDocumentToLesson(doc)
-        );
+    this.unsubscribe = onSnapshot(lessonsRef, {
+      next: (snapshot) => {
+        const lessons = snapshot.docs.map(this.createLesson);
         this.lessonsSubject.next(lessons);
-        console.log('Данные занятий обновлены', lessons);
+        this.updatePrevAndNextLessons(lessons);
       },
-      (error) => {
-        console.error('Ошибка при подписке на занятия:', error);
-      }
-    );
-
-    this.destroy$.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      unsubscribe();
+      error: (err) => console.error('Ошибка загрузки:', err)
     });
   }
 
-  private async loadLessons(): Promise<void> {
-    try {
-      const lessonsRef = collection(this.firestore, 'lessons');
-      const querySnapshot = await getDocs(lessonsRef);
+  private updatePrevAndNextLessons(lessons: Lesson[]): void {
+    const now = new Date();
+    const prevLessonsMap = new Map<string, Lesson>();
+    const nextLessonsMap = new Map<string, Lesson>();
 
-      const lessons = querySnapshot.docs.map(doc =>
-        this.mapDocumentToLesson(doc)
-      );
+    const studentIds = [...new Set(lessons.map(lesson => lesson.studentId))];
 
-      this.lessonsSubject.next(lessons);
-      console.log(`Успешно загружено ${lessons.length} занятий`);
-    } catch (error) {
-      console.error('Ошибка при получении занятий:', error);
-      this.lessonsSubject.next([]);
+    studentIds.forEach(studentId => {
+      const studentLessons = lessons.filter(lesson => lesson.studentId === studentId);
+
+      const prevLesson = this.findPrevLesson(studentLessons, now);
+      if (prevLesson) {
+        prevLessonsMap.set(studentId, prevLesson);
+      }
+
+      const nextLesson = this.findNextLesson(studentLessons, now);
+      if (nextLesson) {
+        nextLessonsMap.set(studentId, nextLesson);
+      }
+    });
+
+    this.prevLessonsSubject.next(prevLessonsMap);
+    this.nextLessonsSubject.next(nextLessonsMap);
+  }
+
+  private stopListening(): void {
+    if (this.unsubscribe) {
+      this.unsubscribe();
     }
   }
 
-  private async refreshLessons(): Promise<void> {
-    await this.loadLessons();
-  }
-
-  private mapDocumentToLesson(doc: any): Lesson {
+  private createLesson(doc: any): Lesson {
     const data = doc.data();
     return {
       id: doc.id,
-      studentId: data['studentId'],
-      date: data['date'],
-      startTime: data['startTime'],
-      endTime: data['endTime'],
-      cost: data['cost'],
-      isPaid: data['isPaid'],
-      realEndTime: data['realEndTime']
+      studentId: data.studentId || '',
+      date: data.date || '',
+      startTime: data.startTime || '',
+      endTime: data.endTime || '',
+      cost: data.cost || 0,
+      isPaid: data.isPaid || false,
+      realEndTime: data.realEndTime || ''
     };
   }
 
-  public async getLessonById(lessonId: string): Promise<Lesson | null> {
+
+  public async getLessons(): Promise<Lesson[]> {
+    const snapshot = await getDocs(collection(this.firestore, 'lessons'));
+    return snapshot.docs.map(this.createLesson);
+  }
+
+  public async getLessonById(id: string): Promise<Lesson | null> {
+    const docSnap = await getDoc(doc(this.firestore, 'lessons', id));
+    return docSnap.exists() ? this.createLesson(docSnap) : null;
+  }
+
+  public async addLesson(lesson: Omit<Lesson, 'id'>): Promise<string> {
+    const docRef = await addDoc(collection(this.firestore, 'lessons'), lesson);
+    return docRef.id;
+  }
+
+  public async updateLesson(id: string, changes: Partial<Lesson>): Promise<void> {
+    await updateDoc(doc(this.firestore, 'lessons', id), changes);
+  }
+
+  public async deleteLesson(id: string): Promise<void> {
+    await deleteDoc(doc(this.firestore, 'lessons', id));
+  }
+
+  private findClosestLesson(lessons: Lesson[], now: Date, direction: 'prev' | 'next'): Lesson | null {
+    if (lessons.length === 0) return null;
+
     try {
-      const lessonDoc = doc(this.firestore, 'lessons', lessonId);
-      const lessonSnapshot = await getDoc(lessonDoc);
+      const lessonsWithTimestamps = lessons
+        .filter(lesson => !!lesson.date && !!lesson.startTime)
+        .map(lesson => ({
+          lesson,
+          timestamp: this.getLessonTimestamp(lesson)
+        }));
 
-      if (!lessonSnapshot.exists()) {
-        console.log('Документ не найден');
-        return null;
-      }
+      if (lessonsWithTimestamps.length === 0) return null;
 
-      return this.mapDocumentToLesson(lessonSnapshot);
+      lessonsWithTimestamps.sort((a, b) =>
+        direction === 'prev'
+          ? b.timestamp - a.timestamp
+          : a.timestamp - b.timestamp
+      );
+
+      const foundLesson = lessonsWithTimestamps.find(item => {
+        try {
+          return direction === 'prev'
+            ? new Date(item.timestamp) < now
+            : new Date(item.timestamp) > now;
+        } catch {
+          return false;
+        }
+      });
+
+      return foundLesson?.lesson || null;
     } catch (error) {
-      console.error('Ошибка при получении документа:', error);
+      console.error(`Ошибка при поиске ${direction === 'prev' ? 'предыдущего' : 'следующего'} занятия:`, error);
       return null;
     }
   }
 
-  public async addLesson(lessonData: Omit<Lesson, 'id'>): Promise<void> {
-    try {
-      const lessonsRef = collection(this.firestore, 'lessons');
-      await addDoc(lessonsRef, lessonData);
-      console.log('занятие успешно добавлено');
-      await this.refreshLessons();
-    } catch (error) {
-      console.error('Ошибка при добавлении занятия:', error);
-      throw error;
-    }
+  private findPrevLesson(lessons: Lesson[], now: Date): Lesson | null {
+    return this.findClosestLesson(lessons, now, 'prev');
   }
 
-  public async updateLesson(lessonId: string, lesson: Partial<Lesson>): Promise<void> {
-    try {
-      const lessonDoc = doc(this.firestore, 'lessons', lessonId);
-      await updateDoc(lessonDoc, lesson);
-      console.log('Занятие успешно обновлено');
-      await this.refreshLessons();
-    } catch (error) {
-      console.error('Ошибка при обновлении студента:', error);
-      throw error;
-    }
-  }
-
-  public async deleteLesson(lessonId: string): Promise<void> {
-    try {
-      const lessonDoc = doc(this.firestore, 'lessons', lessonId);
-      await deleteDoc(lessonDoc);
-      console.log('Занятие успешно удалено');
-      await this.refreshLessons();
-    } catch (error) {
-      console.error('Ошибка при удалении занятия:', error);
-      throw error;
-    }
+  private findNextLesson(lessons: Lesson[], now: Date): Lesson | null {
+    return this.findClosestLesson(lessons, now, 'next');
   }
 
   public async getLessonsByStudentId(studentId: string): Promise<Lesson[]> {
@@ -257,25 +158,16 @@ export class LessonService implements OnDestroy {
     return studentLessons;
   }
 
-  public async getPrevLessonByStudentId(studentId: string): Promise<Lesson | null> {
-    const currentLessons = this.lessonsSubject.value;
+  public async getPrevLessonByStudentId(studentId: string) {
     const now = new Date();
+    const studentLessons = await this.getLessonsByStudentId(studentId);
+    return this.findPrevLesson(studentLessons, now)
+  }
 
-    const lessonsWithTimestamps = currentLessons
-      .filter(lesson => lesson.studentId === studentId)
-      .map(lesson => ({
-        lesson,
-        timestamp: this.getLessonTimestamp(lesson)
-      }));
-
-    lessonsWithTimestamps.sort((a, b) => b.timestamp - a.timestamp);
-
-    const prevLesson = lessonsWithTimestamps.find(item => {
-      const lessonDate = new Date(item.timestamp);
-      return lessonDate < now;
-    });
-
-    return prevLesson ? prevLesson.lesson : null;
+  public async getNextLessonByStudentId(studentId: string) {
+    const now = new Date();
+    const studentLessons = await this.getLessonsByStudentId(studentId);
+    return this.findNextLesson(studentLessons, now)
   }
 
   private getLessonTimestamp(lesson: Lesson): number {

@@ -25,7 +25,6 @@ export class StudentService implements OnDestroy {
     this.unsubscribe = onSnapshot(studentsRef, {
       next: (snapshot) => {
         const students = snapshot.docs.map(this.createStudent);
-        console.log('Текущие студенты (с ID):', students);
         this.studentsSubject.next(students);
       },
       error: (err) => console.error('Ошибка загрузки:', err)

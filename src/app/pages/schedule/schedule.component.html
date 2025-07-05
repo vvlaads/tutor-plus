@@ -62,7 +62,7 @@
                 [style.top.px]="getLessonTop(lesson)" [style.left.%]="getLessonLeft(lesson)"
                 (click)="editLesson(lesson)">
 
-                <div class="lesson-content" [style.background-color]="getColorByLesson(lesson)">
+                <div class="lesson-content" [style.background-color]="getStudentByLesson(lesson)?.color">
                     <span class="lesson-time">{{lesson.startTime}} - {{lesson.endTime}}</span>
                     <br />
                     <span class="student-name">{{getStudentByLesson(lesson)?.name}}</span>

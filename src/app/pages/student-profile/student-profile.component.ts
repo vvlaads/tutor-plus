@@ -1,15 +1,14 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
-import { doc, Firestore, getDoc } from '@angular/fire/firestore';
 import { ActivatedRoute } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { MatDialog } from '@angular/material/dialog';
 import { LayoutService } from '../../services/layout.service';
 import { StudentDialogComponent } from '../../components/student-dialog/student-dialog.component';
 import { DialogMode } from '../../app.enums';
-import { Lesson } from '../../app.interfaces';
-import { LessonService } from '../../services/lesson.service';
+import { Lesson, SelectOptionWithIcon } from '../../app.interfaces';
 import { LessonSliderComponent } from '../../components/lesson-slider/lesson-slider.component';
+import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS } from '../../app.constants';
 
 @Component({
   selector: 'app-student-profile',
@@ -20,15 +19,16 @@ import { LessonSliderComponent } from '../../components/lesson-slider/lesson-sli
 export class StudentProfileComponent implements OnInit {
   student: any = null;
   private dialog = inject(MatDialog);
-  private firestore = inject(Firestore);
   marginLeft = '25%';
+  platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
+  communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
+  fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;
 
   studentLessons: Lesson[] = []
 
   constructor(private route: ActivatedRoute,
     private studentService: StudentService,
-    private layoutService: LayoutService,
-    private lessonService: LessonService) {
+    private layoutService: LayoutService) {
     this.layoutService.isHide$.subscribe(isHide => {
       this.marginLeft = isHide ? '7%' : '25%'
     })
@@ -38,7 +38,6 @@ export class StudentProfileComponent implements OnInit {
     const studentId = this.route.snapshot.paramMap.get('id');
     if (studentId) {
       await this.loadStudent(studentId);
-      this.studentLessons = await this.lessonService.getLessonsByStudent(studentId);
     }
   }
 
@@ -46,13 +45,13 @@ export class StudentProfileComponent implements OnInit {
     this.student = await this.studentService.getStudentById(studentId);
   }
 
-  goBack() {
+  public goBack() {
     window.history.back();
   }
-  updateStudent(studentId: string): void {
+  public updateStudent(studentId: string): void {
     this.openDialog();
   }
-  deleteStudent(studentId: string): void {
+  public deleteStudent(studentId: string): void {
     const confirmDelete = confirm('Вы уверены, что хотите удалить этого студента?');
 
     if (confirmDelete) {
@@ -61,7 +60,7 @@ export class StudentProfileComponent implements OnInit {
     }
   }
 
-  openDialog(): void {
+  public openDialog(): void {
     if (!this.student) return;
 
     const dialogRef = this.dialog.open(StudentDialogComponent, {
@@ -79,4 +78,33 @@ export class StudentProfileComponent implements OnInit {
       }
     });
   }
+
+  public getPlatformIcon(platformName: string): string {
+    const platform = this.platformOptions.find(p => p.text === platformName);
+    return platform?.icon || '';
+  }
+
+  public getCommunicationIcon(communicationName: string): string {
+    const communication = this.communicationOptions.find(c => c.text === communicationName);
+    return communication?.icon || '';
+  }
+
+  public getFromIcon(fromName: string): string {
+    const from = this.fromOptions.find(f => f.text === fromName);
+    return from?.icon || '';
+  }
+
+
+  //Форматирует номер телефона в формате +7XXXXXXXXXX в читаемый вид: +7 (XXX) XXX-XX-XX
+  public formatPhoneNumber(phone: string): string {
+    const digitsOnly = phone.replace(/\D/g, ''); // Удаляем все нецифровые символы
+
+    // Проверяем соответствие формату
+    if (!digitsOnly.startsWith('7') || digitsOnly.length !== 11) {
+      throw new Error('Неверный формат номера. Ожидается: +7XXXXXXXXXX (11 цифр)');
+    }
+    // Форматируем номер
+    return `+7(${digitsOnly.substring(1, 4)})${digitsOnly.substring(4, 7)}-${digitsOnly.substring(7, 9)}-${digitsOnly.substring(9)}`;
+  }
+
 }

@@ -5,18 +5,17 @@
             <div class="form-group">
                 <label for="input-name" class="form-label">Имя:</label>
                 <input formControlName="name" id="input-name" class="form-input" placeholder="Введите имя ученика">
-                <div *ngIf="studentForm.get('name')?.invalid && studentForm.get('name')?.touched" class="error-message">
-                    Обязательное поле
+                <div *ngIf="formSubmitted && studentForm.get('name')?.errors" class="error-message">
+                    {{ getError('name') }}
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="input-phone" class="form-label">Телефон:</label>
                 <input formControlName="phone" id="input-phone" class="form-input" type="tel"
-                    placeholder="+7 (XXX) XXX-XX-XX">
-                <div *ngIf="studentForm.get('phone')?.invalid && studentForm.get('phone')?.touched"
-                    class="error-message">
-                    Введите корректный телефон
+                    placeholder="+7XXXXXXXXXX">
+                <div *ngIf="formSubmitted && studentForm.get('phone')?.errors" class="error-message">
+                    {{ getError('phone') }}
                 </div>
             </div>
 
@@ -24,9 +23,8 @@
                 <label for="input-subject" class="form-label">Предмет:</label>
                 <input formControlName="subject" id="input-subject" class="form-input"
                     placeholder="История, Экономика...">
-                <div *ngIf="studentForm.get('subject')?.invalid && studentForm.get('subject')?.touched"
-                    class="error-message">
-                    Обязательное поле
+                <div *ngIf="formSubmitted && studentForm.get('subject')?.errors" class="error-message">
+                    {{ getError('subject') }}
                 </div>
             </div>
 
@@ -36,9 +34,8 @@
                     [selectedValue]="studentForm.get('communication')?.value"
                     (selected)="onSelectCommunication($event.value)">
                 </app-custom-select>
-                <div *ngIf="studentForm.get('communication')?.invalid && studentForm.get('communication')?.touched"
-                    class="error-message">
-                    Выберите из списка
+                <div *ngIf="formSubmitted && studentForm.get('communication')?.errors" class="error-message">
+                    {{ getError('communication') }}
                 </div>
             </div>
 
@@ -47,9 +44,8 @@
                 <app-custom-select [options]="platformOptions" [selectedValue]="studentForm.get('platform')?.value"
                     (selected)="onSelectPlatform($event.value)">
                 </app-custom-select>
-                <div *ngIf="studentForm.get('platform')?.invalid && studentForm.get('platform')?.touched"
-                    class="error-message">
-                    Выберите из списка
+                <div *ngIf="formSubmitted && studentForm.get('platform')?.errors" class="error-message">
+                    {{ getError('platform') }}
                 </div>
             </div>
 
@@ -58,19 +54,19 @@
                 <app-custom-select [options]="fromOptions" [selectedValue]="studentForm.get('from')?.value"
                     (selected)="onSelectFrom($event.value)">
                 </app-custom-select>
-                <div *ngIf="studentForm.get('from')?.invalid && studentForm.get('from')?.touched" class="error-message">
-                    Выберите из списка
+                <div *ngIf="formSubmitted && studentForm.get('from')?.errors" class="error-message">
+                    {{ getError('from') }}
                 </div>
             </div>
 
             <div class="form-group">
                 <label for="input-cost" class="form-label">Стоимость за час:</label>
                 <div class="input-with-symbol">
-                    <input formControlName="cost" id="input-cost" class="form-input" type="number" placeholder="1000">
+                    <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000">
                     <span class="currency-symbol">₽</span>
                 </div>
-                <div *ngIf="studentForm.get('cost')?.invalid && studentForm.get('cost')?.touched" class="error-message">
-                    Введите корректную сумму
+                <div *ngIf="formSubmitted && studentForm.get('cost')?.errors" class="error-message">
+                    {{ getError('cost') }}
                 </div>
             </div>
 
@@ -81,14 +77,13 @@
                         {{ option.text }}
                     </option>
                 </select>
-                <div *ngIf="studentForm.get('isActive')?.invalid && studentForm.get('isActive')?.touched"
-                    class="error-message">
-                    Выберите из списка
+                <div *ngIf="formSubmitted && studentForm.get('isActive')?.errors" class="error-message">
+                    {{ getError('isActive') }}
                 </div>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="submit-button" [disabled]="studentForm.invalid">
+                <button type="submit" class="submit-button">
                     {{submitMessage}}
                 </button>
                 <button type="button" (click)="close(false)" class="cancel-button">

@@ -1,42 +1,92 @@
 <main class="content-wrapper" [style.margin-left]="marginLeft">
     <div *ngIf="student" class="profile-container">
-        <h2>{{ student.name }}</h2>
-        <hr>
-        <div class="student-lessons">
-            <h2>История занятий:</h2>
-            <app-lesson-slider [studentId]="student.id"></app-lesson-slider>
-        </div>
-        <hr>
-
-        <div class="profile-details">
-            <p><strong>Телефон:</strong> {{ student.phone }}</p>
-            <p><strong>Предмет:</strong> {{ student.subject }}</p>
-            <p><strong>Способ связи:</strong> {{ student.communication }}</p>
-            <p><strong>Платформа:</strong> {{ student.platform }}</p>
-            <p><strong>Стоимость часа:</strong> {{ student.cost }} ₽</p>
-            <p><strong>Откуда пришел:</strong> {{ student.from }}</p>
-            <p><strong>Статус:</strong> {{ student.isActual ? 'Активный' : 'Завершенный' }}</p>
-        </div>
-        <div class="change-student-buttons">
-            <button class="change-student-button" mat-button (click)="goBack()">
-                <img class="button-icon"
-                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png">
-                <span class="button-content">Назад</span>
-            </button>
-            <button class="change-student-button" (click)="updateStudent(student.id)">
-                <img class="button-icon"
-                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png">
-                <span class="button-content">Изменить</span>
-            </button>
+        <!-- Заголовок профиля -->
+        <div class="profile-header">
+            <h2 class="student-name">{{ student.name }}</h2>
             <button class="delete-button" (click)="deleteStudent(student.id)">
-                <img class="button-icon"
-                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
+                    class="delete-icon" alt="Delete">
                 <span class="button-content">Удалить</span>
             </button>
         </div>
+
+        <div class="divider"></div>
+
+        <!-- Блок с уроками -->
+        <div class="student-lessons">
+            <app-lesson-slider [studentId]="student.id"></app-lesson-slider>
+        </div>
+
+        <div class="divider"></div>
+
+        <!-- Основная информация о студенте -->
+        <div class="student-info">
+            <!-- Первый столбец -->
+            <div class="info-column">
+                <div class="info-item">
+                    <span class="info-label">Телефон:</span>
+                    <span class="info-value phone">{{ formatPhoneNumber(student.phone) }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Предмет:</span>
+                    <span class="info-value subject">{{ student.subject }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Статус:</span>
+                    <span class="info-value status" [class.active]="student.isActive"
+                        [class.inactive]="!student.isActive">
+                        {{ student.isActive ? 'Активный' : 'Завершенный' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Второй столбец -->
+            <div class="info-column">
+                <div class="info-item">
+                    <span class="info-label">Способ связи:</span>
+                    <div class="info-value with-icon">
+                        <img class="value-icon" [src]="getCommunicationIcon(student.communication)" alt="Communication">
+                        <span>{{ student.communication }}</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Платформа:</span>
+                    <div class="info-value with-icon">
+                        <img class="value-icon" [src]="getPlatformIcon(student.platform)" alt="Platform">
+                        <span>{{ student.platform }}</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Источник:</span>
+                    <div class="info-value with-icon">
+                        <img class="value-icon" [src]="getFromIcon(student.from)" alt="Source">
+                        <span>{{ student.from }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Стоимость -->
+        <div class="cost-block">
+            <h3 class="cost-title">Стоимость часа:</h3>
+            <div class="cost-amount">{{ student.cost }} ₽</div>
+        </div>
     </div>
 
-    <div *ngIf="!student" class="loading">
-        <p>Пусто</p>
+    <!-- Кнопка редактирования -->
+    <div class="edit-button-container">
+        <button class="edit-button floating-button" (click)="updateStudent(student.id)">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png" class="edit-icon"
+                alt="Edit">
+            <span>Редактировать</span>
+        </button>
+    </div>
+
+    <div *ngIf="!student" class="empty-state">
+        <p>Нет данных о студенте</p>
     </div>
 </main>

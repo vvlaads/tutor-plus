@@ -6,6 +6,7 @@ import { CustomSelectComponent } from '../custom-select/custom-select.component'
 import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
+import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
 
 @Component({
   selector: 'app-student-dialog',
@@ -14,33 +15,22 @@ import { SelectOptionWithIcon, Student } from '../../app.interfaces';
   styleUrl: './student-dialog.component.css'
 })
 export class StudentDialogComponent {
-  dialogRef = inject(MatDialogRef<StudentDialogComponent>);
-  studentForm: FormGroup;
-  mode: DialogMode = DialogMode.Add;
-  title: string = 'Добавление ученика'
-  submitMessage: string = 'Добавить'
+  private dialogRef = inject(MatDialogRef<StudentDialogComponent>);
+  private mode: DialogMode = DialogMode.Add;
 
-  statusOptions = [{ value: true, text: 'Активный' }, { value: false, text: 'Завершенный' }]
+  public studentForm: FormGroup;
+  public title: string = 'Добавление ученика'
+  public submitMessage: string = 'Добавить'
+  public formSubmitted = false;
 
-  communicationOptions: SelectOptionWithIcon[] = [
-    { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' },
-    { value: 'WhatsApp', text: 'WhatsApp', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Whatsapp%20Icon.png' },
-    { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
-    { value: 'Profi', text: 'Profi', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Profi%20Icon.png' },
-    { value: 'Телефон', text: 'Телефон', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' }
-  ];
 
-  platformOptions: SelectOptionWithIcon[] = [
-    { value: 'Zoom', text: 'Zoom', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Zoom%20Icon.png' },
-    { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
-    { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' }
-  ];
+  public statusOptions = STATUS_OPTIONS;
 
-  fromOptions: SelectOptionWithIcon[] = [
-    { value: 'Repetit.ru', text: 'Repetit.ru', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png' },
-    { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
-    { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' }
-  ];
+  public communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
+
+  public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
+
+  public fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;
 
   constructor(
     private fb: FormBuilder,
@@ -86,11 +76,15 @@ export class StudentDialogComponent {
     this.studentForm.get('from')?.setValue(optionValue);
   }
 
-  submit() {
+  public submit(): void {
+    this.formSubmitted = true;
+    Object.keys(this.studentForm.controls).forEach(key => {
+      this.studentForm.get(key)?.markAsTouched();
+    });
     if (this.studentForm.invalid) {
-      this.studentForm.markAllAsTouched();
       return;
     }
+
     switch (this.mode) {
       case DialogMode.Add:
         this.addStudent();
@@ -101,7 +95,8 @@ export class StudentDialogComponent {
     }
   }
 
-  addStudent() {
+
+  public addStudent(): void {
     const newStudent: Student = {
       ...this.studentForm.value
     };
@@ -114,7 +109,7 @@ export class StudentDialogComponent {
       });
   }
 
-  updateStudent() {
+  public updateStudent(): void {
     const updatedStudent: Student = {
       ...this.data.student,
       ...this.studentForm.value
@@ -127,11 +122,21 @@ export class StudentDialogComponent {
 
   }
 
-  compareFn(option1: boolean, option2: boolean): boolean {
+  public compareFn(option1: boolean, option2: boolean): boolean {
     return option1 === option2;
   }
 
-  close(status: boolean) {
+  public close(status: boolean): void {
     this.dialogRef.close(status);
+  }
+
+  public getError(field: string): string | null {
+    const control = this.studentForm.get(field);
+    if (!control || !control.errors) return null;
+
+    if (control.errors['required']) return '*Поле обязательно';
+    if (control.errors['pattern']) return '*Неверный формат';
+    if (control.errors['min']) return '*Слишком маленькое значение';
+    return null;
   }
 }

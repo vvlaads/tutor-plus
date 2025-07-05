@@ -8,15 +8,15 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<User | null>(null);
-  currentUser$ = this.currentUserSubject.asObservable();
+  public currentUser$ = this.currentUserSubject.asObservable();
 
-  constructor(private auth: Auth, private router: Router) {
+  public constructor(private auth: Auth, private router: Router) {
     this.auth.onAuthStateChanged(user => {
       this.currentUserSubject.next(user);
     });
   }
 
-  async googleSignIn() {
+  public async googleSignIn() {
     try {
       const provider = new GoogleAuthProvider();
       await signInWithPopup(this.auth, provider);
@@ -26,7 +26,7 @@ export class AuthService {
     }
   }
 
-  async signOut() {
+  public async signOut() {
     await signOut(this.auth);
     this.router.navigate(['/login']);
   }

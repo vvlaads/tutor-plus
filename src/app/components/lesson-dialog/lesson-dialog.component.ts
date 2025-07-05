@@ -6,6 +6,7 @@ import { DialogMode } from '../../app.enums';
 import { Lesson, SelectOption, Student } from '../../app.interfaces';
 import { LessonService } from '../../services/lesson.service';
 import { StudentService } from '../../services/student.service';
+import { DateService } from '../../services/date.service';
 
 
 function convertTimeToMinutes(timeStr: string): number {
@@ -46,10 +47,13 @@ export class LessonDialogComponent implements OnInit {
   students: Student[] = []
   options: SelectOption[] = []
 
+  lessons: Lesson[] = []
+
   constructor(
     private fb: FormBuilder,
     private lessonService: LessonService,
     private studentService: StudentService,
+    private dateService: DateService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Lesson | null }
   ) {
     this.mode = data.mode;
@@ -64,76 +68,147 @@ export class LessonDialogComponent implements OnInit {
         break;
     }
 
+    let date = data.lesson?.date
+    if (date) {
+      date = this.dateService.changeFormatDotToMinus(date)
+    }
+
     this.lessonForm = this.fb.group({
       studentId: [data.lesson?.studentId, [Validators.required]],
-      date: [data.lesson?.date, [Validators.required, Validators.pattern(/^[0-3]\d\.[0-1]\d\.\d{4}$/)]],
+      date: [date, [Validators.required, Validators.pattern(/^\d{4}\-[0-1]\d\-[0-3]\d$/)]],
       startTime: [data.lesson?.startTime, [Validators.required, Validators.pattern(/^[0-2]\d:[0-6]\d$/)]],
       endTime: [data.lesson?.endTime, [Validators.required, Validators.pattern(/^[0-2]\d:[0-6]\d$/)]],
       cost: [data.lesson?.cost, [Validators.required, Validators.min(0)]],
       isPaid: [data.lesson == null ? false : data.lesson.isPaid],
+      isRepeat: [false],
+      repeatUntil: [''],
     }, { validators: timeRangeValidator });
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     this.studentService.students$.subscribe(students => {
       this.students = students;
       this.students.filter(student => student.isActive == true).forEach(student => {
         this.options.push({ value: student.id, text: `${student.name} ${student.phone}` });
       })
     });
+
+    this.lessonForm.get('isRepeat')?.valueChanges.subscribe((isRepeat: boolean) => {
+      const repeatUntil = this.lessonForm.get('repeatUntil');
+      if (isRepeat) {
+        repeatUntil?.setValidators([Validators.required]);
+      } else {
+        repeatUntil?.clearValidators();
+      }
+      repeatUntil?.updateValueAndValidity();
+    });
   }
 
 
-  submit() {
+  public submit() {
     if (this.lessonForm.invalid) {
       this.lessonForm.markAllAsTouched();
       return;
     }
-    switch (this.mode) {
-      case DialogMode.Add:
-        this.addLesson();
-        break;
-      case DialogMode.Edit:
-        this.updateLesson();
-        break;
+
+    const lessonValue = { ...this.lessonForm.value };
+    lessonValue.date = this.dateService.changeFormatMinusToDot(lessonValue.date);
+    if (lessonValue.isRepeat) {
+      lessonValue.repeatUntil = this.dateService.changeFormatMinusToDot(lessonValue.repeatUntil);
+
+      let dates: Date[] = []
+      if (lessonValue.isRepeat) {
+        let start = this.dateService.stringToDate(lessonValue.date);
+        let end = this.dateService.stringToDate(lessonValue.repeatUntil);
+        dates = this.dateService.getDatesBetween(start, end);
+      }
+      console.log(dates)
+      for (const date of dates) {
+        let lesson = {
+          studentId: lessonValue.studentId,
+          date: this.dateService.dateToString(date),
+          startTime: lessonValue.startTime,
+          endTime: lessonValue.endTime,
+          cost: lessonValue.cost,
+          isPaid: lessonValue.isPaid,
+          realEndTime: ''
+        }
+
+        switch (this.mode) {
+          case DialogMode.Add:
+            this.addLesson(lesson);
+            break;
+          case DialogMode.Edit:
+            this.updateLesson(lesson);
+            break;
+        }
+      }
+    } else {
+      let lesson = {
+        studentId: lessonValue.studentId,
+        date: lessonValue.date,
+        startTime: lessonValue.startTime,
+        endTime: lessonValue.endTime,
+        cost: lessonValue.cost,
+        isPaid: lessonValue.isPaid,
+        realEndTime: ''
+      }
+      switch (this.mode) {
+        case DialogMode.Add:
+          this.addLesson(lesson);
+          break;
+        case DialogMode.Edit:
+          this.updateLesson(lesson);
+          break;
+      }
     }
   }
 
-  addLesson() {
-    const newLesson: Lesson = {
-      ...this.lessonForm.value
-    };
-    this.lessonService.addLesson(newLesson).then(_ => { this.close(true); })
-      .catch(error => { console.error('Ошибка при добавлении:', error); this.close(false); });
+  private generateTempId(): string {
+    return 'temp-' + Math.random().toString(36).substr(2, 9);
   }
 
-  updateLesson() {
-    const updatedLesson: Lesson = {
-      ...this.data.lesson,
-      ...this.lessonForm.value
+  private addLesson(lessonData: Omit<Lesson, 'id'>) {
+    const lesson: Lesson = {
+      ...lessonData,
+      id: this.generateTempId(),
+      realEndTime: lessonData.realEndTime || ''
     };
 
+    this.lessonService.addLesson(lesson)
+      .then(_ => this.close(true))
+      .catch(error => {
+        console.error('Ошибка при добавлении:', error);
+        this.close(false);
+      });
+  }
+
+  private updateLesson(lesson: Partial<Lesson>) {
+    const updatedLesson = {
+      ...this.data.lesson,
+      ...lesson
+    } as Lesson;
     this.lessonService.updateLesson(updatedLesson.id, updatedLesson).then(_ => { this.close(true); })
       .catch(error => { console.error('Ошибка при обновлении:', error); this.close(false); });
 
   }
 
-  close(status: boolean) {
+  public close(status: boolean) {
     this.dialogRef.close(status);
   }
 
-  deleteLesson() {
+  public deleteLesson() {
     if (this.data.lesson) {
       const confirmDelete = confirm('Вы уверены, что хотите удалить это занятие?');
       if (confirmDelete) {
         this.lessonService.deleteLesson(this.data.lesson.id).then(_ => {
           this.close(true);
-        })
+        }).catch(error => { console.error('Ошибка при удалении:', error); this.close(false); })
       }
     }
   }
 
-  isEditMode(): boolean {
+  public isEditMode(): boolean {
     return this.mode == DialogMode.Edit;
   }
 }

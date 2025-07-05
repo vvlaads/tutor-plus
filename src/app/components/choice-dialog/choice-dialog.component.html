@@ -1,0 +1,8 @@
+<div class="container">
+    <div class="choice-buttons">
+        <button class="choice-button" *ngFor="let option of options" (click)="submit(option)">{{option}}</button>
+    </div>
+    <div class="exit-section">
+        <button class="exit-button" (click)="close(null)">Отмена</button>
+    </div>
+</div>

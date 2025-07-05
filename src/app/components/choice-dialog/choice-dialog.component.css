@@ -1,0 +1,36 @@
+.container {
+    height: 600px;
+    margin: 0;
+    padding: 24px;
+    box-sizing: border-box;
+    background-color: #ffffff;
+    border-radius: 0;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.choice-buttons {
+    display: flex;
+    flex-direction: column;
+    height: 300px;
+}
+
+.choice-button {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    background-color: #4299e1;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 20px;
+    font-family: sans-serif;
+}

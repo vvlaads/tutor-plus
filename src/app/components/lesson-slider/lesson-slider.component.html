@@ -1,20 +1,29 @@
 <div class="slider-wrapper">
-    <div class="slide-button-wrapper" id="left-block">
-        <button class="slide-button" (click)="slideLeft()"><img class="button-icon"
-                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png"></button>
-    </div>
+    <button class="slide-button left-button" (click)="slideLeft()" [disabled]="!canSlideLeft()"
+        [class.disabled]="!canSlideLeft()">
+        <img class="button-icon"
+            src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png"
+            alt="Предыдущие занятия">
+    </button>
 
     <div class="lessons-container">
-        <div *ngFor="let lesson of visibleLessons" class="lesson-block" (click)="changeLesson(lesson)">
-            <p>Дата: {{lesson.date}}</p>
-            <p>Стоимость: {{lesson.cost}} ₽</p>
-            <p>Оплачено: <span *ngIf="lesson.isPaid">Да</span><span *ngIf="!lesson.isPaid">Нет</span></p>
+        <div *ngFor="let lesson of visibleLessons; trackBy: trackByLessonId" class="lesson-block"
+            (click)="openLessonDialog(lesson)">
+            <p class="lesson-date">Дата: {{ lesson.date }}</p>
+            <p class="lesson-cost">Стоимость: {{ lesson.cost }} ₽</p>
+            <p class="lesson-payment">
+                Оплачено:
+                <span [class.paid]="lesson.isPaid" [class.not-paid]="!lesson.isPaid">
+                    {{ lesson.isPaid ? 'Да' : 'Нет' }}
+                </span>
+            </p>
         </div>
     </div>
 
-    <div class="slide-button-wrapper" id="right-block">
-
-        <button class="slide-button" (click)="slideRight()"><img class="button-icon"
-                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Right%20Arrow.png"></button>
-    </div>
+    <button class="slide-button right-button" (click)="slideRight()" [disabled]="!canSlideRight()"
+        [class.disabled]="!canSlideRight()">
+        <img class="button-icon"
+            src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Right%20Arrow.png"
+            alt="Следующие занятия">
+    </button>
 </div>

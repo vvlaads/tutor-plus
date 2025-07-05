@@ -8,3 +8,8 @@ export enum Section {
     Students = 'STUDENTS',
     Schedule = "SCHEDULE"
 }
+
+export enum ScheduleObject {
+    Slot = 'SLOT',
+    Lesson = 'LESSON'
+}

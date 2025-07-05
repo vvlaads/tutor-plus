@@ -4,7 +4,7 @@
         <form [formGroup]="lessonForm" class="lesson-form" (ngSubmit)="submit()">
             <div class="form-group">
                 <label for="input-date" class="form-label">Дата:</label>
-                <input formControlName="date" id="input-date" class="form-input" placeholder="02.07.2025">
+                <input formControlName="date" id="input-date" class="form-input" type="date" placeholder="02.07.2025">
                 <div *ngIf="lessonForm.get('date')?.invalid && lessonForm.get('date')?.touched" class="error-message">
                     Обязательное поле
                 </div>
@@ -28,21 +28,6 @@
                     Конец занятия должен быть позже начала!
                 </div>
             </div>
-            <div class="form-group">
-                <label for="input-cost" class="form-label">Стоимость:</label>
-                <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000">
-                <div *ngIf="lessonForm.get('cost')?.invalid && lessonForm.get('cost')?.touched" class="error-message">
-                    Обязательное поле
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="input-isPaid" class="form-label">Оплачено:</label>
-                <input type="checkbox" id="input-isPaid" formControlName="isPaid">
-                <div *ngIf="lessonForm.get('isPaid')?.invalid && lessonForm.get('isPaid')?.touched"
-                    class="error-message">
-                    Обязательное поле
-                </div>
-            </div>
 
             <div class="form-group">
                 <label class="form-label">Ученик:</label>
@@ -58,19 +43,45 @@
             </div>
 
             <div class="form-group">
-                <label class="form-label">Повторять еженедельно:</label>
-                <input type="checkbox" id="input-isRepeat">
+                <label for="input-cost" class="form-label">Стоимость:</label>
+                <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000">
+                <div *ngIf="lessonForm.get('cost')?.invalid && lessonForm.get('cost')?.touched" class="error-message">
+                    Обязательное поле
+                </div>
             </div>
+            <div class="form-group">
+                <div class="form-group form-group-inline">
+                    <label for="input-isPaid" class="form-label">Оплачено:</label>
+                    <input type="checkbox" id="input-isPaid" formControlName="isPaid">
+                </div>
+                <div *ngIf="lessonForm.get('isPaid')?.invalid && lessonForm.get('isPaid')?.touched"
+                    class="error-message">
+                    Обязательное поле
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="form-group form-group-inline">
+                    <label class="form-label">Повторять еженедельно:</label>
+                    <input type="checkbox" id="input-isRepeat" formControlName="isRepeat">
+                </div>
+            </div>
+
+            <div class="form-group" *ngIf="lessonForm.get('isRepeat')?.value">
+                <label for="repeat-until" class="form-label">Повторять до:</label>
+                <input type="date" id="repeat-until" formControlName="repeatUntil" class="form-input">
+            </div>
+
 
             <div class="form-actions">
                 <button type="submit" class="submit-button" [disabled]="lessonForm.invalid">
                     {{submitMessage}}
                 </button>
-                <button type="button" (click)="close(false)" class="cancel-button">
-                    Отмена
-                </button>
                 <button type="button" (click)="deleteLesson()" class="delete-button" *ngIf="isEditMode()">
                     Удалить
+                </button>
+                <button type="button" (click)="close(false)" class="cancel-button">
+                    Отмена
                 </button>
             </div>
         </form>

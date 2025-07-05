@@ -54,6 +54,20 @@ export class DateService {
     return date;
   }
 
+  public minutesToString(minutes: number): string {
+    if (minutes < 0 || minutes > 1439) {
+      throw new Error('Неверные значение минут');
+    }
+
+    const hours = Math.floor(minutes / 60);
+    const correctMinutes = Math.floor(minutes % 60);
+
+    const formattedHours = hours < 10 ? `0${hours}` : hours;
+    const formattedMinutes = correctMinutes < 10 ? `0${correctMinutes}` : correctMinutes;
+
+    return `${formattedHours}:${formattedMinutes}`
+  }
+
   public stringToMinutes(formattedTime: string): number {
     const parts = formattedTime.split(':');
 
@@ -75,24 +89,37 @@ export class DateService {
     return hours * 60 + minutes;
   }
 
-  public minutesToString(minutes: number): string {
-    if (minutes < 0 || minutes > 1439) {
-      throw new Error('Неверные значение минут');
-    }
-
-    const hours = Math.floor(minutes / 60);
-    const correctMinutes = Math.floor(minutes % 60);
-
-    return `${hours}:${correctMinutes}`
-  }
-
   public setTimeToDate(date: Date, time: string): Date {
     let minutes = this.stringToMinutes(time);
     date.setMinutes(minutes);
     return date;
   }
 
-  public dateIsToday(date: Date): boolean {
-    return this.isDatesEquals(date, new Date())
+  public changeFormatMinusToDot(minusFormat: string): string {
+    const parts = minusFormat.split('-');
+    const year = parts[0];
+    const month = parts[1];
+    const day = parts[2];
+    return `${day}.${month}.${year}`;
+  }
+
+  public changeFormatDotToMinus(dotFormat: string): string {
+    const parts = dotFormat.split('.');
+    const day = parts[0];
+    const month = parts[1];
+    const year = parts[2];
+    return `${year}-${month}-${day}`;
+  }
+
+  public getDatesBetween(start: Date, end: Date): Date[] {
+    const dates = []
+    let date = new Date(start)
+    while (date.getTime() <= end.getTime()) {
+      console.log(date.getDate());
+      dates.push(new Date(date));
+      date.setDate(date.getDate() + 7);
+    }
+
+    return dates;
   }
 }

@@ -3,8 +3,10 @@
         <div class="calendar-sticky-header">
             <div class="change-schedule-status-buttons">
                 <button class="change-schedule-status-button" (click)="resetCurrentDate()"> Вернуться к сегодня</button>
-                <button class="change-schedule-status-button" (click)="setOneDayFormat(true)">Один день</button>
-                <button class="change-schedule-status-button" (click)="setOneDayFormat(false)">На неделю</button>
+                <button class="change-schedule-status-button" (click)="setOneDayFormat(true)"
+                    [class.isActive]="isOneDayFormat">Один день</button>
+                <button class="change-schedule-status-button" (click)="setOneDayFormat(false)"
+                    [class.isActive]="!isOneDayFormat">На неделю</button>
                 <button class="date-button" id="prev-date-button" (click)="goToPrev()">
                     <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon%20Swap.png"
                         class="button-icon">
@@ -19,9 +21,13 @@
                 </button>
             </div>
 
-            <div class="info">
-                <span id="year-info">{{currentDate.getFullYear()}} </span>
-                <span id="today-info" *ngIf="showTodayMessage()">Сегодня</span>
+            <div *ngIf="isOneDayFormat" class="info">
+                <span *ngIf="isOneDayFormat">{{getCurrentDateInString()}}</span>
+                <span id="today-info" *ngIf="showTodayMessage()"> Сегодня</span>
+                <button *ngIf="isOneDayFormat" class="print-button" (click)="printTable()">Печать</button>
+            </div>
+            <div *ngIf="!isOneDayFormat" class="info">
+                <span id="year-info" *ngIf="!isOneDayFormat">{{currentDate.getFullYear()}} </span>
                 <span id="week-info" *ngIf="showWeekMessage()">Текущая неделя</span>
             </div>
 
@@ -55,26 +61,61 @@
                 [style.height]="getLessonHeight(lesson)" [style.width.%]=" blockWidthPercentage"
                 [style.top.px]="getLessonTop(lesson)" [style.left.%]="getLessonLeft(lesson)"
                 (click)="editLesson(lesson)">
+
                 <div class="lesson-content" [style.background-color]="getColorByLesson(lesson)">
                     <span class="lesson-time">{{lesson.startTime}} - {{lesson.endTime}}</span>
                     <br />
                     <span class="student-name">{{getStudentByLesson(lesson)?.name}}</span>
                 </div>
             </div>
+
+            <div *ngFor="let slot of slots" class="slot" [style.min-height]="getSlotHeight(slot)"
+                [style.height]="getSlotHeight(slot)" [style.width.%]=" blockWidthPercentage"
+                [style.top.px]="getSlotTop(slot)" [style.left.%]="getSlotLeft(slot)" (click)="editSlot(slot)">
+
+                <div class="slot-content">
+                    <span class="slot-time">{{slot.startTime}} - {{slot.endTime}}</span>
+                </div>
+            </div>
+
         </div>
 
         <div class="one-day-calendar" *ngIf="isOneDayFormat">
-            <table class="one-day-table">
-                <tr>
-                    <th>Ученик</th>
-                    <th>Где общаемся</th>
-                    <th>Где занимаемся</th>
-                </tr>
-                <tr>
-                    <td>Саша</td>
-                    <td>Саша</td>
-                    <td>Саша</td>
-                </tr>
+            <table class="one-day-table" id="schedule-table">
+                <thead>
+                    <tr class="table-header">
+                        <th class="time-start-column">Начало</th>
+                        <th class="time-end-column">Конец</th>
+                        <th class="time-distance-column">Время</th>
+                        <th class="student-column">Ученик</th>
+                        <th class="communication-column">Где общаемся</th>
+                        <th class="platform-column">Где занимаемся</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <ng-container *ngFor="let lesson of oneDayLessons; let i = index">
+                        <tr class="lesson-info-row">
+                            <td class="time-start-cell">{{lesson.startTime}}</td>
+                            <td class="time-end-cell">{{lesson.endTime}}</td>
+                            <td class="time-distance-cell" [class.not-default]="notDefaultTime(lesson)">
+                                {{getTimeDifference(lesson.startTime,
+                                lesson.endTime)}} мин
+                            </td>
+                            <td class="student-cell">{{getStudentByLesson(lesson)?.name}}</td>
+                            <td class="communication-cell"
+                                [style.background-color]="getAppColor(getStudentByLesson(lesson)?.communication)">
+                                {{getStudentByLesson(lesson)?.communication}}</td>
+                            <td class="platform-cell"
+                                [style.background-color]="getAppColor(getStudentByLesson(lesson)?.platform)">
+                                {{getStudentByLesson(lesson)?.platform}}</td>
+                        </tr>
+                        <tr class="break-row" *ngIf="i < oneDayLessons.length - 1">
+                            <td colspan="6" class="break-cell">
+                                Перерыв {{getBreakTime(i)}} минут
+                            </td>
+                        </tr>
+                    </ng-container>
+                </tbody>
             </table>
         </div>
     </div>

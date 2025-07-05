@@ -6,6 +6,7 @@ export interface Lesson {
     endTime: string;
     cost: number;
     isPaid: boolean;
+    realEndTime?: string;
 }
 
 export interface Student {
@@ -18,6 +19,14 @@ export interface Student {
     cost: number;
     isActive: boolean;
     from: string;
+    color: string;
+}
+
+export interface Slot {
+    id: string;
+    date: string;
+    startTime: string;
+    endTime: string;
 }
 
 export interface SelectOptionWithIcon {

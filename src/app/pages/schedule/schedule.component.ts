@@ -5,12 +5,15 @@ import { FindDateDialogComponent } from '../../components/find-date-dialog/find-
 import { MatDialog } from '@angular/material/dialog';
 import { DateService } from '../../services/date.service';
 import { LessonDialogComponent } from '../../components/lesson-dialog/lesson-dialog.component';
-import { DialogMode } from '../../app.enums';
+import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
-import { Lesson, Student } from '../../app.interfaces';
+import { Lesson, Slot, Student } from '../../app.interfaces';
 import { take } from 'rxjs';
 import { StudentService } from '../../services/student.service';
 import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN } from '../../app.constants';
+import { SlotService } from '../../services/slot.service';
+import { SlotDialogComponent } from '../../components/slot-dialog/slot-dialog.component';
+import { ChoiceDialogComponent } from '../../components/choice-dialog/choice-dialog.component';
 
 @Component({
   standalone: true,
@@ -23,6 +26,7 @@ export class ScheduleComponent implements OnInit {
   private dialog: MatDialog = inject(MatDialog);
 
   public currentDate: Date = new Date();
+  public today: Date = new Date();
 
   public isOneDayFormat: boolean = false;
 
@@ -38,15 +42,18 @@ export class ScheduleComponent implements OnInit {
     '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
 
   public lessons: Lesson[] = []
+  public slots: Slot[] = []
   public oneDayLessons: Lesson[] = []
   private students: Map<string, Student> = new Map<string, Student>()
   private colors: Map<string, string[]> = new Map<string, string[]>()
+
 
   public constructor(
     private layoutService: LayoutService,
     private dateService: DateService,
     private lessonService: LessonService,
-    private studentService: StudentService) {
+    private studentService: StudentService,
+    private slotService: SlotService) {
     this.layoutService.isHide$.subscribe(isHide => {
       this.pageMarginLeftPercentage = isHide ? PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN : PAGE_MARGIN_LEFT_PERCENTAGE
     })
@@ -56,6 +63,7 @@ export class ScheduleComponent implements OnInit {
     this.updateCurrentWeek();
     this.subscribeToLessons();
     this.subscribeToStudents();
+    this.subscribeToSlots();
     this.generateColors();
   }
 
@@ -82,12 +90,15 @@ export class ScheduleComponent implements OnInit {
     this.oneDayLessons = lessons.filter(lesson => {
       try {
         const lessonDate = this.dateService.stringToDate(lesson.date);
-        return this.dateService.isDatesEquals(this.currentDate, lessonDate)
+        return this.dateService.isDatesEquals(this.currentDate, lessonDate);
       } catch (e) {
         console.error('Ошибка преобразования:', e);
         return false;
       }
     });
+
+    // Сортируем уроки по времени начала (по возрастанию)
+    this.sortLessonsByStartTime();
 
     this.lessons = lessons.filter(lesson => {
       try {
@@ -108,21 +119,38 @@ export class ScheduleComponent implements OnInit {
     })
   }
 
+
   private updateStudents(student: Student) {
     this.students.set(student.id, student);
     this.checkStudent(student.id);
+  }
+
+  private subscribeToSlots(): void {
+    this.slotService.slots$.subscribe(slots => {
+      this.updateSlots(slots);
+    });
+  }
+
+  private updateSlots(slots: Slot[]) {
+    this.slots = slots.filter(slot => {
+      try {
+        const slotDate = this.dateService.stringToDate(slot.date);
+        return this.currentWeekDates.some(date => this.dateService.isDatesEquals(date, slotDate));
+      } catch (e) {
+        console.error('Ошибка преобразования:', e);
+        return false;
+      }
+    });
   }
 
   private checkStudent(id: string) {
     const student = this.students.get(id)
     if (student) {
       if (!student.isActive) {
-        this.students.delete(id);
         for (let [color, studentIds] of this.colors) {
           if (studentIds.includes(id)) {
             studentIds = studentIds.filter(studentId => studentId !== id);
-            console.log(`Убран ученик ${id}`)
-            console.log(this.colors)
+            console.log(`Цвет ${color} больше не привязан к ученику ${id}`)
           }
         }
       }
@@ -165,9 +193,8 @@ export class ScheduleComponent implements OnInit {
   }
 
   private updateCurrentDate(newDate: Date): void {
-    this.currentDate = newDate;
+    this.currentDate.setDate(newDate.getDate());
     this.updateCurrentWeek();
-    //?
     this.lessonService.lessons$.pipe(take(1)).subscribe(lessons => {
       this.updateLessons(lessons);
     });
@@ -232,13 +259,20 @@ export class ScheduleComponent implements OnInit {
   }
 
   public resetCurrentDate(): void {
-    this.updateCurrentDate(new Date());
+    this.updateCurrentDate(this.today);
   }
 
   private getNextTime(time: string): string {
     let timeInMinutes = this.dateService.stringToMinutes(time)
     timeInMinutes += 60;
-    return this.dateService.minutesToString(timeInMinutes);
+    let nextTime = ''
+    try {
+      nextTime = this.dateService.minutesToString(timeInMinutes)
+    } catch (error) {
+      timeInMinutes -= 5;
+      nextTime = this.dateService.minutesToString(timeInMinutes)
+    }
+    return nextTime;
   }
 
   private getConstantToFixOffset(hours: number): number {
@@ -309,6 +343,30 @@ export class ScheduleComponent implements OnInit {
     return 0;
   }
 
+  public getSlotHeight(slot: Slot): string {
+    let startTime = this.dateService.stringToMinutes(slot.startTime);
+    let endTime = this.dateService.stringToMinutes(slot.endTime);
+    let hours = Math.floor(endTime / 60) - Math.floor(startTime / 60)
+
+    return `${(endTime - startTime) * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours)}px`
+  }
+
+  public getSlotTop(slot: Slot): number {
+    const totalMinutes = this.dateService.stringToMinutes(slot.startTime)
+    const hours = Math.floor(totalMinutes / 60);
+    return totalMinutes * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours);
+  }
+
+  public getSlotLeft(slot: Slot): number {
+    const lessonDate = this.dateService.stringToDate(slot.date);
+    for (let i = 0; i < this.currentWeekDates.length; i++) {
+      if (this.dateService.isDatesEquals(lessonDate, this.currentWeekDates[i])) {
+        return this.timeColumnWidthPercetage + i * this.blockWidthPercentage;
+      }
+    }
+    return 0;
+  }
+
   private openLessonDialog(mode: DialogMode, lesson: Partial<Lesson> | null) {
     this.dialog.open(LessonDialogComponent, {
       width: '1200px',
@@ -316,6 +374,17 @@ export class ScheduleComponent implements OnInit {
       data: {
         mode: mode,
         lesson: lesson
+      }
+    });
+  }
+
+  private openSlotDialog(mode: DialogMode, slot: Partial<Slot> | null) {
+    this.dialog.open(SlotDialogComponent, {
+      width: '1200px',
+      disableClose: true,
+      data: {
+        mode: mode,
+        slot: slot
       }
     });
   }
@@ -328,6 +397,10 @@ export class ScheduleComponent implements OnInit {
     this.openLessonDialog(DialogMode.Edit, lesson);
   }
 
+  public editSlot(slot: Slot) {
+    this.openSlotDialog(DialogMode.Edit, slot);
+  }
+
   public cellIsClicked(time: string, dayName: string) {
     if (this.isCellDisabled(time, dayName)) {
       return;
@@ -337,59 +410,140 @@ export class ScheduleComponent implements OnInit {
     if (!date) {
       return;
     }
+    let options = [ScheduleObject.Slot, ScheduleObject.Lesson]
+    const dialogRef = this.openChoiceDialog(options);
 
-    var endTime = this.getNextTime(time);
-    const lesson = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
-    this.openLessonDialog(DialogMode.Add, lesson)
+    dialogRef.afterClosed().subscribe((option) => {
+      switch (option) {
+      case ScheduleObject.Slot:
+        this.openSlotDialog(DialogMode.Add, null);
+        break;
+      case ScheduleObject.Lesson:
+        var endTime = this.getNextTime(time);
+        const lesson = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
+        this.openLessonDialog(DialogMode.Add, lesson)
+        break;
+    }
+    });
+    
   }
 
   public isCellDisabled(time: string, dayName: string): boolean {
-    let cellStart = this.getDateByDayName(dayName);
-    if (!cellStart) {
+    const originalDate = this.getDateByDayName(dayName);
+    if (!originalDate) {
       return false;
     }
+    const cellStartDate = new Date(originalDate);
+    cellStartDate.setHours(0, 0, 0, 0);
 
-    cellStart = this.dateService.setTimeToDate(new Date(cellStart), time);
-    cellStart.setSeconds(0)
-
+    const cellStart = new Date(this.dateService.setTimeToDate(new Date(cellStartDate), time));
     const cellEnd = new Date(cellStart.getTime());
-    cellEnd.setMinutes(cellEnd.getMinutes() + 59);
-    cellEnd.setSeconds(0)
+    cellEnd.setMinutes(cellStart.getMinutes() + 59);
 
-    for (const lesson of this.lessons) {
-      const lessonStart = this.dateService.setTimeToDate(
-        new Date(this.dateService.stringToDate(lesson.date)),
-        lesson.startTime
-      );
-      const lessonEnd = this.dateService.setTimeToDate(
-        new Date(this.dateService.stringToDate(lesson.date)),
-        lesson.endTime
-      );
+    return this.lessons.some(lesson => {
+      const lessonDate = new Date(this.dateService.stringToDate(lesson.date));
+      const lessonStart = new Date(this.dateService.setTimeToDate(new Date(lessonDate), lesson.startTime));
+      const lessonEnd = new Date(this.dateService.setTimeToDate(new Date(lessonDate), lesson.endTime));
 
-      const isOverlap = lessonStart < cellEnd && lessonEnd > cellStart;
-
-      if (isOverlap) {
-        return true;
-      }
-    }
-    return false;
+      const result = (lessonStart >= cellStart && lessonStart <= cellEnd) ||
+        (lessonEnd >= cellStart && lessonEnd <= cellEnd) ||
+        (lessonStart <= cellStart && lessonEnd >= cellEnd);
+      return result;
+    });
   }
 
   public showTodayMessage(): boolean {
-    if (this.isOneDayFormat && this.dateService.dateIsToday(this.currentDate)) {
+    if (this.isOneDayFormat && this.dateIsToday(this.currentDate)) {
       return true;
     }
     return false;
   }
 
   public showWeekMessage(): boolean {
-    if (!this.isOneDayFormat && this.dateService.dateIsToday(this.currentDate)) {
+    if (!this.isOneDayFormat && this.dateIsToday(this.currentDate)) {
       return true;
     }
     return false;
   }
 
   public dateIsToday(date: Date): boolean {
-    return this.dateService.dateIsToday(date);
+    return this.dateService.isDatesEquals(date, this.today);
+  }
+
+  openChoiceDialog(options: string[]) {
+    const dialogRef = this.dialog.open(ChoiceDialogComponent, {
+      width: '1200px',
+      disableClose: true,
+      data: {
+        options: options
+      }
+    });
+    return dialogRef;
+  }
+
+  public getTimeDifference(time1: string, time2: string): number {
+    let minutes1 = this.dateService.stringToMinutes(time1);
+    let minutes2 = this.dateService.stringToMinutes(time2);
+    let difference = minutes1 - minutes2
+    if (difference < 0) {
+      return -difference;
+    }
+    return difference;
+  }
+
+  public sortLessonsByStartTime(ascending: boolean = true): void {
+    this.oneDayLessons.sort((a, b) => {
+      const timeA = this.dateService.stringToMinutes(a.startTime);
+      const timeB = this.dateService.stringToMinutes(b.startTime);
+
+      return ascending ? timeA - timeB : timeB - timeA;
+    });
+  }
+
+  public getBreakTime(index: number) {
+    let prevTime = this.oneDayLessons[index].endTime
+    let nextTime = this.oneDayLessons[index + 1].startTime
+    return this.getTimeDifference(prevTime, nextTime);
+  }
+
+  public notDefaultTime(lesson: Lesson): boolean {
+    let time = this.getTimeDifference(lesson.startTime, lesson.endTime);
+    if (time !== 60) {
+      return true;
+    }
+    return false;
+  }
+
+  public printTable(): void {
+    const printContent = document.getElementById('schedule-table')?.outerHTML;
+    const originalContent = document.body.innerHTML;
+
+    document.body.innerHTML = printContent || '';
+    window.print();
+    document.body.innerHTML = originalContent;
+
+    window.location.reload();
+  }
+
+  public getAppColor(appName: string | undefined): string {
+    if (appName) {
+      switch (appName) {
+        case 'WhatsApp':
+          return 'rgb(141, 255, 147)';
+        case 'Telegram':
+          return 'rgb(141, 238, 255)';
+        case 'Zoom':
+          return 'rgb(24, 143, 154)';
+        case 'Profi':
+          return 'rgb(255, 165, 171)';
+        case 'Teams':
+          return 'rgb(207, 144, 255)';
+      }
+    }
+    return 'rgb(255,255,255)'
+  }
+
+  getCurrentDateInString(): string {
+    return this.dateService.dateToString(this.currentDate);
   }
 }

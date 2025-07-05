@@ -7,6 +7,7 @@
 
 .calendar {
     width: 100%;
+    padding-bottom: 100px;
 }
 
 .calendar-sticky-header {
@@ -20,29 +21,60 @@
 .change-schedule-status-buttons {
     display: flex;
     flex-direction: row;
-    justify-content: center;
 }
 
 .change-schedule-status-button {
+    justify-items: center;
+    justify-content: center;
     margin-right: 20px;
     height: 30px;
     width: 30%;
     font-size: large;
-    border-radius: 20px;
-    background-color: white;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border: none;
+    color: rgba(0, 0, 0, 0.5);
+    padding: 0 15px;
     cursor: pointer;
+    border: 1px solid #e0e0e0;
+}
+
+.change-schedule-status-button.isActive {
+    background-color: #4299e1;
+    color: white;
 }
 
 .change-schedule-status-button:hover {
-    background-color: rgba(255, 255, 255, 0.4);
     transform: scale(1.01);
+    background-color: #4299e1;
+    color: white;
+}
+
+.change-schedule-status-button:active {
+    transform: scale(0.98);
+    background-color: #4299e1;
+}
+
+.change-schedule-status-button.isActive:hover {
+    transform: scale(1.01);
+    background-color: #3182ce;
+    color: white;
+}
+
+.change-schedule-status-button.isActive:active {
+    transform: scale(0.98);
+    background-color: #3182ce;
+    color: white;
 }
 
 .date-button {
     width: 30px;
     height: 30px;
     justify-content: center;
-    background: linear-gradient(135deg, #3498db, #2c3e50);
+    background: #4299e1;
     color: white;
     border-radius: 5px;
     border: none;
@@ -67,7 +99,25 @@
 .info {
     font-weight: 400;
     font-size: 20px;
-    margin-bottom: 5px;
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    vertical-align: middle;
+    margin-top: 5px;
+    gap: 16px;
+}
+
+.print-button {
+    margin-left: auto;
+    margin-bottom: 0;
+}
+
+#today-info {
+    font-weight: 600;
+}
+
+#week-info {
+    font-weight: 600;
 }
 
 .calendar-header {
@@ -185,14 +235,27 @@
 }
 
 .lesson {
-    font-size: small;
-    background-color: #f9f9f9;
-    cursor: pointer;
     position: absolute;
+    overflow: hidden;
+    font-size: small;
     z-index: 100;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    cursor: pointer;
+}
+
+.lesson:hover {
+    z-index: 200;
+    overflow: visible;
+}
+
+.lesson::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: transparent;
+    pointer-events: none;
+    z-index: 1;
 }
 
 .lesson-content {
@@ -200,24 +263,17 @@
     height: 100%;
     box-sizing: border-box;
     padding: 10px;
+    padding-top: 4px;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
 }
 
-.lesson:hover {
-    height: auto;
-    min-height: inherit;
-    z-index: 200;
-    overflow: visible;
-    height: auto;
-}
-
 .lesson:hover .lesson-content {
     white-space: normal;
     overflow: visible;
-    height: auto;
     min-height: initial;
+    height: 200px;
 }
 
 .lesson:hover .student-name {
@@ -226,26 +282,17 @@
     text-overflow: unset;
 }
 
-.lesson:hover::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: rgba(0, 0, 0, 0.15);
-    pointer-events: none;
-    height: auto;
-}
-
 .lesson-content {
     width: 100%;
     padding-left: 10px;
     padding-right: 10px;
     box-sizing: border-box;
-    overflow: visible;
 }
 
 .lesson-time {
     font-weight: 600;
     color: #2c3e50;
+    font-size: 14px;
 }
 
 .student-name {
@@ -259,8 +306,113 @@
     text-overflow: ellipsis;
 }
 
+
+
+.slot {
+    position: absolute;
+    overflow: hidden;
+    font-size: small;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    border: 10px solid #126850;
+    background-color: #a2e0ce;
+    box-sizing: border-box;
+}
+
+.slot:hover {
+    z-index: 200;
+    overflow: visible;
+}
+
+.slot::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-color: transparent;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.slot-content {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    padding: 10px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.slot:hover .slot-content {
+    white-space: normal;
+    overflow: visible;
+    min-height: initial;
+    height: 200px;
+}
+
+.slot-content {
+    width: 100%;
+    padding-left: 10px;
+    padding-right: 10px;
+    box-sizing: border-box;
+}
+
+.slot-time {
+    font-weight: 600;
+    color: #ff0000;
+    font-size: 14px;
+}
+
+.one-day-calendar {
+    padding-bottom: 100px;
+}
+
 .one-day-table {
-    border: 1px solid #2c3e50;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 16px;
+}
+
+.not-default {
+    border: 1px solid #ff9c9c;
+    background-color: #ffbdbd;
+}
+
+
+.one-day-table td {
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+}
+
+.one-day-table th {
+    background-color: #4299e1;
+    font-weight: 500;
+    color: #e2e8f0;
+    padding: 12px;
+}
+
+.time-distance-cell.not-default {
+    font-weight: 600;
+}
+
+.break-cell {
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+    background-color: #cecece;
+    color: #232323;
+}
+
+.break-row {
+    height: 40px;
+}
+
+.student-cell {
+    font-weight: 600;
+    font-size: 20px;
 }
 
 .fixed-block {
@@ -305,4 +457,111 @@
 .add-lesson-button:active {
     transform: translateY(0);
     box-shadow: 0 3px 8px rgba(41, 128, 185, 0.3);
+}
+
+
+/* В ваш файл стилей добавьте: */
+@media print {
+
+    @page {
+        margin: 0;
+        /* Убираем отступы */
+        size: auto;
+        /* Автоматический размер */
+    }
+
+
+    body::after {
+        display: none;
+        /* Скрываем footer */
+    }
+
+    /* Скрываем заголовки и адреса */
+    @page :footer {
+        display: none;
+    }
+
+    @page :header {
+        display: none;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #schedule-table,
+    #schedule-table * {
+        visibility: visible;
+    }
+
+    #schedule-table {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .print-button {
+        display: none;
+    }
+
+    .break-cell {
+        page-break-after: avoid;
+    }
+
+    .one-day-table {
+        font-size: 12pt;
+        /* Стандартный размер для печати */
+    }
+
+    .lesson-info-row {
+        page-break-inside: avoid;
+        /* Не разрывать строки между страницами */
+    }
+}
+
+/* Стили для кнопки печати (не для печати) */
+.print-button {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+}
+
+.print-button:hover {
+    background: #3182ce;
+}
+
+.lesson-info-row {
+    height: 80px;
+}
+
+.time-start-cell {
+    font-size: 24px;
+    font-weight: bolder;
+}
+
+.time-end-cell {
+    font-size: 24px;
+    font-weight: bolder;
+}
+
+.communication-cell {
+    font-weight: 600;
+}
+
+.platform-cell {
+    font-weight: 600;
+}
+
+.time-distance-cell {
+    font-weight: 600;
 }

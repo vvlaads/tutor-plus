@@ -133,22 +133,82 @@
 }
 
 .cancel-button:hover {
-    background-color: #f7fafc;
+    background-color: #e5e7e8;
     border-color: #cbd5e0;
 }
+
+.delete-button {
+    background-color: #ffffff;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    font-family: sans-serif;
+}
+
+
+.form-group-inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 12px;
+}
+
+.delete-button:hover {
+    background-color: #e74646;
+    color: #e2e8f0;
+}
+
 
 .error-message {
     color: #e74646;
 }
 
 input[type="checkbox"] {
-  transform: scale(1.8);       /* увеличить размер */
-  transform-origin: top left;  /* точка масштабирования — левый верхний угол, чтобы не съезжало */
-  cursor: pointer;
-  width: 20px;                 /* базовый размер input */
-  height: 20px;                /* базовый размер input */
-  margin: 0;                   /* убрать внешние отступы */
-  padding: 0;
-  display: inline-block;       /* НЕ flex, чтобы не занимал лишнее */
-  vertical-align: middle;      /* для выравнивания по вертикали */
+    transform-origin: top left;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+input[type="date"] {
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+select {
+    padding: 14px 16px;
+    padding-right: 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 18px;
+    background-color: #f8fafc;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+select:hover {
+    border-color: #cbd5e0;
+    background-color: #ffffff;
+}
+
+select:focus {
+    outline: none;
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+    background-color: #ffffff;
 }

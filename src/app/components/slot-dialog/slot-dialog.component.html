@@ -1,0 +1,40 @@
+<div class="form-container">
+    <h2 class="form-title">{{title}}</h2>
+    <div class="form-content">
+        <form [formGroup]="slotForm" class="slot-form" (ngSubmit)="submit()">
+            <div class="form-group">
+                <label for="input-date" class="form-label">Дата:</label>
+                <input formControlName="date" id="input-date" class="form-input" type="date">
+                <div *ngIf="formSubmitted && slotForm.get('date')?.errors" class="error-message">
+                    {{ getError('date') }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="input-startTime" class="form-label">Начало:</label>
+                <input formControlName="startTime" id="input-startTime" class="form-input" placeholder="10:00">
+                <div *ngIf="formSubmitted && slotForm.get('startTime')?.errors" class="error-message">
+                    {{ getError('startTime') }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="input-endTime" class="form-label">Конец:</label>
+                <input formControlName="endTime" id="input-endTime" class="form-input" placeholder="12:00">
+                <div *ngIf="formSubmitted && slotForm.get('endTime')?.errors" class="error-message">
+                    {{ getError('endTime') }}
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-button">
+                    {{submitMessage}}
+                </button>
+                <button type="button" (click)="close(false)" class="cancel-button">
+                    Отмена
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>

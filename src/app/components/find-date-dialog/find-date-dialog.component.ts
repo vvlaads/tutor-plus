@@ -26,12 +26,8 @@ export class FindDateDialogComponent {
       return;
     }
 
-    let selectedDate = this.findDateForm.value.date;
-    const parts = selectedDate.split('-');
-    const year = parts[0];
-    const month = parts[1];
-    const day = parts[2];
-    this.close(`${day}.${month}.${year}`);
+    const selectedDate = this.findDateForm.value.date;
+    this.close(this.dateService.changeFormatMinusToDot(selectedDate));
   }
 
   close(date: string | null) {

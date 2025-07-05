@@ -1,10 +1,10 @@
-<main class="content-wrapper" [style.margin-left]="marginLeft">
+<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
     <div class="work-panel">
         <div class="change-student-status-buttons">
-            <button class="change-student-status-button" (click)="setActual(true)"
-                [class.isActive]="isActive">Актуальные</button>
-            <button class="change-student-status-button" (click)="setActual(false)"
-                [class.isActive]="!isActive">Завершённые</button>
+            <button class="change-student-status-button" (click)="setActiveFormat(true)"
+                [class.isActive]="isActiveFormat">Актуальные</button>
+            <button class="change-student-status-button" (click)="setActiveFormat(false)"
+                [class.isActive]="!isActiveFormat">Завершённые</button>
         </div>
 
         <hr>
@@ -15,7 +15,7 @@
     </div>
 
     <div class="student-list">
-        <div *ngFor="let student of students" class="student-block" (click)="openStudentProfile(student.id)">
+        <div *ngFor="let student of filteredStudents" class="student-block" (click)="openStudentProfile(student.id)">
             <h3>{{ student.name }}</h3>
             <div class="student-block-content">
                 <div class="student-block-info">
@@ -23,8 +23,28 @@
                     <p>Телефон: {{ student.phone }}</p>
                 </div>
                 <div class="student-block-lessons">
-                    <p>Последнее занятие: 22.04.2025</p>
-                    <p>Следующее занятие: 23.09.2025</p>
+                    <p>
+                        Последнее занятие:
+                        <ng-container *ngIf="isPrevLessonsLoading; else prevLessonLoaded">
+                            <span class="loading-text">Загрузка...</span>
+                        </ng-container>
+                        <ng-template #prevLessonLoaded>
+                            <span [class.no-data]="!(prevLessons$ | async)?.get(student.id)">
+                                {{ getPrevLessonDate((prevLessons$ | async)?.get(student.id)) }}
+                            </span>
+                        </ng-template>
+                    </p>
+                    <p>
+                        Следующее занятие:
+                        <ng-container *ngIf="isNextLessonsLoading; else nextLessonLoaded">
+                            <span class="loading-text">Загрузка...</span>
+                        </ng-container>
+                        <ng-template #nextLessonLoaded>
+                            <span [class.no-data]="!(nextLessons$ | async)?.get(student.id)">
+                                {{ getNextLessonDate((nextLessons$ | async)?.get(student.id)) }}
+                            </span>
+                        </ng-template>
+                    </p>
                 </div>
             </div>
         </div>

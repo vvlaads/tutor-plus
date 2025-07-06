@@ -1,4 +1,4 @@
-<main class="content-wrapper" [style.margin-left]="marginLeft">
+<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
     <div *ngIf="student" class="profile-container">
         <!-- Заголовок профиля -->
         <div class="profile-header">
@@ -12,16 +12,18 @@
 
         <div class="statistics">
             <div class="statistics-info">
-                <span class="info-label">Итого проведено:</span>
-                <span class="info-value"> {{ prevLessonsCount }} </span>
+                <span class="info-label stat-label">Итого проведено:</span>
+                <span class="info-value stat-value"> {{ prevLessonsCount }} </span>
             </div>
             <div class="statistics-info">
-                <span class="info-label">Неоплачено уроков:</span>
-                <span class="info-value"> {{ unpaidLessonsCount }} </span>
+                <span class="info-label stat-label">Неоплачено уроков:</span>
+                <span class="info-value stat-value" [class.red]="unpaidLessonsCount>0"> {{ unpaidLessonsCount }}
+                </span>
             </div>
             <div class="statistics-info">
-                <span class="info-label">Предоплачено уроков:</span>
-                <span class="info-value"> {{ prepaidLessonsCount }} </span>
+                <span class="info-label stat-label">Предоплачено уроков:</span>
+                <span class="info-value  stat-value" [class.green]="prepaidLessonsCount>0"> {{ prepaidLessonsCount }}
+                </span>
             </div>
         </div>
 

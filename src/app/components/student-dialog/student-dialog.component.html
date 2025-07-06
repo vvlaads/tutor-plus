@@ -62,7 +62,7 @@
             <div class="form-group">
                 <label for="input-cost" class="form-label">Стоимость за час:</label>
                 <div class="input-with-symbol">
-                    <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000">
+                    <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000" type="number">
                     <span class="currency-symbol">₽</span>
                 </div>
                 <div *ngIf="formSubmitted && studentForm.get('cost')?.errors" class="error-message">
@@ -72,7 +72,7 @@
 
             <div class="form-group">
                 <label class="form-label">Статус:</label>
-                <select formControlName="isActive" [compareWith]="compareFn">
+                <select formControlName="isActive">
                     <option *ngFor="let option of statusOptions" [ngValue]="option.value">
                         {{ option.text }}
                     </option>
@@ -100,7 +100,7 @@
                 <button type="submit" class="submit-button">
                     {{submitMessage}}
                 </button>
-                <button type="button" (click)="close(false)" class="cancel-button">
+                <button type="button" (click)="close()" class="cancel-button">
                     Отмена
                 </button>
             </div>

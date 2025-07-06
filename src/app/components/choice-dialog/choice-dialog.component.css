@@ -1,5 +1,5 @@
 .dialog-container {
-    height: 600px;
+    height: auto;
     margin: 0;
     padding: 24px;
     box-sizing: border-box;
@@ -12,15 +12,20 @@
     overflow: hidden;
 }
 
+.dialog-header {
+    text-align: center;
+}
+
 .options-container {
     display: flex;
     flex-direction: column;
-    height: 300px;
 }
 
 .option-button {
+    justify-content: center;
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
     display: flex;
-    justify-content: flex-end;
     gap: 12px;
     margin-top: 24px;
     background-color: #4299e1;
@@ -31,11 +36,11 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size: 20px;
-    font-family: sans-serif;
 }
 
 .cancel-button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
@@ -48,6 +53,4 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    font-size: 20px;
-    font-family: sans-serif;
 }

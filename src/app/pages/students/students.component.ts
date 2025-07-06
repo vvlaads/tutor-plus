@@ -14,6 +14,7 @@ import { Lesson, Student } from '../../app.interfaces';
 import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN } from '../../app.constants';
 import { take, Subscription } from 'rxjs';
 import { LessonService } from '../../services/lesson.service';
+import { formatPhoneNumber } from '../../app.functions';
 
 @Component({
   selector: 'app-students',
@@ -41,6 +42,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
   public isActiveFormat = true;
   public isLoading = false;
   public searchQuery = '';
+  public formatPhoneNumber = formatPhoneNumber;
 
   public isPrevLessonsLoading = true;
   public isNextLessonsLoading = true;

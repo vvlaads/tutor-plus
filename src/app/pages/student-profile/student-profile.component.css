@@ -231,3 +231,26 @@
     color: #95a5a6;
     font-size: 20px;
 }
+
+.statistics {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 600;
+}
+
+.stat-label {
+    font-size: 24px;
+}
+
+.red {
+    color: #dc3545;
+}
+
+.green {
+    color: #28a745;
+}

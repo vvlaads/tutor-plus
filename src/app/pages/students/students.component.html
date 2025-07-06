@@ -24,7 +24,7 @@
             <div class="student-block-content">
                 <div class="student-block-info">
                     <p>Предмет: <span class="student-value">{{ student.subject }}</span></p>
-                    <p>Телефон: <span class="student-value">{{ student.phone }}</span></p>
+                    <p>Телефон: <span class="student-value">{{ formatPhoneNumber(student.phone) }}</span></p>
                 </div>
                 <div class="student-block-lessons">
                     <p>

@@ -6,10 +6,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { LayoutService } from '../../services/layout.service';
 import { StudentDialogComponent } from '../../components/student-dialog/student-dialog.component';
 import { DialogMode } from '../../app.enums';
-import { Lesson, SelectOptionWithIcon } from '../../app.interfaces';
+import { Lesson, SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { LessonSliderComponent } from '../../components/lesson-slider/lesson-slider.component';
-import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS } from '../../app.constants';
+import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, PLATFORM_OPTIONS } from '../../app.constants';
 import { LessonService } from '../../services/lesson.service';
+import { formatPhoneNumber } from '../../app.functions';
 
 @Component({
   selector: 'app-student-profile',
@@ -18,47 +19,57 @@ import { LessonService } from '../../services/lesson.service';
   styleUrl: './student-profile.component.css'
 })
 export class StudentProfileComponent implements OnInit {
-  student: any = null;
+  public student: Student | null = null;
   private dialog = inject(MatDialog);
-  marginLeft = '25%';
-  platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
-  communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
-  fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;
-
-  studentLessons: Lesson[] = []
+  public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
+  public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
+  public communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
+  public fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;
   public prevLessonsCount: number = 0;
   public unpaidLessonsCount: number = 0;
   public prepaidLessonsCount: number = 0;
+  public formatPhoneNumber = formatPhoneNumber;
 
   constructor(private route: ActivatedRoute,
     private studentService: StudentService,
     private layoutService: LayoutService,
     private lessonService: LessonService) {
     this.layoutService.isHide$.subscribe(isHide => {
-      this.marginLeft = isHide ? '7%' : '25%'
+      this.pageMarginLeftPercentage = isHide ? PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN : PAGE_MARGIN_LEFT_PERCENTAGE
     })
   }
 
-  async ngOnInit() {
+  public async ngOnInit(): Promise<void> {
+    this.subscribeToLessons();
+    this.subscribeToStudents();
+  }
+
+  private subscribeToLessons(): void {
+    this.lessonService.lessons$.subscribe(lessons => {
+      this.loadStudent();
+    })
+  }
+
+  private subscribeToStudents(): void {
+    this.studentService.students$.subscribe(students => {
+      this.loadStudent();
+    })
+  }
+
+  public async loadStudent(): Promise<void> {
     const studentId = this.route.snapshot.paramMap.get('id');
     if (studentId) {
-      await this.loadStudent(studentId);
+      this.student = await this.studentService.getStudentById(studentId);
+      this.prevLessonsCount = await this.getPrevLessonsCount();
+      this.unpaidLessonsCount = await this.getUnpaidLessonsCount();
+      this.prepaidLessonsCount = await this.getPrepaidLessonsCount();
     }
-    this.lessonService.lessons$.subscribe(lessons => {
-      this.loadStudent(this.student.id);
-    })
   }
 
-  async loadStudent(studentId: string) {
-    this.student = await this.studentService.getStudentById(studentId);
-    this.prevLessonsCount = await this.getPrevLessonsCount();
-    this.unpaidLessonsCount = await this.getUnpaidLessonsCount();
-    this.prepaidLessonsCount = await this.getPrepaidLessonsCount();
-  }
-
-  public goBack() {
+  public goBack(): void {
     window.history.back();
   }
+
   public updateStudent(): void {
     this.openDialog();
   }
@@ -85,7 +96,7 @@ export class StudentProfileComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((updated) => {
       if (updated) {
-        this.loadStudent(this.student.id);
+        this.loadStudent();
       }
     });
   }
@@ -105,32 +116,27 @@ export class StudentProfileComponent implements OnInit {
     return from?.icon || '';
   }
 
-
-  //Форматирует номер телефона в формате +7XXXXXXXXXX в читаемый вид: +7 (XXX) XXX-XX-XX
-  public formatPhoneNumber(phone: string): string {
-    const digitsOnly = phone.replace(/\D/g, ''); // Удаляем все нецифровые символы
-
-    // Проверяем соответствие формату
-    if (!digitsOnly.startsWith('7') || digitsOnly.length !== 11) {
-      throw new Error('Неверный формат номера. Ожидается: +7XXXXXXXXXX (11 цифр)');
-    }
-    // Форматируем номер
-    return `+7(${digitsOnly.substring(1, 4)})${digitsOnly.substring(4, 7)}-${digitsOnly.substring(7, 9)}-${digitsOnly.substring(9)}`;
-  }
-
   public async getPrevLessonsCount(): Promise<number> {
-    const lessons = await this.lessonService.getPrevLessonsByStudentId(this.student.id);
-    return lessons.length;
+    if (this.student) {
+      const lessons = await this.lessonService.getPrevLessonsByStudentId(this.student.id);
+      return lessons.length;
+    }
+    return 0;
   }
 
   public async getUnpaidLessonsCount(): Promise<number> {
-    const lessons = await this.lessonService.getUnpaidLessonsByStudentId(this.student.id);
-    return lessons.length;
+    if (this.student) {
+      const lessons = await this.lessonService.getUnpaidLessonsByStudentId(this.student.id);
+      return lessons.length;
+    }
+    return 0;
   }
 
   public async getPrepaidLessonsCount(): Promise<number> {
-    const lessons = await this.lessonService.getPrepaidLessonsByStudentId(this.student.id);
-    return lessons.length;
+    if (this.student) {
+      const lessons = await this.lessonService.getPrepaidLessonsByStudentId(this.student.id);
+      return lessons.length;
+    }
+    return 0;
   }
-
 }

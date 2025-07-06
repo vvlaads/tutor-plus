@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Inject, inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -7,7 +7,7 @@ import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
-import { ColorService } from '../../services/color.service';
+import { allowedValuesValidator, generateColor } from '../../app.functions';
 
 @Component({
   selector: 'app-student-dialog',
@@ -17,30 +17,31 @@ import { ColorService } from '../../services/color.service';
 })
 export class StudentDialogComponent {
   private dialogRef = inject(MatDialogRef<StudentDialogComponent>);
-  private mode: DialogMode = DialogMode.Add;
+  private mode: DialogMode;
 
   public studentForm: FormGroup;
-  public title: string = 'Добавление ученика'
-  public submitMessage: string = 'Добавить'
+  public title: string;
+  public submitMessage: string;
   public formSubmitted = false;
-
-
   public statusOptions = STATUS_OPTIONS;
-
   public communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
-
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
-
   public fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;
 
-  constructor(
+  @ViewChild('colorPicker')
+  public colorPicker!: ElementRef<HTMLInputElement>;
+
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscapeKey(event: KeyboardEvent) {
+    this.close();
+  }
+
+  public constructor(
     private fb: FormBuilder,
     private studentService: StudentService,
-    private colorService: ColorService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, student: Student | null }
   ) {
     this.mode = data.mode;
-    var isActive = true;
     switch (this.mode) {
       case DialogMode.Add:
         this.title = 'Добавление ученика'
@@ -49,46 +50,36 @@ export class StudentDialogComponent {
       case DialogMode.Edit:
         this.title = 'Обновить ученика'
         this.submitMessage = 'Сохранить'
-        if (data.student) {
-          isActive = data.student.isActive
-        }
         break;
     }
-    let color = colorService.generateColor();
+
+    let isActive = true;
+    let color = generateColor();
     if (data.student) {
       color = data.student.color;
+      isActive = data.student.isActive;
     }
 
     this.studentForm = this.fb.group({
       name: [data.student?.name, [Validators.required]],
       phone: [data.student?.phone, [Validators.required, Validators.pattern(/^\+79\d{9}$/)]],
       subject: [data.student?.subject, Validators.required],
-      communication: [data.student?.communication, Validators.required],
-      platform: [data.student?.platform, Validators.required],
+      communication: [data.student?.communication, [Validators.required, allowedValuesValidator(this.communicationOptions, 'value')]],
+      platform: [data.student?.platform, [Validators.required, allowedValuesValidator(this.platformOptions, 'value')]],
       cost: [data.student?.cost, [Validators.required, Validators.min(0)]],
-      isActive: [isActive, [Validators.required]],
-      from: [data.student?.from, [Validators.required]],
+      isActive: [isActive, [Validators.required, allowedValuesValidator(this.statusOptions, 'value')]],
+      from: [data.student?.from, [Validators.required, allowedValuesValidator(this.fromOptions, 'value')]],
       color: [color, [Validators.required]]
     });
   }
 
-  onSelectCommunication(optionValue: string) {
-    this.studentForm.get('communication')?.setValue(optionValue);
-  }
-
-  onSelectPlatform(optionValue: string) {
-    this.studentForm.get('platform')?.setValue(optionValue);
-  }
-
-  onSelectFrom(optionValue: string) {
-    this.studentForm.get('from')?.setValue(optionValue);
-  }
-
   public submit(): void {
     this.formSubmitted = true;
+
     Object.keys(this.studentForm.controls).forEach(key => {
       this.studentForm.get(key)?.markAsTouched();
     });
+
     if (this.studentForm.invalid) {
       return;
     }
@@ -103,18 +94,16 @@ export class StudentDialogComponent {
     }
   }
 
-
   public addStudent(): void {
     const newStudent: Student = {
       ...this.studentForm.value
     };
-    this.studentService.addStudent(newStudent).then(_ => {
-      this.close(true);
-    })
-      .catch(error => {
-        console.error('Ошибка при добавлении:', error);
-        this.close(false);
-      });
+
+    this.studentService.addStudent(newStudent).catch(error => {
+      console.error('Ошибка при добавлении:', error);
+    });
+
+    this.close();
   }
 
   public updateStudent(): void {
@@ -123,19 +112,27 @@ export class StudentDialogComponent {
       ...this.studentForm.value
     };
 
-    this.studentService.updateStudent(updatedStudent.id, updatedStudent).then(_ => {
-      this.close(true);
-    })
-      .catch(error => { console.error('Ошибка при обновлении:', error); this.close(false); });
+    this.studentService.updateStudent(updatedStudent.id, updatedStudent).catch(error => {
+      console.error('Ошибка при обновлении:', error);
+    });
 
+    this.close();
   }
 
-  public compareFn(option1: boolean, option2: boolean): boolean {
-    return option1 === option2;
+  public onSelectCommunication(optionValue: string): void {
+    this.studentForm.get('communication')?.setValue(optionValue);
   }
 
-  public close(status: boolean): void {
-    this.dialogRef.close(status);
+  public onSelectPlatform(optionValue: string): void {
+    this.studentForm.get('platform')?.setValue(optionValue);
+  }
+
+  public onSelectFrom(optionValue: string): void {
+    this.studentForm.get('from')?.setValue(optionValue);
+  }
+
+  public close(): void {
+    this.dialogRef.close();
   }
 
   public getError(field: string): string | null {
@@ -145,10 +142,10 @@ export class StudentDialogComponent {
     if (control.errors['required']) return '*Поле обязательно';
     if (control.errors['pattern']) return '*Неверный формат';
     if (control.errors['min']) return '*Слишком маленькое значение';
+    if (control.errors['allowedValues']) return '*Недопустимое значение';
+
     return null;
   }
-
-  @ViewChild('colorPicker') colorPicker!: ElementRef<HTMLInputElement>;
 
   public openColorPicker(): void {
     const buttonRect = this.colorPicker.nativeElement.getBoundingClientRect();

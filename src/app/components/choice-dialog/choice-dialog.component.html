@@ -7,14 +7,13 @@
     <div class="options-container">
         <button class="option-button" *ngFor="let option of options" (click)="submit(option.value)">
             <span class="option-text">{{option.text}}</span>
-            <span class="option-arrow">→</span>
         </button>
     </div>
 
     <div class="dialog-footer">
         <button class="cancel-button" (click)="close(null)">
             <span class="cancel-icon">×</span>
-            Отмена
+            <span class="cancel-text">Отмена</span>
         </button>
     </div>
 </div>

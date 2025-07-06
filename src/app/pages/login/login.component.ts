@@ -8,10 +8,10 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
-  constructor(private authService: AuthService) {
+  public constructor(private authService: AuthService) {
 
   }
-  loginWithGoogle() {
+  public loginWithGoogle(): void {
     this.authService.googleSignIn();
   }
 }

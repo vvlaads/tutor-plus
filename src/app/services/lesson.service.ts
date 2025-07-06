@@ -64,6 +64,41 @@ export class LessonService implements OnDestroy {
     this.nextLessonsSubject.next(nextLessonsMap);
   }
 
+  private findClosestLesson(lessons: Lesson[], now: Date, direction: 'prev' | 'next'): Lesson | null {
+    if (lessons.length === 0) return null;
+
+    const lessonsWithTimestamps = lessons
+      .filter(lesson => !!lesson.date && !!lesson.startTime)
+      .map(lesson => ({
+        lesson,
+        timestamp: this.getLessonTimestamp(lesson)
+      }));
+
+    if (lessonsWithTimestamps.length === 0) return null;
+
+    lessonsWithTimestamps.sort((a, b) =>
+      direction === 'prev'
+        ? b.timestamp - a.timestamp
+        : a.timestamp - b.timestamp
+    );
+
+    const foundLesson = lessonsWithTimestamps.find(item =>
+      direction === 'prev'
+        ? new Date(item.timestamp) < now
+        : new Date(item.timestamp) > now
+    );
+
+    return foundLesson?.lesson || null;
+  }
+
+  private findPrevLesson(lessons: Lesson[], now: Date): Lesson | null {
+    return this.findClosestLesson(lessons, now, 'prev');
+  }
+
+  private findNextLesson(lessons: Lesson[], now: Date): Lesson | null {
+    return this.findClosestLesson(lessons, now, 'next');
+  }
+
   private stopListening(): void {
     if (this.unsubscribe) {
       this.unsubscribe();
@@ -113,48 +148,11 @@ export class LessonService implements OnDestroy {
     await deleteDoc(doc(this.firestore, 'lessons', id));
   }
 
-  private findClosestLesson(lessons: Lesson[], now: Date, direction: 'prev' | 'next'): Lesson | null {
-    if (lessons.length === 0) return null;
-
-    try {
-      const lessonsWithTimestamps = lessons
-        .filter(lesson => !!lesson.date && !!lesson.startTime)
-        .map(lesson => ({
-          lesson,
-          timestamp: this.getLessonTimestamp(lesson)
-        }));
-
-      if (lessonsWithTimestamps.length === 0) return null;
-
-      lessonsWithTimestamps.sort((a, b) =>
-        direction === 'prev'
-          ? b.timestamp - a.timestamp
-          : a.timestamp - b.timestamp
-      );
-
-      const foundLesson = lessonsWithTimestamps.find(item => {
-        try {
-          return direction === 'prev'
-            ? new Date(item.timestamp) < now
-            : new Date(item.timestamp) > now;
-        } catch {
-          return false;
-        }
-      });
-
-      return foundLesson?.lesson || null;
-    } catch (error) {
-      console.error(`Ошибка при поиске ${direction === 'prev' ? 'предыдущего' : 'следующего'} занятия:`, error);
-      return null;
+  public async deleteLessonsByStudentId(studentId: string): Promise<void> {
+    const lessons = await this.getLessonsByStudentId(studentId);
+    for (let i = 0; i < lessons.length; i++) {
+      this.deleteLesson(lessons[i].id);
     }
-  }
-
-  private findPrevLesson(lessons: Lesson[], now: Date): Lesson | null {
-    return this.findClosestLesson(lessons, now, 'prev');
-  }
-
-  private findNextLesson(lessons: Lesson[], now: Date): Lesson | null {
-    return this.findClosestLesson(lessons, now, 'next');
   }
 
   public async getLessonsByStudentId(studentId: string): Promise<Lesson[]> {
@@ -163,21 +161,83 @@ export class LessonService implements OnDestroy {
     return studentLessons;
   }
 
-  public async getPrevLessonByStudentId(studentId: string) {
-    const now = new Date();
-    const studentLessons = await this.getLessonsByStudentId(studentId);
-    return this.findPrevLesson(studentLessons, now)
+  public async getPrevLessonByStudentId(studentId: string): Promise<Lesson | null> {
+    const studentLessons = await this.getPrevLessonsByStudentId(studentId);
+    if (studentLessons.length === 0) {
+      return null;
+    }
+    return studentLessons[-1];
   }
 
-  public async getNextLessonByStudentId(studentId: string) {
-    const now = new Date();
-    const studentLessons = await this.getLessonsByStudentId(studentId);
-    return this.findNextLesson(studentLessons, now)
+  public async getNextLessonByStudentId(studentId: string): Promise<Lesson | null> {
+    const studentLessons = await this.getNextLessonsByStudentId(studentId);
+    if (studentLessons.length === 0) {
+      return null;
+    }
+    return studentLessons[0];
   }
 
   private getLessonTimestamp(lesson: Lesson): number {
     const date = this.dateService.stringToDate(lesson.date);
     date.setHours(0, this.dateService.stringToMinutes(lesson.startTime), 0, 0)
     return date.getTime();
+  }
+
+  public async getPrevLessonsByStudentId(studentId: string): Promise<Lesson[]> {
+    try {
+      const now = new Date();
+      const studentLessons = await this.getLessonsByStudentId(studentId);
+
+      const prevLessons = studentLessons.filter(lesson => {
+        try {
+          return this.getLessonTimestamp(lesson) < now.getTime();
+        } catch {
+          return false;
+        }
+      });
+      prevLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
+
+      return prevLessons;
+    } catch (error) {
+      console.error('Ошибка при получении предыдущих уроков:', error);
+      return [];
+    }
+  }
+
+  public async getNextLessonsByStudentId(studentId: string): Promise<Lesson[]> {
+    try {
+      const now = new Date();
+      const studentLessons = await this.getLessonsByStudentId(studentId);
+
+      const nextLessons = studentLessons.filter(lesson => {
+        try {
+          return this.getLessonTimestamp(lesson) > now.getTime();
+        } catch {
+          return false;
+        }
+      });
+      nextLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
+
+      return nextLessons;
+    } catch (error) {
+      console.error('Ошибка при получении предыдущих уроков:', error);
+      return [];
+    }
+  }
+
+  public async getUnpaidLessonsByStudentId(studentId: string) {
+    const studentLessons = await this.getPrevLessonsByStudentId(studentId);
+    const unpaidLessons = studentLessons.filter(lesson => !lesson.isPaid);
+    unpaidLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
+
+    return unpaidLessons;
+  }
+
+  public async getPrepaidLessonsByStudentId(studentId: string) {
+    const studentLessons = await this.getNextLessonsByStudentId(studentId);
+    const prepaidLessons = studentLessons.filter(lesson => lesson.isPaid);
+    prepaidLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
+
+    return prepaidLessons;
   }
 }

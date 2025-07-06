@@ -9,6 +9,7 @@ import { DialogMode } from '../../app.enums';
 import { Lesson, SelectOptionWithIcon } from '../../app.interfaces';
 import { LessonSliderComponent } from '../../components/lesson-slider/lesson-slider.component';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS } from '../../app.constants';
+import { LessonService } from '../../services/lesson.service';
 
 @Component({
   selector: 'app-student-profile',
@@ -25,10 +26,14 @@ export class StudentProfileComponent implements OnInit {
   fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;
 
   studentLessons: Lesson[] = []
+  public prevLessonsCount: number = 0;
+  public unpaidLessonsCount: number = 0;
+  public prepaidLessonsCount: number = 0;
 
   constructor(private route: ActivatedRoute,
     private studentService: StudentService,
-    private layoutService: LayoutService) {
+    private layoutService: LayoutService,
+    private lessonService: LessonService) {
     this.layoutService.isHide$.subscribe(isHide => {
       this.marginLeft = isHide ? '7%' : '25%'
     })
@@ -39,16 +44,22 @@ export class StudentProfileComponent implements OnInit {
     if (studentId) {
       await this.loadStudent(studentId);
     }
+    this.lessonService.lessons$.subscribe(lessons => {
+      this.loadStudent(this.student.id);
+    })
   }
 
   async loadStudent(studentId: string) {
     this.student = await this.studentService.getStudentById(studentId);
+    this.prevLessonsCount = await this.getPrevLessonsCount();
+    this.unpaidLessonsCount = await this.getUnpaidLessonsCount();
+    this.prepaidLessonsCount = await this.getPrepaidLessonsCount();
   }
 
   public goBack() {
     window.history.back();
   }
-  public updateStudent(studentId: string): void {
+  public updateStudent(): void {
     this.openDialog();
   }
   public deleteStudent(studentId: string): void {
@@ -105,6 +116,21 @@ export class StudentProfileComponent implements OnInit {
     }
     // Форматируем номер
     return `+7(${digitsOnly.substring(1, 4)})${digitsOnly.substring(4, 7)}-${digitsOnly.substring(7, 9)}-${digitsOnly.substring(9)}`;
+  }
+
+  public async getPrevLessonsCount(): Promise<number> {
+    const lessons = await this.lessonService.getPrevLessonsByStudentId(this.student.id);
+    return lessons.length;
+  }
+
+  public async getUnpaidLessonsCount(): Promise<number> {
+    const lessons = await this.lessonService.getUnpaidLessonsByStudentId(this.student.id);
+    return lessons.length;
+  }
+
+  public async getPrepaidLessonsCount(): Promise<number> {
+    const lessons = await this.lessonService.getPrepaidLessonsByStudentId(this.student.id);
+    return lessons.length;
   }
 
 }

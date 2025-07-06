@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
+import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN } from '../../app.constants';
 
 @Component({
   selector: 'app-home',
@@ -8,11 +9,11 @@ import { LayoutService } from '../../services/layout.service';
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  marginLeft = '25%';
+  public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
 
-  constructor(private layoutService: LayoutService) {
+  public constructor(private layoutService: LayoutService) {
     this.layoutService.isHide$.subscribe(isHide => {
-      this.marginLeft = isHide ? '7%' : '25%'
+      this.pageMarginLeftPercentage = isHide ? PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN : PAGE_MARGIN_LEFT_PERCENTAGE
     })
   }
 }

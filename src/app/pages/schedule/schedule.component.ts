@@ -14,6 +14,7 @@ import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDU
 import { SlotService } from '../../services/slot.service';
 import { SlotDialogComponent } from '../../components/slot-dialog/slot-dialog.component';
 import { ChoiceDialogComponent } from '../../components/choice-dialog/choice-dialog.component';
+import * as XLSX from 'xlsx';
 
 @Component({
   standalone: true,
@@ -144,7 +145,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   private updateCurrentDate(newDate: Date): void {
-    this.currentDate.setDate(newDate.getDate());
+    this.currentDate = new Date(newDate);
     this.updateCurrentWeek();
     this.lessonService.lessons$.pipe(take(1)).subscribe(lessons => {
       this.updateLessons(lessons);
@@ -488,5 +489,45 @@ export class ScheduleComponent implements OnInit {
           break;
       }
     });
+  }
+
+  public async exportTables(): Promise<void> {
+
+    const rangeWeeks = 2;
+    this.resetCurrentDate();
+    this.updateCurrentDate(this.currentWeekDates[0]);
+    const dayInWeek = 7;
+    for (let i = 0; i < dayInWeek * rangeWeeks; i++) {
+      this.goToPrev();
+    }
+    const dayCount = (rangeWeeks * 2 + 1) * dayInWeek;
+    const workbook = XLSX.utils.book_new();
+
+    try {
+      console.log(`Начинаем экспорт`);
+
+      for (let i = 0; i < dayCount; i++) {
+        const tableElement = document.getElementById('schedule-table');
+        if (!tableElement) {
+          console.error('Таблица не найдена');
+          continue;
+        }
+
+        const worksheet = XLSX.utils.table_to_sheet(tableElement);
+        const sheetName = `${this.dateService.dateToString(this.currentDate)}`;
+        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
+        this.goToNext();
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      this.resetCurrentDate();
+      const fileName = `Расписание ${this.dateService.dateToString(this.currentDate)}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+      console.log('Экспорт завершен успешно!');
+
+    } catch (error) {
+      console.error('Ошибка при экспорте:', error);
+      this.resetCurrentDate();
+    }
   }
 }

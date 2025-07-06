@@ -24,7 +24,8 @@
             <div *ngIf="isOneDayFormat" class="info">
                 <span *ngIf="isOneDayFormat">{{getCurrentDateInString()}}</span>
                 <span id="today-info" *ngIf="showTodayMessage()"> Сегодня</span>
-                <button *ngIf="isOneDayFormat" class="print-button" (click)="printTable()">Печать</button>
+                <button class="print-button" (click)="printTable()">Печать</button>
+                <button class="export-button" (click)="exportTables()">Экспорт</button>
             </div>
             <div *ngIf="!isOneDayFormat" class="info">
                 <span id="year-info" *ngIf="!isOneDayFormat">{{currentDate.getFullYear()}} </span>
@@ -64,7 +65,9 @@
 
                 <div class="lesson-content" [style.background-color]="getStudentByLesson(lesson)?.color">
                     <span class="lesson-time">{{lesson.startTime}} - {{lesson.endTime}}</span>
-                    <br />
+                    <span class="lesson-paid-badge" [class.paid]="lesson.isPaid">
+                        {{lesson.isPaid ? '✓' : '₽'}}
+                    </span>
                     <span class="student-name">{{getStudentByLesson(lesson)?.name}}</span>
                 </div>
             </div>

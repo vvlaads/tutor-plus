@@ -10,6 +10,21 @@
             </button>
         </div>
 
+        <div class="statistics">
+            <div class="statistics-info">
+                <span class="info-label">Итого проведено:</span>
+                <span class="info-value"> {{ prevLessonsCount }} </span>
+            </div>
+            <div class="statistics-info">
+                <span class="info-label">Неоплачено уроков:</span>
+                <span class="info-value"> {{ unpaidLessonsCount }} </span>
+            </div>
+            <div class="statistics-info">
+                <span class="info-label">Предоплачено уроков:</span>
+                <span class="info-value"> {{ prepaidLessonsCount }} </span>
+            </div>
+        </div>
+
         <div class="divider"></div>
 
         <!-- Блок с уроками -->
@@ -79,7 +94,7 @@
 
     <!-- Кнопка редактирования -->
     <div class="edit-button-container">
-        <button class="edit-button floating-button" (click)="updateStudent(student.id)">
+        <button class="edit-button floating-button" (click)="updateStudent()">
             <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png" class="edit-icon"
                 alt="Edit">
             <span>Редактировать</span>

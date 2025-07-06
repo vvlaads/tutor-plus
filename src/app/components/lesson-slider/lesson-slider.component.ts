@@ -51,6 +51,7 @@ export class LessonSliderComponent implements OnInit, OnDestroy {
     } catch (error) {
       console.error('Error loading lessons:', error);
     }
+    this.lessonService.loadLessons();
   }
 
   slideLeft(): void {
@@ -93,7 +94,7 @@ export class LessonSliderComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe(updated => {
-      if (updated) this.loadLessons();
+      this.loadLessons();
     });
   }
 

@@ -17,11 +17,14 @@
     <div class="student-list">
         <div *ngFor="let student of filteredStudents" class="student-block" [style.background-color]="student.color"
             (click)="openStudentProfile(student.id)">
-            <h3>{{ student.name }}</h3>
+            <h2 class="student-name">{{ student.name }}</h2>
+
+            <div class="divider"></div>
+
             <div class="student-block-content">
                 <div class="student-block-info">
-                    <p>Предмет: {{ student.subject }}</p>
-                    <p>Телефон: {{ student.phone }}</p>
+                    <p>Предмет: <span class="student-value">{{ student.subject }}</span></p>
+                    <p>Телефон: <span class="student-value">{{ student.phone }}</span></p>
                 </div>
                 <div class="student-block-lessons">
                     <p>
@@ -30,7 +33,7 @@
                             <span class="loading-text">Загрузка...</span>
                         </ng-container>
                         <ng-template #prevLessonLoaded>
-                            <span [class.no-data]="!(prevLessons$ | async)?.get(student.id)">
+                            <span class="student-value" [class.no-data]="!(prevLessons$ | async)?.get(student.id)">
                                 {{ getPrevLessonDate((prevLessons$ | async)?.get(student.id)) }}
                             </span>
                         </ng-template>
@@ -41,7 +44,7 @@
                             <span class="loading-text">Загрузка...</span>
                         </ng-container>
                         <ng-template #nextLessonLoaded>
-                            <span [class.no-data]="!(nextLessons$ | async)?.get(student.id)">
+                            <span class="student-value" [class.no-data]="!(nextLessons$ | async)?.get(student.id)">
                                 {{ getNextLessonDate((nextLessons$ | async)?.get(student.id)) }}
                             </span>
                         </ng-template>

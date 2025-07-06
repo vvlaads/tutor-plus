@@ -104,9 +104,9 @@ app-search {
     }
 }
 
-.student-block h3 {
+.student-block h2 {
     margin-top: 0;
-    color: #2c3e50;
+    color: #000;
 }
 
 .student-block p {
@@ -215,6 +215,17 @@ app-search {
     margin-right: 10%;
 }
 
+.student-value {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
 .no-data {
     color: red;
+}
+
+/* Разделители */
+.divider {
+    height: 1px;
+    background: #000;
 }

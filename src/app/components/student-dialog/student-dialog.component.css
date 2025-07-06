@@ -172,3 +172,75 @@ select:focus {
 .form-input.ng-invalid.ng-touched {
     border-color: #ff4444;
 }
+
+/* Стили для группы с цветом */
+.color-group {
+    display: flex;
+    align-items: center;
+    /* Выравниваем элементы по центру по вертикали */
+    gap: 16px;
+    position: relative;
+    flex-direction: row;
+    /* Явно указываем направление строкой */
+}
+
+.color-label {
+    margin-bottom: 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+    /* Запрещаем перенос текста */
+}
+
+/* Кнопка с кругляшком цвета */
+.color-picker-button {
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+/* Кругляшок с предпросмотром цвета */
+.color-preview {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #e2e8f0;
+    transition: all 0.2s ease;
+}
+
+.color-picker-button:hover .color-preview {
+    border-color: #cbd5e0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    transform: scale(1.05);
+}
+
+/* Стили для нативного color picker (скрыт) */
+.native-color-picker {
+    position: absolute;
+    opacity: 0;
+    width: 40px;
+    /* Ширина кругляшка */
+    height: 40px;
+    /* Высота кругляшка */
+    top: 50%;
+    /* Позиционируем по вертикали */
+    left: calc(100% + 16px);
+    /* Позиционируем справа от кругляшка с отступом */
+    transform: translateY(-50%);
+    /* Центрируем по вертикали */
+    cursor: pointer;
+    z-index: 10;
+    /* Убедимся, что он поверх других элементов */
+}
+
+/* Эффект при нажатии */
+.color-picker-button:active .color-preview {
+    transform: scale(0.95);
+}

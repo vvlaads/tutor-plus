@@ -1,4 +1,4 @@
-import { Component, Inject, inject } from '@angular/core';
+import { Component, ElementRef, Inject, inject, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -146,5 +146,19 @@ export class StudentDialogComponent {
     if (control.errors['pattern']) return '*Неверный формат';
     if (control.errors['min']) return '*Слишком маленькое значение';
     return null;
+  }
+
+  @ViewChild('colorPicker') colorPicker!: ElementRef<HTMLInputElement>;
+
+  public openColorPicker(): void {
+    const buttonRect = this.colorPicker.nativeElement.getBoundingClientRect();
+    this.colorPicker.nativeElement.style.position = 'fixed';
+    this.colorPicker.nativeElement.style.left = `${buttonRect.left}px`;
+    this.colorPicker.nativeElement.click();
+  }
+
+  public onColorChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.studentForm.get('color')?.setValue(input.value);
   }
 }

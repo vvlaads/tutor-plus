@@ -2,6 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, updateDoc, deleteDoc, onSnapshot, getDocs } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Student } from '../app.interfaces';
+import { LessonService } from './lesson.service';
 
 @Injectable({ providedIn: 'root' })
 export class StudentService implements OnDestroy {
@@ -11,7 +12,7 @@ export class StudentService implements OnDestroy {
 
   public students$ = this.studentsSubject.asObservable();
 
-  public constructor() {
+  public constructor(private lessonService: LessonService) {
     this.startListening();
   }
 
@@ -80,5 +81,6 @@ export class StudentService implements OnDestroy {
 
   public async deleteStudent(id: string): Promise<void> {
     await deleteDoc(doc(this.firestore, 'students', id));
+    this.lessonService.deleteLessonsByStudentId(id);
   }
 }

@@ -60,24 +60,22 @@ export class SlotDialogComponent {
       return;
     }
 
-    this.slotForm.value.date = this.dateService.changeFormatMinusToDot(this.slotForm.value.date);
+    const slotValue = { ...this.slotForm.value };
+    slotValue.date = this.dateService.changeFormatMinusToDot(slotValue.date);
 
     switch (this.mode) {
       case DialogMode.Add:
-        this.addSlot();
+        this.addSlot(slotValue);
         break;
       case DialogMode.Edit:
-        this.updateSlot();
+        this.updateSlot(slotValue);
         break;
     }
   }
 
 
-  public addSlot(): void {
-    const newSlot: Slot = {
-      ...this.slotForm.value
-    };
-    this.slotService.addSlot(newSlot).then(_ => {
+  public addSlot(slot: Slot): void {
+    this.slotService.addSlot(slot).then(_ => {
       this.close(true);
     })
       .catch(error => {
@@ -86,10 +84,10 @@ export class SlotDialogComponent {
       });
   }
 
-  public updateSlot(): void {
+  public updateSlot(slot: Slot): void {
     const updatedSlot: Slot = {
       ...this.data.slot,
-      ...this.slotForm.value
+      ...slot
     };
 
     this.slotService.updateSlot(updatedSlot.id, updatedSlot).then(_ => {
@@ -115,5 +113,19 @@ export class SlotDialogComponent {
     if (control.errors['pattern']) return '*Неверный формат';
     if (control.errors['min']) return '*Слишком маленькое значение';
     return null;
+  }
+
+  public isEditMode() {
+    return this.mode == DialogMode.Edit;
+  }
+
+  public deleteSlot() {
+    if (this.data.slot) {
+      const confirmDelete = confirm('Вы уверены, что хотите удалить это окно?');
+      if (confirmDelete) {
+        this.slotService.deleteSlot(this.data.slot.id).catch(error => { console.error('Ошибка при удалении:', error); })
+        this.close(true);
+      }
+    }
   }
 }

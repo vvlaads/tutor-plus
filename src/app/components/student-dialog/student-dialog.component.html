@@ -1,98 +1,135 @@
 <div class="form-container">
-    <h2 class="form-title">{{title}}</h2>
+    <span class="form-title">{{title}}</span>
     <div class="form-content">
         <form [formGroup]="studentForm" class="student-form" (ngSubmit)="submit()">
-            <div class="form-group">
-                <label for="input-name" class="form-label">Имя:</label>
-                <input formControlName="name" id="input-name" class="form-input" placeholder="Введите имя ученика">
-                <div *ngIf="formSubmitted && studentForm.get('name')?.errors" class="error-message">
-                    {{ getError('name') }}
+            <div class="input-columns">
+                <div class="input-column">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-name" class="form-label">Имя:</label>
+                            <input formControlName="name" id="input-name" class="form-input"
+                                placeholder="Введите имя ученика">
+                        </div>
+                        <div *ngIf="formSubmitted && studentForm.get('name')?.errors" class="error-message">
+                            {{ getError('name') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-phone" class="form-label">Телефон:</label>
+                            <input formControlName="phone" id="input-phone" class="form-input" type="tel"
+                                placeholder="+7XXXXXXXXXX">
+                        </div>
+                        <div *ngIf="formSubmitted && studentForm.get('phone')?.errors" class="error-message">
+                            {{ getError('phone') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-subject" class="form-label">Предмет:</label>
+                            <input formControlName="subject" id="input-subject" class="form-input"
+                                placeholder="История, Экономика...">
+                        </div>
+                        <div *ngIf="formSubmitted && studentForm.get('subject')?.errors" class="error-message">
+                            {{ getError('subject') }}
+                        </div>
+                    </div>
+
+
+                    <div class="form-group color-group">
+                        <div class="form-row">
+                            <label class="form-label color-label">Цвет:</label>
+                            <button type="button" class="color-picker-button" (click)="openColorPicker()">
+                                <svg class="color-preview" viewBox="0 0 24 24">
+                                    <circle cx="12" cy="12" r="10"
+                                        [attr.fill]="studentForm.get('color')?.value || '#ffffff'" />
+                                </svg>
+                                <input formControlName="color" type="color" class="native-color-picker" #colorPicker
+                                    (change)="onColorChange($event)">
+                            </button>
+                        </div>
+                        <div *ngIf="formSubmitted && studentForm.get('color')?.errors" class="error-message">
+                            {{ getError('color') }}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-column">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label class="form-label">Где общаемся:</label>
+                            <app-custom-select [options]="communicationOptions"
+                                [selectedValue]="studentForm.get('communication')?.value"
+                                (selected)="onSelectCommunication($event.value)">
+                            </app-custom-select>
+                        </div>
+
+                        <div *ngIf="formSubmitted && studentForm.get('communication')?.errors" class="error-message">
+                            {{ getError('communication') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label class="form-label">Где занимаемся:</label>
+                            <app-custom-select [options]="platformOptions"
+                                [selectedValue]="studentForm.get('platform')?.value"
+                                (selected)="onSelectPlatform($event.value)">
+                            </app-custom-select>
+                        </div>
+
+                        <div *ngIf="formSubmitted && studentForm.get('platform')?.errors" class="error-message">
+                            {{ getError('platform') }}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label class="form-label">Откуда пришел:</label>
+                            <app-custom-select [options]="fromOptions" [selectedValue]="studentForm.get('from')?.value"
+                                (selected)="onSelectFrom($event.value)">
+                            </app-custom-select>
+                        </div>
+
+                        <div *ngIf="formSubmitted && studentForm.get('from')?.errors" class="error-message">
+                            {{ getError('from') }}
+                        </div>
+                    </div>
+
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label class="form-label">Статус:</label>
+                            <select formControlName="isActive">
+                                <option *ngFor="let option of statusOptions" [ngValue]="option.value">
+                                    {{ option.text }}
+                                </option>
+                            </select>
+                        </div>
+
+                        <div *ngIf="formSubmitted && studentForm.get('isActive')?.errors" class="error-message">
+                            {{ getError('isActive') }}
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="input-phone" class="form-label">Телефон:</label>
-                <input formControlName="phone" id="input-phone" class="form-input" type="tel"
-                    placeholder="+7XXXXXXXXXX">
-                <div *ngIf="formSubmitted && studentForm.get('phone')?.errors" class="error-message">
-                    {{ getError('phone') }}
-                </div>
-            </div>
 
             <div class="form-group">
-                <label for="input-subject" class="form-label">Предмет:</label>
-                <input formControlName="subject" id="input-subject" class="form-input"
-                    placeholder="История, Экономика...">
-                <div *ngIf="formSubmitted && studentForm.get('subject')?.errors" class="error-message">
-                    {{ getError('subject') }}
+                <div class="form-row">
+                    <label for="input-cost" class="form-label">Стоимость за час:</label>
+                    <div class="input-with-symbol">
+                        <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000"
+                            type="number">
+                        <span class="currency-symbol">₽</span>
+                    </div>
                 </div>
-            </div>
 
-            <div class="form-group">
-                <label class="form-label">Где общаемся:</label>
-                <app-custom-select [options]="communicationOptions"
-                    [selectedValue]="studentForm.get('communication')?.value"
-                    (selected)="onSelectCommunication($event.value)">
-                </app-custom-select>
-                <div *ngIf="formSubmitted && studentForm.get('communication')?.errors" class="error-message">
-                    {{ getError('communication') }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Где занимаемся:</label>
-                <app-custom-select [options]="platformOptions" [selectedValue]="studentForm.get('platform')?.value"
-                    (selected)="onSelectPlatform($event.value)">
-                </app-custom-select>
-                <div *ngIf="formSubmitted && studentForm.get('platform')?.errors" class="error-message">
-                    {{ getError('platform') }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Откуда пришел:</label>
-                <app-custom-select [options]="fromOptions" [selectedValue]="studentForm.get('from')?.value"
-                    (selected)="onSelectFrom($event.value)">
-                </app-custom-select>
-                <div *ngIf="formSubmitted && studentForm.get('from')?.errors" class="error-message">
-                    {{ getError('from') }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="input-cost" class="form-label">Стоимость за час:</label>
-                <div class="input-with-symbol">
-                    <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000" type="number">
-                    <span class="currency-symbol">₽</span>
-                </div>
                 <div *ngIf="formSubmitted && studentForm.get('cost')?.errors" class="error-message">
                     {{ getError('cost') }}
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Статус:</label>
-                <select formControlName="isActive">
-                    <option *ngFor="let option of statusOptions" [ngValue]="option.value">
-                        {{ option.text }}
-                    </option>
-                </select>
-                <div *ngIf="formSubmitted && studentForm.get('isActive')?.errors" class="error-message">
-                    {{ getError('isActive') }}
-                </div>
-            </div>
-
-            <div class="form-group color-group">
-                <label class="form-label color-label">Цвет:</label>
-                <button type="button" class="color-picker-button" (click)="openColorPicker()">
-                    <svg class="color-preview" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" [attr.fill]="studentForm.get('color')?.value || '#ffffff'" />
-                    </svg>
-                    <input formControlName="color" type="color" class="native-color-picker" #colorPicker
-                        (change)="onColorChange($event)">
-                </button>
-                <div *ngIf="formSubmitted && studentForm.get('color')?.errors" class="error-message">
-                    {{ getError('color') }}
                 </div>
             </div>
 

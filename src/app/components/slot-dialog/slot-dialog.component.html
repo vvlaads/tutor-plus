@@ -30,6 +30,9 @@
                 <button type="submit" class="submit-button">
                     {{submitMessage}}
                 </button>
+                <button type="button" (click)="deleteSlot()" class="delete-button" *ngIf="isEditMode()">
+                    Удалить
+                </button>
                 <button type="button" (click)="close(false)" class="cancel-button">
                     Отмена
                 </button>

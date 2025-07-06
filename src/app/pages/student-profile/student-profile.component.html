@@ -3,11 +3,18 @@
         <!-- Заголовок профиля -->
         <div class="profile-header">
             <h2 class="student-name">{{ student.name }}</h2>
-            <button class="delete-button" (click)="deleteStudent(student.id)">
-                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
-                    class="delete-icon" alt="Delete">
-                <span class="button-content">Удалить</span>
-            </button>
+            <div class="actions">
+                <button class="delete-button" (click)="deleteStudent(student.id)">
+                    <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
+                        class="delete-icon">
+                    <span class="button-content">Удалить</span>
+                </button>
+                <button class="edit-button" (click)="updateStudent()">
+                    <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png"
+                        class="edit-icon">
+                    <span class="button-content">Изменить</span>
+                </button>
+            </div>
         </div>
 
         <div class="statistics">
@@ -48,6 +55,13 @@
                 <div class="info-item">
                     <span class="info-label">Предмет:</span>
                     <span class="info-value subject">{{ student.subject }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Цвет:</span>
+                    <svg class="color-preview" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" [attr.fill]="student.color || '#ffffff'" />
+                    </svg>
                 </div>
 
                 <div class="info-item">
@@ -94,12 +108,11 @@
         </div>
     </div>
 
-    <!-- Кнопка редактирования -->
-    <div class="edit-button-container">
-        <button class="edit-button floating-button" (click)="updateStudent()">
-            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png" class="edit-icon"
-                alt="Edit">
-            <span>Редактировать</span>
+    <div class="lesson-button-container">
+        <button class="lesson-button floating-button" (click)="addLesson()">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
+                class="lesson-icon">
+            <span>Добавить занятие</span>
         </button>
     </div>
 

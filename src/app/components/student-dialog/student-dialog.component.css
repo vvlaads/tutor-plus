@@ -1,55 +1,91 @@
+/* Обновленные стили для диалога */
 .form-container {
-    height: 600px;
-    margin: 0;
+    width: 1200px;
+    margin: 0 auto;
     padding: 24px;
     box-sizing: border-box;
     background-color: #ffffff;
-    border-radius: 0;
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    height: 100%;
 }
 
 .form-content {
     overflow-y: auto;
     flex-grow: 1;
     padding-right: 8px;
+    padding-top: 20px;
 }
 
-.form-title {
-    color: #2d3748;
-    text-align: center;
-    margin-bottom: 24px;
-    font-weight: 600;
-    font-size: 24px;
+.input-columns {
+    display: flex;
+    gap: 50px;
+    margin-bottom: 20px;
 }
 
-.student-form {
+.input-column {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 16px;
 }
 
+/* Заголовок формы */
+.form-title {
+    color: #2d3748;
+    text-align: center;
+    font-weight: 600;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    font-size: 30px;
+}
+
+/* Группы полей */
 .form-group {
     display: flex;
     flex-direction: column;
+    /* Оставляем колонку для правильного расположения ошибок */
     gap: 6px;
 }
 
+/* Строка с лейблом и полем ввода */
+.form-row {
+    display: flex;
+    align-items: center;
+    /* Это ключевое свойство для вертикального выравнивания */
+    gap: 16px;
+}
+
+/* Лейблы */
 .form-label {
     color: #4a5568;
     font-size: 20px;
     font-weight: 500;
+    min-width: 120px;
+    /* Фиксированная ширина для выравнивания */
+    text-align: right;
+    margin: 0;
+    /* Убираем возможные отступы */
+    line-height: normal;
+    /* Сбрасываем line-height */
+    display: flex;
+    align-items: center;
+    /* Дополнительное выравнивание по центру */
+    height: 100%;
+    /* Занимает всю высоту родителя */
 }
 
+/* Поля ввода */
 .form-input {
     padding: 12px 16px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
     font-size: 20px;
-    transition: border-color 0.3s ease;
+    transition: all 0.3s ease;
+    flex-grow: 1;
+    box-sizing: border-box;
 }
 
 .form-input:focus {
@@ -58,28 +94,36 @@
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
 }
 
-.form-input::placeholder {
-    color: #a0aec0;
+/* Для горизонтального расположения (цвет) */
+.form-group.color-group {
+    flex-direction: row;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.color-label {
+    min-width: 120px;
+    text-align: right;
+    margin-right: 16px;
 }
 
 /* Стили для select */
-.form-select {
-    padding: 12px 16px;
+select {
+    padding: 14px 16px;
     padding-right: 40px;
     border: 1px solid #e2e8f0;
     border-radius: 8px;
-    font-size: 20px;
-    background-color: white;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    background-size: 16px;
+    font-size: 18px;
+    background-color: #f8fafc;
+    flex-grow: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
 /* Поле с валютой */
 .input-with-symbol {
     position: relative;
+    flex-grow: 1;
 }
 
 .input-with-symbol .currency-symbol {
@@ -88,31 +132,36 @@
     top: 50%;
     transform: translateY(-50%);
     color: #718096;
-}
-
-.input-with-symbol .form-input {
-    padding-right: 40px;
+    pointer-events: none;
 }
 
 /* Кнопки */
 .form-actions {
     display: flex;
-    justify-content: flex-end;
-    gap: 12px;
-    margin-top: 24px;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.submit-button,
+.cancel-button {
+    flex: 1;
+    max-width: 300px;
+    padding: 14px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 20px;
+    transition: all 0.3s ease;
+    text-align: center;
 }
 
 .submit-button {
     background-color: #4299e1;
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    font-size: 20px;
-    font-family: sans-serif;
 }
 
 .submit-button:hover {
@@ -123,13 +172,6 @@
     background-color: #ffffff;
     color: #4a5568;
     border: 1px solid #e2e8f0;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 20px;
-    font-family: sans-serif;
 }
 
 .cancel-button:hover {
@@ -137,76 +179,16 @@
     border-color: #cbd5e0;
 }
 
-.error-message {
-    color: #e74646;
-}
-
-select {
-    padding: 14px 16px;
-    padding-right: 40px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 18px;
-    background-color: #f8fafc;
-    appearance: none;
-    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right 16px center;
-    background-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-select:hover {
-    border-color: #cbd5e0;
-    background-color: #ffffff;
-}
-
-select:focus {
-    outline: none;
-    border-color: #4299e1;
-    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
-    background-color: #ffffff;
-}
-
-.form-input.ng-invalid.ng-touched {
-    border-color: #ff4444;
-}
-
-/* Стили для группы с цветом */
-.color-group {
-    display: flex;
-    align-items: center;
-    /* Выравниваем элементы по центру по вертикали */
-    gap: 16px;
-    position: relative;
-    flex-direction: row;
-    /* Явно указываем направление строкой */
-}
-
-.color-label {
-    margin-bottom: 0;
-    flex-shrink: 0;
-    white-space: nowrap;
-    /* Запрещаем перенос текста */
-}
-
-/* Кнопка с кругляшком цвета */
+/* Цветовой пикер */
 .color-picker-button {
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
-    width: 48px;
-    height: 48px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.2s ease;
-    position: relative;
 }
 
-/* Кругляшок с предпросмотром цвета */
 .color-preview {
     width: 40px;
     height: 40px;
@@ -215,32 +197,29 @@ select:focus {
     transition: all 0.2s ease;
 }
 
-.color-picker-button:hover .color-preview {
-    border-color: #cbd5e0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    transform: scale(1.05);
-}
-
 /* Стили для нативного color picker (скрыт) */
 .native-color-picker {
     position: absolute;
     opacity: 0;
     width: 40px;
-    /* Ширина кругляшка */
     height: 40px;
-    /* Высота кругляшка */
     top: 50%;
-    /* Позиционируем по вертикали */
-    left: calc(100% + 16px);
-    /* Позиционируем справа от кругляшка с отступом */
+    left: calc(10% + 16px);
     transform: translateY(-50%);
-    /* Центрируем по вертикали */
     cursor: pointer;
     z-index: 10;
-    /* Убедимся, что он поверх других элементов */
 }
 
 /* Эффект при нажатии */
 .color-picker-button:active .color-preview {
     transform: scale(0.95);
+}
+
+/* Ошибки */
+.error-message {
+    color: #e74646;
+    font-size: 20px;
+    margin-top: 4px;
+    min-height: 20px;
+    margin-left: 136px;
 }

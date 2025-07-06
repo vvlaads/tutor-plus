@@ -43,9 +43,9 @@ export class SlotService implements OnDestroy {
     const data = doc.data();
     return {
       id: doc.id,
-      date: data.name || '',
-      startTime: data.phone || '',
-      endTime: data.subject || '',
+      date: data.date || '',
+      startTime: data.startTime || '',
+      endTime: data.endTime || '',
     };
   }
 

@@ -1,13 +1,11 @@
 import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { LayoutService } from '../../services/layout.service';
 import { Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
-import { StudentDialogComponent } from '../../components/student-dialog/student-dialog.component';
 import { DialogMode } from '../../app.enums';
 import { SearchComponent } from '../../components/search/search.component';
 import { Lesson, Student } from '../../app.interfaces';
@@ -15,6 +13,7 @@ import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN } from 
 import { take, Subscription } from 'rxjs';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
+import { DialogService } from '../../services/dialog.service';
 
 @Component({
   selector: 'app-students',
@@ -30,11 +29,11 @@ import { formatPhoneNumber } from '../../app.functions';
   styleUrls: ['./students.component.css']
 })
 export class StudentsComponent implements OnInit, OnDestroy {
-  private dialog = inject(MatDialog);
   private studentService = inject(StudentService);
   private lessonService = inject(LessonService);
   private layoutService = inject(LayoutService);
   private router = inject(Router);
+  private dialogService = inject(DialogService);
 
   public students: Student[] = [];
   public filteredStudents: Student[] = [];
@@ -56,13 +55,13 @@ export class StudentsComponent implements OnInit, OnDestroy {
   private prevLessonsSubscription!: Subscription;
   private nextLessonsSubscription!: Subscription;
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.subscribeToLayoutChanges();
     this.subscribeToStudents();
     this.subscribeToLessons();
   }
 
-  ngOnDestroy(): void {
+  public ngOnDestroy(): void {
     this.studentsSubscription?.unsubscribe();
     this.layoutSubscription?.unsubscribe();
     this.prevLessonsSubscription?.unsubscribe();
@@ -143,20 +142,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
   }
 
   public addStudent(): void {
-    const dialogRef = this.dialog.open(StudentDialogComponent, {
-      width: '1200px',
-      disableClose: true,
-      data: {
-        mode: DialogMode.Add,
-        student: null
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(() => {
-      this.studentService.students$
-        .pipe(take(1))
-        .subscribe(students => this.updateStudents(students));
-    });
+    this.dialogService.openStudentDialog(DialogMode.Add, null);
   }
 
   public openStudentProfile(studentId: string): void {

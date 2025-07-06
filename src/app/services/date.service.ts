@@ -30,7 +30,7 @@ export class DateService {
     const parts = formattedDate.split('.');
 
     if (parts.length !== 3) {
-      throw new Error('Неверный формат даты. Ожидалось: dd.mm.yyyy');
+      throw new Error(`Неверный формат даты. Ожидалось: dd.mm.yyyy, получено: ${formattedDate}`);
     }
 
     const day = parseInt(parts[0], 10);

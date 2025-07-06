@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, inject, Input } from '@angular/core';
+import { Component, HostListener, Inject, inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { SelectOption } from '../../app.interfaces';
 
@@ -10,19 +10,23 @@ import { SelectOption } from '../../app.interfaces';
   styleUrl: './choice-dialog.component.css'
 })
 export class ChoiceDialogComponent {
-  options: SelectOption[] = [];
+  public options: SelectOption[] = [];
+  public dialogRef = inject(MatDialogRef<ChoiceDialogComponent>);
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { options: SelectOption[] }) {
+  @HostListener('document:keydown.escape', ['$event'])
+  handleEscapeKey(event: KeyboardEvent) {
+    this.close(null);
+  }
+
+  public constructor(@Inject(MAT_DIALOG_DATA) public data: { options: SelectOption[] }) {
     this.options = data.options;
   }
 
-  public dialogRef = inject(MatDialogRef<ChoiceDialogComponent>);
-
-  submit(option: string) {
+  public submit(option: string) {
     this.close(option);
   }
 
-  close(option: string | null) {
+  public close(option: string | null) {
     this.dialogRef.close(option);
   }
 }

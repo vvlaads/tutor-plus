@@ -38,19 +38,33 @@
     transition: background-color 0.3s ease;
 }
 
+.option-button:hover {
+    background-color: #3182ce;
+}
+
+.dialog-footer {
+    display: flex;
+    flex-direction: column;
+}
+
 .cancel-button {
+    justify-content: center;
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
     display: flex;
-    justify-content: flex-end;
     gap: 12px;
     margin-top: 24px;
-    background-color: #636363;
-    color: white;
-    border: none;
     padding: 12px 24px;
     border-radius: 8px;
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    background-color: #ffffff;
+    color: #4a5568;
+    border: 1px solid #e2e8f0;
+}
+
+.cancel-button:hover {
+    background-color: #f7fafc;
+    border-color: #cbd5e0;
 }

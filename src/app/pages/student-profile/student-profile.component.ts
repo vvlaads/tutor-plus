@@ -4,13 +4,13 @@ import { ActivatedRoute } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { MatDialog } from '@angular/material/dialog';
 import { LayoutService } from '../../services/layout.service';
-import { StudentDialogComponent } from '../../components/student-dialog/student-dialog.component';
 import { DialogMode } from '../../app.enums';
-import { Lesson, SelectOptionWithIcon, Student } from '../../app.interfaces';
+import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { LessonSliderComponent } from '../../components/lesson-slider/lesson-slider.component';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, PLATFORM_OPTIONS } from '../../app.constants';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
+import { DialogService } from '../../services/dialog.service';
 
 @Component({
   selector: 'app-student-profile',
@@ -21,6 +21,7 @@ import { formatPhoneNumber } from '../../app.functions';
 export class StudentProfileComponent implements OnInit {
   public student: Student | null = null;
   private dialog = inject(MatDialog);
+  private dialogService = inject(DialogService);
   public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
   public communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
@@ -71,7 +72,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   public updateStudent(): void {
-    this.openDialog();
+    this.dialogService.openStudentDialog(DialogMode.Edit, this.student);
   }
   public deleteStudent(studentId: string): void {
     const confirmDelete = confirm('Вы уверены, что хотите удалить этого студента?');
@@ -82,23 +83,8 @@ export class StudentProfileComponent implements OnInit {
     }
   }
 
-  public openDialog(): void {
-    if (!this.student) return;
-
-    const dialogRef = this.dialog.open(StudentDialogComponent, {
-      width: '1200px',
-      disableClose: true,
-      data: {
-        mode: DialogMode.Edit,
-        student: this.student
-      }
-    });
-
-    dialogRef.afterClosed().subscribe((updated) => {
-      if (updated) {
-        this.loadStudent();
-      }
-    });
+  public addLesson(): void {
+    this.dialogService.openLessonDialog(DialogMode.Add, { studentId: this.student?.id });
   }
 
   public getPlatformIcon(platformName: string): string {

@@ -150,6 +150,11 @@
     font-family: sans-serif;
 }
 
+.delete-button:hover {
+    background-color: #e74646;
+    color: #e2e8f0;
+}
+
 
 .form-group-inline {
     flex-direction: row;
@@ -157,10 +162,7 @@
     gap: 12px;
 }
 
-.delete-button:hover {
-    background-color: #e74646;
-    color: #e2e8f0;
-}
+
 
 
 .error-message {

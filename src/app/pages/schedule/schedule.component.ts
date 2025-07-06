@@ -15,6 +15,7 @@ import { SlotService } from '../../services/slot.service';
 import { SlotDialogComponent } from '../../components/slot-dialog/slot-dialog.component';
 import { ChoiceDialogComponent } from '../../components/choice-dialog/choice-dialog.component';
 import * as XLSX from 'xlsx';
+import { DialogService } from '../../services/dialog.service';
 
 @Component({
   standalone: true,
@@ -24,7 +25,7 @@ import * as XLSX from 'xlsx';
   styleUrl: './schedule.component.css'
 })
 export class ScheduleComponent implements OnInit {
-  private dialog: MatDialog = inject(MatDialog);
+  private dialogService = inject(DialogService);
 
   public currentDate: Date = new Date();
   public today: Date = new Date();
@@ -132,7 +133,7 @@ export class ScheduleComponent implements OnInit {
     });
   }
 
-  private updateSlots(slots: Slot[]) {
+  private updateSlots(slots: Slot[]): void {
     this.slots = slots.filter(slot => {
       try {
         const slotDate = this.dateService.stringToDate(slot.date);
@@ -196,10 +197,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   public findDate(): void {
-    const dialogRef = this.dialog.open(FindDateDialogComponent, {
-      width: '1200px',
-      disableClose: true
-    });
+    const dialogRef = this.dialogService.openFindDateDialog();
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Переход к дате ${result}`)
       if (result !== undefined) {
@@ -295,38 +293,16 @@ export class ScheduleComponent implements OnInit {
     return 0;
   }
 
-  private openLessonDialog(mode: DialogMode, lesson: Partial<Lesson> | null) {
-    this.dialog.open(LessonDialogComponent, {
-      width: '1200px',
-      disableClose: true,
-      data: {
-        mode: mode,
-        lesson: lesson
-      }
-    });
-  }
-
-  private openSlotDialog(mode: DialogMode, slot: Partial<Slot> | null) {
-    this.dialog.open(SlotDialogComponent, {
-      width: '1200px',
-      disableClose: true,
-      data: {
-        mode: mode,
-        slot: slot
-      }
-    });
-  }
-
   public addLesson() {
-    this.openLessonDialog(DialogMode.Add, null);
+    this.dialogService.openLessonDialog(DialogMode.Add, null);
   }
 
   public editLesson(lesson: Lesson) {
-    this.openLessonDialog(DialogMode.Edit, lesson);
+    this.dialogService.openLessonDialog(DialogMode.Edit, lesson);
   }
 
   public editSlot(slot: Slot) {
-    this.openSlotDialog(DialogMode.Edit, slot);
+    this.dialogService.openSlotDialog(DialogMode.Edit, slot);
   }
 
   public cellIsClicked(time: string, dayName: string) {
@@ -339,17 +315,18 @@ export class ScheduleComponent implements OnInit {
       return;
     }
     let options = SCHEDULE_OBJECT_OPTIONS
-    const dialogRef = this.openChoiceDialog(options);
+    const dialogRef = this.dialogService.openChoiceDialog(options);
+    var endTime = this.getNextTime(time);
 
     dialogRef.afterClosed().subscribe((option) => {
       switch (option) {
         case ScheduleObject.Slot:
-          this.openSlotDialog(DialogMode.Add, null);
+          const slot = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
+          this.dialogService.openSlotDialog(DialogMode.Add, slot);
           break;
         case ScheduleObject.Lesson:
-          var endTime = this.getNextTime(time);
           const lesson = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
-          this.openLessonDialog(DialogMode.Add, lesson)
+          this.dialogService.openLessonDialog(DialogMode.Add, lesson)
           break;
       }
     });
@@ -396,17 +373,6 @@ export class ScheduleComponent implements OnInit {
 
   public dateIsToday(date: Date): boolean {
     return this.dateService.isDatesEquals(date, this.today);
-  }
-
-  openChoiceDialog(options: SelectOption[]) {
-    const dialogRef = this.dialog.open(ChoiceDialogComponent, {
-      width: '1200px',
-      disableClose: true,
-      data: {
-        options: options
-      }
-    });
-    return dialogRef;
   }
 
   public getTimeDifference(time1: string, time2: string): number {
@@ -477,15 +443,15 @@ export class ScheduleComponent implements OnInit {
 
   public addScheduleObject(): void {
     let options = SCHEDULE_OBJECT_OPTIONS;
-    const dialogRef = this.openChoiceDialog(options);
+    const dialogRef = this.dialogService.openChoiceDialog(options);
 
     dialogRef.afterClosed().subscribe((option) => {
       switch (option) {
         case ScheduleObject.Slot:
-          this.openSlotDialog(DialogMode.Add, null);
+          this.dialogService.openSlotDialog(DialogMode.Add, null);
           break;
         case ScheduleObject.Lesson:
-          this.openLessonDialog(DialogMode.Add, null);
+          this.dialogService.openLessonDialog(DialogMode.Add, null);
           break;
       }
     });

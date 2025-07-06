@@ -1,3 +1,5 @@
+import { ScheduleObject } from "./app.enums";
+
 export const PAGE_MARGIN_LEFT_PERCENTAGE = 25;
 export const PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN = 7;
 
@@ -25,3 +27,4 @@ export const FROM_OPTIONS = [
 ];
 
 export const MONTH_NAMES = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+export const SCHEDULE_OBJECT_OPTIONS = [{ value: ScheduleObject.Slot, text: "Окно" }, { value: ScheduleObject.Lesson, text: "Занятие" }]

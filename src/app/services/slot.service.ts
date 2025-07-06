@@ -49,6 +49,12 @@ export class SlotService implements OnDestroy {
     };
   }
 
+  public loadSlots(): void {
+    getDocs(collection(this.firestore, 'slots')).then(() => {
+      console.log('Загрузка данных окон в расписании');
+    });
+  }
+
   public async getSlots(): Promise<Slot[]> {
     const snapshot = await getDocs(collection(this.firestore, 'slots'));
     return snapshot.docs.map(this.createSlot);

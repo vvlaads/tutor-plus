@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, inject, Input } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { SelectOption } from '../../app.interfaces';
 
 @Component({
   selector: 'app-choice-dialog',
@@ -9,9 +10,9 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
   styleUrl: './choice-dialog.component.css'
 })
 export class ChoiceDialogComponent {
-  options: string[] = [];
+  options: SelectOption[] = [];
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { options: string[] }) {
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { options: SelectOption[] }) {
     this.options = data.options;
   }
 

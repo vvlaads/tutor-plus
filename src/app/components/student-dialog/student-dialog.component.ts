@@ -7,6 +7,7 @@ import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
+import { ColorService } from '../../services/color.service';
 
 @Component({
   selector: 'app-student-dialog',
@@ -35,6 +36,7 @@ export class StudentDialogComponent {
   constructor(
     private fb: FormBuilder,
     private studentService: StudentService,
+    private colorService: ColorService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, student: Student | null }
   ) {
     this.mode = data.mode;
@@ -52,6 +54,11 @@ export class StudentDialogComponent {
         }
         break;
     }
+    let color = colorService.generateColor();
+    if (data.student) {
+      color = data.student.color;
+    }
+
     this.studentForm = this.fb.group({
       name: [data.student?.name, [Validators.required]],
       phone: [data.student?.phone, [Validators.required, Validators.pattern(/^\+79\d{9}$/)]],
@@ -60,7 +67,8 @@ export class StudentDialogComponent {
       platform: [data.student?.platform, Validators.required],
       cost: [data.student?.cost, [Validators.required, Validators.min(0)]],
       isActive: [isActive, [Validators.required]],
-      from: [data.student?.from, [Validators.required]]
+      from: [data.student?.from, [Validators.required]],
+      color: [color, [Validators.required]]
     });
   }
 

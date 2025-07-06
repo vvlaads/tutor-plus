@@ -7,10 +7,10 @@ import { DateService } from '../../services/date.service';
 import { LessonDialogComponent } from '../../components/lesson-dialog/lesson-dialog.component';
 import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
-import { Lesson, Slot, Student } from '../../app.interfaces';
+import { Lesson, SelectOption, Slot, Student } from '../../app.interfaces';
 import { take } from 'rxjs';
 import { StudentService } from '../../services/student.service';
-import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN } from '../../app.constants';
+import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
 import { SlotDialogComponent } from '../../components/slot-dialog/slot-dialog.component';
 import { ChoiceDialogComponent } from '../../components/choice-dialog/choice-dialog.component';
@@ -79,6 +79,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   private subscribeToLessons(): void {
+    this.lessonService.loadLessons();
     this.lessonService.lessons$.subscribe(lessons => {
       this.updateLessons(lessons);
     });
@@ -110,6 +111,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   private subscribeToStudents(): void {
+    this.studentService.loadStudents();
     this.studentService.students$.subscribe(students => {
       students.forEach(student => {
         this.updateStudents(student);
@@ -123,6 +125,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   private subscribeToSlots(): void {
+    this.slotService.loadSlots();
     this.slotService.slots$.subscribe(slots => {
       this.updateSlots(slots);
     });
@@ -334,7 +337,7 @@ export class ScheduleComponent implements OnInit {
     if (!date) {
       return;
     }
-    let options = [ScheduleObject.Slot, ScheduleObject.Lesson]
+    let options = SCHEDULE_OBJECT_OPTIONS
     const dialogRef = this.openChoiceDialog(options);
 
     dialogRef.afterClosed().subscribe((option) => {
@@ -394,7 +397,7 @@ export class ScheduleComponent implements OnInit {
     return this.dateService.isDatesEquals(date, this.today);
   }
 
-  openChoiceDialog(options: string[]) {
+  openChoiceDialog(options: SelectOption[]) {
     const dialogRef = this.dialog.open(ChoiceDialogComponent, {
       width: '1200px',
       disableClose: true,
@@ -469,5 +472,21 @@ export class ScheduleComponent implements OnInit {
 
   getCurrentDateInString(): string {
     return this.dateService.dateToString(this.currentDate);
+  }
+
+  public addScheduleObject(): void {
+    let options = SCHEDULE_OBJECT_OPTIONS;
+    const dialogRef = this.openChoiceDialog(options);
+
+    dialogRef.afterClosed().subscribe((option) => {
+      switch (option) {
+        case ScheduleObject.Slot:
+          this.openSlotDialog(DialogMode.Add, null);
+          break;
+        case ScheduleObject.Lesson:
+          this.openLessonDialog(DialogMode.Add, null);
+          break;
+      }
+    });
   }
 }

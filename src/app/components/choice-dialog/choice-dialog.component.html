@@ -1,8 +1,20 @@
-<div class="container">
-    <div class="choice-buttons">
-        <button class="choice-button" *ngFor="let option of options" (click)="submit(option)">{{option}}</button>
+<div class="dialog-container">
+    <div class="dialog-header">
+        <h2 class="dialog-title">Выберите вариант</h2>
+        <div class="dialog-divider"></div>
     </div>
-    <div class="exit-section">
-        <button class="exit-button" (click)="close(null)">Отмена</button>
+
+    <div class="options-container">
+        <button class="option-button" *ngFor="let option of options" (click)="submit(option.value)">
+            <span class="option-text">{{option.text}}</span>
+            <span class="option-arrow">→</span>
+        </button>
+    </div>
+
+    <div class="dialog-footer">
+        <button class="cancel-button" (click)="close(null)">
+            <span class="cancel-icon">×</span>
+            Отмена
+        </button>
     </div>
 </div>

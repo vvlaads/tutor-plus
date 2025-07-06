@@ -15,7 +15,8 @@
     </div>
 
     <div class="student-list">
-        <div *ngFor="let student of filteredStudents" class="student-block" (click)="openStudentProfile(student.id)">
+        <div *ngFor="let student of filteredStudents" class="student-block" [style.background-color]="student.color"
+            (click)="openStudentProfile(student.id)">
             <h3>{{ student.name }}</h3>
             <div class="student-block-content">
                 <div class="student-block-info">

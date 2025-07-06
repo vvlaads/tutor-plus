@@ -1,4 +1,4 @@
-.container {
+.dialog-container {
     height: 600px;
     margin: 0;
     padding: 24px;
@@ -12,18 +12,35 @@
     overflow: hidden;
 }
 
-.choice-buttons {
+.options-container {
     display: flex;
     flex-direction: column;
     height: 300px;
 }
 
-.choice-button {
+.option-button {
     display: flex;
     justify-content: flex-end;
     gap: 12px;
     margin-top: 24px;
     background-color: #4299e1;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-size: 20px;
+    font-family: sans-serif;
+}
+
+.cancel-button {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+    background-color: #636363;
     color: white;
     border: none;
     padding: 12px 24px;

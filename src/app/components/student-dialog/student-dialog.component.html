@@ -82,6 +82,14 @@
                 </div>
             </div>
 
+            <div class="form-group">
+                <label for="input-color" class="form-label">Цвет:</label>
+                <input formControlName="color" id="input-color" class="form-input" placeholder="#ffffff" type="color">
+                <div *ngIf="formSubmitted && studentForm.get('color')?.errors" class="error-message">
+                    {{ getError('color') }}
+                </div>
+            </div>
+
             <div class="form-actions">
                 <button type="submit" class="submit-button">
                     {{submitMessage}}

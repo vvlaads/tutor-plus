@@ -84,6 +84,11 @@ export class LessonService implements OnDestroy {
     };
   }
 
+  public loadLessons(): void {
+    getDocs(collection(this.firestore, 'lessons')).then(() => {
+      console.log('Загрузка данных занятий');
+    });
+  }
 
   public async getLessons(): Promise<Lesson[]> {
     const snapshot = await getDocs(collection(this.firestore, 'lessons'));

@@ -6,12 +6,11 @@ import { LessonDialogComponent } from '../lesson-dialog/lesson-dialog.component'
 import { DialogMode } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
 import { Subscription } from 'rxjs';
-import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-lesson-slider',
   standalone: true,
-  imports: [CommonModule, DatePipe],
+  imports: [CommonModule],
   templateUrl: './lesson-slider.component.html',
   styleUrls: ['./lesson-slider.component.css']
 })

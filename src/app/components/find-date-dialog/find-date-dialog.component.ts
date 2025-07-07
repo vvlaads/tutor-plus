@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
 import { changeDateFormatMinusToDot, getErrorMessage } from '../../app.functions';
@@ -15,6 +15,11 @@ export class FindDateDialogComponent {
 
   public formSubmitted = false;
   public findDateForm: FormGroup;
+
+  @HostListener('document:keydown.escape', ['$event'])
+  public handleEscapeKey(event: KeyboardEvent): void {
+    this.close(null);
+  }
 
   public constructor(private fb: FormBuilder) {
     this.findDateForm = this.fb.group({

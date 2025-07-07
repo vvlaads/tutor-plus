@@ -1,7 +1,7 @@
 <div class="form-container">
     <h2 class="form-title">Поиск по дате</h2>
     <div class="form-content">
-        <form [formGroup]="findDateForm" class="lesson-form" (ngSubmit)="submit()">
+        <form [formGroup]="findDateForm" class="find-date-form" (ngSubmit)="submit()">
             <div class="form-group">
                 <label for="input-date" class="form-label">Дата:</label>
                 <input formControlName="date" id="input-date" class="form-input" type="date">
@@ -15,7 +15,7 @@
                 <button type="submit" class="submit-button">
                     Найти
                 </button>
-                <button type="button" (click)="close(null)" class="cancel-button">
+                <button (click)="close(null)" class="cancel-button">
                     Отмена
                 </button>
             </div>

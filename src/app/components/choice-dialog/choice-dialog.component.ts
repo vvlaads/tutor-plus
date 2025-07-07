@@ -10,11 +10,12 @@ import { SelectOption } from '../../app.interfaces';
   styleUrl: './choice-dialog.component.css'
 })
 export class ChoiceDialogComponent {
+  private dialogRef = inject(MatDialogRef<ChoiceDialogComponent>);
+
   public options: SelectOption[] = [];
-  public dialogRef = inject(MatDialogRef<ChoiceDialogComponent>);
 
   @HostListener('document:keydown.escape', ['$event'])
-  public handleEscapeKey(event: KeyboardEvent) {
+  public handleEscapeKey(event: KeyboardEvent): void {
     this.close(null);
   }
 

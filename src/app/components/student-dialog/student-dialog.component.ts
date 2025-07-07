@@ -32,7 +32,7 @@ export class StudentDialogComponent {
   public colorPicker!: ElementRef<HTMLInputElement>;
 
   @HostListener('document:keydown.escape', ['$event'])
-  handleEscapeKey(event: KeyboardEvent) {
+  public handleEscapeKey(event: KeyboardEvent): void {
     this.close();
   }
 

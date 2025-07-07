@@ -31,7 +31,7 @@
 
             <div class="form-group">
                 <label class="form-label">Ученик:</label>
-                <select formControlName="studentId">
+                <select formControlName="studentId" (change)="getCostByStudentId()">
                     <option *ngFor="let option of options" [ngValue]="option.value">
                         {{ option.text }}
                     </option>
@@ -40,6 +40,7 @@
                     class="error-message">
                     Выберите из списка
                 </div>
+                <div>{{studentCost}}</div>
             </div>
 
             <div class="form-group">
@@ -70,6 +71,15 @@
             <div class="form-group" *ngIf="lessonForm.get('isRepeat')?.value">
                 <label for="repeat-until" class="form-label">Повторять до:</label>
                 <input type="date" id="repeat-until" formControlName="repeatUntil" class="form-input">
+            </div>
+
+            <div class="form-group">
+                <label for="input-note" class="form-label">Примечание:</label>
+                <textarea formControlName="note" id="input-note" class="form-input"
+                    placeholder="Первое занятие"></textarea>
+                <div *ngIf="lessonForm.get('note')?.invalid && lessonForm.get('note')?.touched" class="error-message">
+                    Обязательное поле
+                </div>
             </div>
 
 

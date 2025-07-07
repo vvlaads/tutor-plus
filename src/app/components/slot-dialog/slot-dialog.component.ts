@@ -1,4 +1,4 @@
-import { Component, Inject, inject } from '@angular/core';
+import { Component, Inject, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogMode } from '../../app.enums';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -6,6 +6,8 @@ import { SlotService } from '../../services/slot.service';
 import { Slot } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
 import { DateService } from '../../services/date.service';
+import { DialogService } from '../../services/dialog.service';
+import { LessonService } from '../../services/lesson.service';
 
 @Component({
   selector: 'app-slot-dialog',
@@ -13,7 +15,7 @@ import { DateService } from '../../services/date.service';
   templateUrl: './slot-dialog.component.html',
   styleUrl: './slot-dialog.component.css'
 })
-export class SlotDialogComponent {
+export class SlotDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<SlotDialogComponent>);
   private mode: DialogMode = DialogMode.Add;
 
@@ -26,6 +28,8 @@ export class SlotDialogComponent {
     private fb: FormBuilder,
     private slotService: SlotService,
     private dateService: DateService,
+    private dialogService: DialogService,
+    private lessonService: LessonService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, slot: Slot | null }
   ) {
     this.mode = data.mode;
@@ -47,8 +51,21 @@ export class SlotDialogComponent {
     this.slotForm = this.fb.group({
       date: [date, [Validators.required]],
       startTime: [data.slot?.startTime, [Validators.required]],
-      endTime: [data.slot?.endTime, Validators.required]
+      endTime: [data.slot?.endTime, Validators.required],
+      isRepeat: [false, Validators.required]
     });
+  }
+
+  public async ngOnInit() {
+    this.lessonService.lessons$.subscribe(async lessons => {
+      if (this.data.slot) {
+        let lesson = await this.lessonService.getLessonByTime(this.data.slot.date, this.data.slot.startTime)
+        if (lesson) {
+          this.slotService.deleteSlot(this.data.slot.id).catch(error => { console.error('Ошибка при удалении:', error); })
+          this.close(true);
+        }
+      }
+    })
   }
 
   public submit(): void {
@@ -126,6 +143,17 @@ export class SlotDialogComponent {
         this.slotService.deleteSlot(this.data.slot.id).catch(error => { console.error('Ошибка при удалении:', error); })
         this.close(true);
       }
+    }
+  }
+
+  public convertToLesson() {
+    const slot = this.data.slot;
+    if (slot) {
+      const lesson = { date: slot?.date, startTime: slot?.startTime, endTime: slot?.endTime }
+      this.dialogService.openLessonDialog(DialogMode.Add, lesson);
+    } else {
+      this.dialogService.openLessonDialog(DialogMode.Add, null);
+      this.close(true);
     }
   }
 }

@@ -72,15 +72,26 @@ export class StudentService implements OnDestroy {
 
   public async addStudent(student: Omit<Student, 'id'>): Promise<string> {
     const docRef = await addDoc(collection(this.firestore, 'students'), student);
+    this.checkNextLessons(docRef.id);
     return docRef.id;
   }
 
   public async updateStudent(id: string, changes: Partial<Student>): Promise<void> {
     await updateDoc(doc(this.firestore, 'students', id), changes);
+    this.checkNextLessons(id);
   }
 
   public async deleteStudent(id: string): Promise<void> {
     await deleteDoc(doc(this.firestore, 'students', id));
     this.lessonService.deleteLessonsByStudentId(id);
+  }
+
+  private async checkNextLessons(id: string) {
+    const student = await this.getStudentById(id);
+    if (student) {
+      if (!student.isActive) {
+        this.lessonService.deleteNextLessonsByStudentId(id);
+      }
+    }
   }
 }

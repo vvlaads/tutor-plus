@@ -46,6 +46,7 @@ export class LessonDialogComponent implements OnInit {
   submitMessage: string = 'Добавить'
   students: Student[] = []
   options: SelectOption[] = []
+  public studentCost = 0;
 
   lessons: Lesson[] = []
 
@@ -68,9 +69,11 @@ export class LessonDialogComponent implements OnInit {
         break;
     }
 
-    let date = data.lesson?.date
-    if (date) {
-      date = this.dateService.changeFormatDotToMinus(date)
+    let date = '';
+    let isRepeat = false;
+    if (data.lesson) {
+      date = this.dateService.changeFormatDotToMinus(data.lesson.date);
+      isRepeat = data.lesson.isRepeat;
     }
 
     this.lessonForm = this.fb.group({
@@ -80,8 +83,11 @@ export class LessonDialogComponent implements OnInit {
       endTime: [data.lesson?.endTime, [Validators.required, Validators.pattern(/^[0-2]\d:[0-6]\d$/)]],
       cost: [data.lesson?.cost, [Validators.required, Validators.min(0)]],
       isPaid: [data.lesson == null ? false : data.lesson.isPaid],
-      isRepeat: [false],
-      repeatUntil: [''],
+      isRepeat: [isRepeat, Validators.required],
+      realEndTime: [''],
+      note: [''],
+      baseLessonId: [''],
+      repeatEndDate: [''],
     }, { validators: timeRangeValidator });
   }
 
@@ -131,7 +137,9 @@ export class LessonDialogComponent implements OnInit {
           endTime: lessonValue.endTime,
           cost: lessonValue.cost,
           isPaid: lessonValue.isPaid,
-          realEndTime: ''
+          isRepeat: lessonValue.isRepeat,
+          realEndTime: '',
+          note: '',
         }
 
         switch (this.mode) {
@@ -151,7 +159,9 @@ export class LessonDialogComponent implements OnInit {
         endTime: lessonValue.endTime,
         cost: lessonValue.cost,
         isPaid: lessonValue.isPaid,
-        realEndTime: ''
+        isRepeat: lessonValue.isRepeat,
+        realEndTime: '',
+        note: '',
       }
       switch (this.mode) {
         case DialogMode.Add:
@@ -210,5 +220,12 @@ export class LessonDialogComponent implements OnInit {
 
   public isEditMode(): boolean {
     return this.mode == DialogMode.Edit;
+  }
+
+  public async getCostByStudentId() {
+    const student = await this.studentService.getStudentById(this.lessonForm.value.studentId);
+    if (student) {
+      this.studentCost = student.cost;
+    }
   }
 }

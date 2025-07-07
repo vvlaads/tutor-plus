@@ -351,7 +351,7 @@ export class ScheduleComponent implements OnInit {
       const lessonEnd = new Date(this.dateService.setTimeToDate(new Date(lessonDate), lesson.endTime));
 
       const result = (lessonStart >= cellStart && lessonStart <= cellEnd) ||
-        (lessonEnd >= cellStart && lessonEnd <= cellEnd) ||
+        (lessonEnd > cellStart && lessonEnd <= cellEnd) ||
         (lessonStart <= cellStart && lessonEnd >= cellEnd);
       return result;
     });

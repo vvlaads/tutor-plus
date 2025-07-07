@@ -46,6 +46,9 @@ export class SlotService implements OnDestroy {
       date: data.date || '',
       startTime: data.startTime || '',
       endTime: data.endTime || '',
+      isRepeat: data.isRepeat || false,
+      baseSlotId: data.baseSlotId || '',
+      repeatEndDate: data.repeatEndDate || ''
     };
   }
 

@@ -3,6 +3,9 @@ import { ScheduleObject } from "./app.enums";
 export const PAGE_MARGIN_LEFT_PERCENTAGE = 25;
 export const PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN = 7;
 
+export const DAYS_IN_WEEK = 7;
+export const MINUTES_IN_HOUR = 60;
+
 export const STATUS_OPTIONS = [{ value: true, text: 'Активный' }, { value: false, text: 'Завершенный' }];
 
 export const COMMUNICATION_OPTIONS = [

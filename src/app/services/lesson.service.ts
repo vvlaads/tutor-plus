@@ -115,7 +115,11 @@ export class LessonService implements OnDestroy {
       endTime: data.endTime || '',
       cost: data.cost || 0,
       isPaid: data.isPaid || false,
-      realEndTime: data.realEndTime || ''
+      isRepeat: data.isRepeat || false,
+      realEndTime: data.realEndTime || '',
+      note: data.note || '',
+      baseLessonId: data.baseLessonId || '',
+      repeatEndDate: data.repeatEndDate || '',
     };
   }
 
@@ -150,6 +154,13 @@ export class LessonService implements OnDestroy {
 
   public async deleteLessonsByStudentId(studentId: string): Promise<void> {
     const lessons = await this.getLessonsByStudentId(studentId);
+    for (let i = 0; i < lessons.length; i++) {
+      this.deleteLesson(lessons[i].id);
+    }
+  }
+
+  public async deleteNextLessonsByStudentId(studentId: string): Promise<void> {
+    const lessons = await this.getNextLessonsByStudentId(studentId);
     for (let i = 0; i < lessons.length; i++) {
       this.deleteLesson(lessons[i].id);
     }
@@ -239,5 +250,14 @@ export class LessonService implements OnDestroy {
     prepaidLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
 
     return prepaidLessons;
+  }
+
+  public async getLessonByTime(formattedDate: string, formattedTime: string): Promise<Lesson | null> {
+    const lessons = await this.getLessons();
+    const result = lessons.filter(lesson => (lesson.date == formattedDate) && (lesson.startTime == formattedTime));
+    if (result.length > 0) {
+      return result[0];
+    }
+    return null;
   }
 }

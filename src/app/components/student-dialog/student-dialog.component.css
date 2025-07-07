@@ -120,6 +120,16 @@ select {
     transition: all 0.3s ease;
 }
 
+app-custom-select {
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 18px;
+    background-color: #f8fafc;
+    flex-grow: 1;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
 /* Поле с валютой */
 .input-with-symbol {
     position: relative;
@@ -127,7 +137,7 @@ select {
 }
 
 .input-with-symbol .currency-symbol {
-    position: absolute;
+    padding-left: 20px;
     right: 16px;
     top: 50%;
     transform: translateY(-50%);

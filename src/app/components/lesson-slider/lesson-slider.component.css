@@ -7,17 +7,15 @@
 
 .lessons-container {
     display: flex;
-    gap: 20px;
-    overflow-x: auto;
+    gap: 40px;
     scrollbar-width: none;
     -ms-overflow-style: none;
     flex-grow: 1;
-    justify-content: space-between;
+    justify-content: center;
 }
 
 .lessons-container::-webkit-scrollbar {
     display: none;
-    /* Для Chrome, Safari и Opera */
 }
 
 .lesson-block {

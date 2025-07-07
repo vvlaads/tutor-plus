@@ -89,12 +89,6 @@ export class DateService {
     return hours * 60 + minutes;
   }
 
-  public setTimeToDate(date: Date, time: string): Date {
-    let minutes = this.stringToMinutes(time);
-    date.setMinutes(minutes);
-    return date;
-  }
-
   public changeFormatMinusToDot(minusFormat: string): string {
     const parts = minusFormat.split('-');
     const year = parts[0];

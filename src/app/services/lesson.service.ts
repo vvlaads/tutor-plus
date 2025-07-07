@@ -236,7 +236,7 @@ export class LessonService implements OnDestroy {
     }
   }
 
-  public async getUnpaidLessonsByStudentId(studentId: string) {
+  public async getUnpaidLessonsByStudentId(studentId: string): Promise<Lesson[]> {
     const studentLessons = await this.getPrevLessonsByStudentId(studentId);
     const unpaidLessons = studentLessons.filter(lesson => !lesson.isPaid);
     unpaidLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
@@ -244,7 +244,7 @@ export class LessonService implements OnDestroy {
     return unpaidLessons;
   }
 
-  public async getPrepaidLessonsByStudentId(studentId: string) {
+  public async getPrepaidLessonsByStudentId(studentId: string): Promise<Lesson[]> {
     const studentLessons = await this.getNextLessonsByStudentId(studentId);
     const prepaidLessons = studentLessons.filter(lesson => lesson.isPaid);
     prepaidLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));

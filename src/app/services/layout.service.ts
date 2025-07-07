@@ -6,9 +6,10 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class LayoutService {
   private isHide = new BehaviorSubject<boolean>(false);
+
   public isHide$ = this.isHide.asObservable();
 
-  public toggleNavigation() {
+  public toggleNavigation(): void {
     this.isHide.next(!this.isHide.value);
   }
 }

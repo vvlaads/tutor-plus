@@ -86,7 +86,7 @@ export class StudentService implements OnDestroy {
     this.lessonService.deleteLessonsByStudentId(id);
   }
 
-  private async checkNextLessons(id: string) {
+  private async checkNextLessons(id: string): Promise<void> {
     const student = await this.getStudentById(id);
     if (student) {
       if (!student.isActive) {

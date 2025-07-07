@@ -115,7 +115,6 @@ export class DateService {
     const dates = []
     let date = new Date(start)
     while (date.getTime() <= end.getTime()) {
-      console.log(date.getDate());
       dates.push(new Date(date));
       date.setDate(date.getDate() + 7);
     }

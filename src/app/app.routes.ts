@@ -7,8 +7,8 @@ import { StudentProfileComponent } from './pages/student-profile/student-profile
 import { HomeComponent } from './pages/home/home.component';
 
 export const routes: Routes = [
-    { path: '', component: HomeComponent, canActivate: [authGuard] },
     { path: 'login', component: LoginComponent },
+    { path: '', component: HomeComponent, canActivate: [authGuard] },
     { path: 'students', component: StudentsComponent, canActivate: [authGuard] },
     { path: 'schedule', component: ScheduleComponent, canActivate: [authGuard] },
     { path: 'student/:id', component: StudentProfileComponent, canActivate: [authGuard] },

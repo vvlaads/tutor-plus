@@ -21,25 +21,34 @@
     flex-direction: column;
 }
 
-.option-button {
+.option-button,
+.cancel-button {
     justify-content: center;
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
     display: flex;
     gap: 12px;
     margin-top: 24px;
-    background-color: #4299e1;
-    color: white;
     border: none;
     padding: 12px 24px;
     border-radius: 8px;
     font-weight: 500;
-    cursor: pointer;
     transition: background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.option-button {
+    background-color: #4299e1;
+    color: white;
 }
 
 .option-button:hover {
     background-color: #3182ce;
+}
+
+.option-button:active,
+.cancel-button:active {
+    transform: scale(0.98);
 }
 
 .dialog-footer {
@@ -48,17 +57,6 @@
 }
 
 .cancel-button {
-    justify-content: center;
-    font-family: 'Roboto', sans-serif;
-    font-size: 20px;
-    display: flex;
-    gap: 12px;
-    margin-top: 24px;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
     background-color: #ffffff;
     color: #4a5568;
     border: 1px solid #e2e8f0;

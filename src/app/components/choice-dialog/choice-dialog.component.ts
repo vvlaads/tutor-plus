@@ -14,7 +14,7 @@ export class ChoiceDialogComponent {
   public dialogRef = inject(MatDialogRef<ChoiceDialogComponent>);
 
   @HostListener('document:keydown.escape', ['$event'])
-  handleEscapeKey(event: KeyboardEvent) {
+  public handleEscapeKey(event: KeyboardEvent) {
     this.close(null);
   }
 
@@ -22,11 +22,11 @@ export class ChoiceDialogComponent {
     this.options = data.options;
   }
 
-  public submit(option: string) {
+  public submit(option: string): void {
     this.close(option);
   }
 
-  public close(option: string | null) {
+  public close(option: string | null): void {
     this.dialogRef.close(option);
   }
 }

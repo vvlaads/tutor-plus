@@ -4,11 +4,15 @@
         <form [formGroup]="findDateForm" class="lesson-form" (ngSubmit)="submit()">
             <div class="form-group">
                 <label for="input-date" class="form-label">Дата:</label>
-                <input formControlName="date" id="input-date" class="form-input" placeholder="Введите дату"
-                    type="date" />
+                <input formControlName="date" id="input-date" class="form-input" type="date">
             </div>
+
+            <div *ngIf="formSubmitted && findDateForm.get('date')?.errors" class="error-message">
+                {{ getErrorMessage('date') }}
+            </div>
+
             <div class="form-actions">
-                <button type="submit" class="submit-button" [disabled]="findDateForm.invalid">
+                <button type="submit" class="submit-button">
                     Найти
                 </button>
                 <button type="button" (click)="close(null)" class="cancel-button">

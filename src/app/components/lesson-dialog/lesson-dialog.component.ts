@@ -6,7 +6,7 @@ import { DialogMode } from '../../app.enums';
 import { Lesson, SelectOption, Student } from '../../app.interfaces';
 import { LessonService } from '../../services/lesson.service';
 import { StudentService } from '../../services/student.service';
-import { DateService } from '../../services/date.service';
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, dateToString, getDatesBetween, stringToDate } from '../../app.functions';
 
 
 function convertTimeToMinutes(timeStr: string): number {
@@ -54,7 +54,6 @@ export class LessonDialogComponent implements OnInit {
     private fb: FormBuilder,
     private lessonService: LessonService,
     private studentService: StudentService,
-    private dateService: DateService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Lesson | null }
   ) {
     this.mode = data.mode;
@@ -72,7 +71,7 @@ export class LessonDialogComponent implements OnInit {
     let date = '';
     let isRepeat = false;
     if (data.lesson) {
-      date = this.dateService.changeFormatDotToMinus(data.lesson.date);
+      date = changeDateFormatDotToMinus(data.lesson.date);
       isRepeat = data.lesson.isRepeat;
     }
 
@@ -118,21 +117,21 @@ export class LessonDialogComponent implements OnInit {
     }
 
     const lessonValue = { ...this.lessonForm.value };
-    lessonValue.date = this.dateService.changeFormatMinusToDot(lessonValue.date);
+    lessonValue.date = changeDateFormatMinusToDot(lessonValue.date);
     if (lessonValue.isRepeat) {
-      lessonValue.repeatUntil = this.dateService.changeFormatMinusToDot(lessonValue.repeatUntil);
+      lessonValue.repeatUntil = changeDateFormatMinusToDot(lessonValue.repeatUntil);
 
       let dates: Date[] = []
       if (lessonValue.isRepeat) {
-        let start = this.dateService.stringToDate(lessonValue.date);
-        let end = this.dateService.stringToDate(lessonValue.repeatUntil);
-        dates = this.dateService.getDatesBetween(start, end);
+        let start = stringToDate(lessonValue.date);
+        let end = stringToDate(lessonValue.repeatUntil);
+        dates = getDatesBetween(start, end);
       }
       console.log(dates)
       for (const date of dates) {
         let lesson = {
           studentId: lessonValue.studentId,
-          date: this.dateService.dateToString(date),
+          date: dateToString(date),
           startTime: lessonValue.startTime,
           endTime: lessonValue.endTime,
           cost: lessonValue.cost,

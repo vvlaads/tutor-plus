@@ -2,7 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Lesson } from '../app.interfaces';
-import { DateService } from './date.service';
+import { stringToDate, stringToMinutes } from '../app.functions';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class LessonService implements OnDestroy {
   public prevLessons$ = this.prevLessonsSubject.asObservable();
   public nextLessons$ = this.nextLessonsSubject.asObservable();
 
-  public constructor(private dateService: DateService) {
+  public constructor() {
     this.startListening();
   }
 
@@ -189,8 +189,8 @@ export class LessonService implements OnDestroy {
   }
 
   private getLessonTimestamp(lesson: Lesson): number {
-    const date = this.dateService.stringToDate(lesson.date);
-    date.setHours(0, this.dateService.stringToMinutes(lesson.startTime), 0, 0)
+    const date = stringToDate(lesson.date);
+    date.setHours(0, stringToMinutes(lesson.startTime), 0, 0)
     return date.getTime();
   }
 

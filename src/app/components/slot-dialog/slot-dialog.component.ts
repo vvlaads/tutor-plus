@@ -5,9 +5,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { SlotService } from '../../services/slot.service';
 import { Slot } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
-import { DateService } from '../../services/date.service';
 import { DialogService } from '../../services/dialog.service';
 import { LessonService } from '../../services/lesson.service';
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../app.functions';
 
 @Component({
   selector: 'app-slot-dialog',
@@ -27,7 +27,6 @@ export class SlotDialogComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private slotService: SlotService,
-    private dateService: DateService,
     private dialogService: DialogService,
     private lessonService: LessonService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, slot: Slot | null }
@@ -45,7 +44,7 @@ export class SlotDialogComponent implements OnInit {
     }
     let date = null;
     if (data.slot) {
-      date = dateService.changeFormatDotToMinus(data.slot.date);
+      date = changeDateFormatDotToMinus(data.slot.date);
     }
 
     this.slotForm = this.fb.group({
@@ -78,7 +77,7 @@ export class SlotDialogComponent implements OnInit {
     }
 
     const slotValue = { ...this.slotForm.value };
-    slotValue.date = this.dateService.changeFormatMinusToDot(slotValue.date);
+    slotValue.date = changeDateFormatMinusToDot(slotValue.date);
 
     switch (this.mode) {
       case DialogMode.Add:

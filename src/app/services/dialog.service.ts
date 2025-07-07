@@ -71,7 +71,7 @@ export class DialogService {
 
   public openFindDateDialog(): MatDialogRef<FindDateDialogComponent, any> {
     const dialogRef = this.dialog.open(FindDateDialogComponent, {
-      width: '1200px',
+      width: '600px',
       maxWidth: '95vw',
       panelClass: 'wide-dialog',
       disableClose: true

@@ -1,21 +1,16 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutService } from '../../services/layout.service';
-import { FindDateDialogComponent } from '../../components/find-date-dialog/find-date-dialog.component';
-import { MatDialog } from '@angular/material/dialog';
-import { DateService } from '../../services/date.service';
-import { LessonDialogComponent } from '../../components/lesson-dialog/lesson-dialog.component';
 import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
-import { Lesson, SelectOption, Slot, Student } from '../../app.interfaces';
+import { Lesson, Slot, Student } from '../../app.interfaces';
 import { take } from 'rxjs';
 import { StudentService } from '../../services/student.service';
 import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
-import { SlotDialogComponent } from '../../components/slot-dialog/slot-dialog.component';
-import { ChoiceDialogComponent } from '../../components/choice-dialog/choice-dialog.component';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
+import { dateToString, isDatesEquals, minutesToString, stringToDate, stringToMinutes } from '../../app.functions';
 
 @Component({
   standalone: true,
@@ -51,7 +46,6 @@ export class ScheduleComponent implements OnInit {
 
   public constructor(
     private layoutService: LayoutService,
-    private dateService: DateService,
     private lessonService: LessonService,
     private studentService: StudentService,
     private slotService: SlotService) {
@@ -90,8 +84,8 @@ export class ScheduleComponent implements OnInit {
   private updateLessons(lessons: Lesson[]): void {
     this.oneDayLessons = lessons.filter(lesson => {
       try {
-        const lessonDate = this.dateService.stringToDate(lesson.date);
-        return this.dateService.isDatesEquals(this.currentDate, lessonDate);
+        const lessonDate = stringToDate(lesson.date);
+        return isDatesEquals(this.currentDate, lessonDate);
       } catch (e) {
         console.error('Ошибка преобразования:', e);
         return false;
@@ -103,8 +97,8 @@ export class ScheduleComponent implements OnInit {
 
     this.lessons = lessons.filter(lesson => {
       try {
-        const lessonDate = this.dateService.stringToDate(lesson.date);
-        return this.currentWeekDates.some(date => this.dateService.isDatesEquals(date, lessonDate));
+        const lessonDate = stringToDate(lesson.date);
+        return this.currentWeekDates.some(date => isDatesEquals(date, lessonDate));
       } catch (e) {
         console.error('Ошибка преобразования:', e);
         return false;
@@ -136,8 +130,8 @@ export class ScheduleComponent implements OnInit {
   private updateSlots(slots: Slot[]): void {
     this.slots = slots.filter(slot => {
       try {
-        const slotDate = this.dateService.stringToDate(slot.date);
-        return this.currentWeekDates.some(date => this.dateService.isDatesEquals(date, slotDate));
+        const slotDate = stringToDate(slot.date);
+        return this.currentWeekDates.some(date => isDatesEquals(date, slotDate));
       } catch (e) {
         console.error('Ошибка преобразования:', e);
         return false;
@@ -201,7 +195,7 @@ export class ScheduleComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Переход к дате ${result}`)
       if (result !== undefined) {
-        this.updateCurrentDate(this.dateService.stringToDate(result));
+        this.updateCurrentDate(stringToDate(result));
       } else {
         console.log("Дата для перехода не найдена")
       }
@@ -213,14 +207,14 @@ export class ScheduleComponent implements OnInit {
   }
 
   private getNextTime(time: string): string {
-    let timeInMinutes = this.dateService.stringToMinutes(time)
+    let timeInMinutes = stringToMinutes(time)
     timeInMinutes += 60;
     let nextTime = ''
     try {
-      nextTime = this.dateService.minutesToString(timeInMinutes)
+      nextTime = minutesToString(timeInMinutes)
     } catch (error) {
       timeInMinutes -= 5;
-      nextTime = this.dateService.minutesToString(timeInMinutes)
+      nextTime = minutesToString(timeInMinutes)
     }
     return nextTime;
   }
@@ -246,23 +240,23 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getLessonHeight(lesson: Lesson): string {
-    let startTime = this.dateService.stringToMinutes(lesson.startTime);
-    let endTime = this.dateService.stringToMinutes(lesson.endTime);
+    let startTime = stringToMinutes(lesson.startTime);
+    let endTime = stringToMinutes(lesson.endTime);
     let hours = Math.floor(endTime / 60) - Math.floor(startTime / 60)
 
     return `${(endTime - startTime) * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours)}px`
   }
 
   public getLessonTop(lesson: Lesson): number {
-    const totalMinutes = this.dateService.stringToMinutes(lesson.startTime)
+    const totalMinutes = stringToMinutes(lesson.startTime)
     const hours = Math.floor(totalMinutes / 60);
     return totalMinutes * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours);
   }
 
   public getLessonLeft(lesson: Lesson): number {
-    const lessonDate = this.dateService.stringToDate(lesson.date);
+    const lessonDate = stringToDate(lesson.date);
     for (let i = 0; i < this.currentWeekDates.length; i++) {
-      if (this.dateService.isDatesEquals(lessonDate, this.currentWeekDates[i])) {
+      if (isDatesEquals(lessonDate, this.currentWeekDates[i])) {
         return this.timeColumnWidthPercetage + i * this.blockWidthPercentage;
       }
     }
@@ -270,23 +264,23 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getSlotHeight(slot: Slot): string {
-    let startTime = this.dateService.stringToMinutes(slot.startTime);
-    let endTime = this.dateService.stringToMinutes(slot.endTime);
+    let startTime = stringToMinutes(slot.startTime);
+    let endTime = stringToMinutes(slot.endTime);
     let hours = Math.floor(endTime / 60) - Math.floor(startTime / 60)
 
     return `${(endTime - startTime) * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours)}px`
   }
 
   public getSlotTop(slot: Slot): number {
-    const totalMinutes = this.dateService.stringToMinutes(slot.startTime)
+    const totalMinutes = stringToMinutes(slot.startTime)
     const hours = Math.floor(totalMinutes / 60);
     return totalMinutes * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours);
   }
 
   public getSlotLeft(slot: Slot): number {
-    const lessonDate = this.dateService.stringToDate(slot.date);
+    const lessonDate = stringToDate(slot.date);
     for (let i = 0; i < this.currentWeekDates.length; i++) {
-      if (this.dateService.isDatesEquals(lessonDate, this.currentWeekDates[i])) {
+      if (isDatesEquals(lessonDate, this.currentWeekDates[i])) {
         return this.timeColumnWidthPercetage + i * this.blockWidthPercentage;
       }
     }
@@ -321,11 +315,11 @@ export class ScheduleComponent implements OnInit {
     dialogRef.afterClosed().subscribe((option) => {
       switch (option) {
         case ScheduleObject.Slot:
-          const slot = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
+          const slot = { date: dateToString(date), startTime: time, endTime: endTime }
           this.dialogService.openSlotDialog(DialogMode.Add, slot);
           break;
         case ScheduleObject.Lesson:
-          const lesson = { date: this.dateService.dateToString(date), startTime: time, endTime: endTime }
+          const lesson = { date: dateToString(date), startTime: time, endTime: endTime }
           this.dialogService.openLessonDialog(DialogMode.Add, lesson)
           break;
       }
@@ -341,14 +335,17 @@ export class ScheduleComponent implements OnInit {
     const cellStartDate = new Date(originalDate);
     cellStartDate.setHours(0, 0, 0, 0);
 
-    const cellStart = new Date(this.dateService.setTimeToDate(new Date(cellStartDate), time));
+    const cellStart = new Date(cellStartDate);
+    cellStart.setMinutes(stringToMinutes(time));
     const cellEnd = new Date(cellStart.getTime());
     cellEnd.setMinutes(cellStart.getMinutes() + 59);
 
     return this.lessons.some(lesson => {
-      const lessonDate = new Date(this.dateService.stringToDate(lesson.date));
-      const lessonStart = new Date(this.dateService.setTimeToDate(new Date(lessonDate), lesson.startTime));
-      const lessonEnd = new Date(this.dateService.setTimeToDate(new Date(lessonDate), lesson.endTime));
+      const lessonDate = new Date(stringToDate(lesson.date));
+      const lessonStart = new Date(lessonDate);
+      lessonStart.setMinutes(stringToMinutes(lesson.startTime));
+      const lessonEnd = new Date(lessonDate);
+      lessonEnd.setMinutes(stringToMinutes(lesson.endTime));
 
       const result = (lessonStart >= cellStart && lessonStart <= cellEnd) ||
         (lessonEnd > cellStart && lessonEnd <= cellEnd) ||
@@ -372,12 +369,12 @@ export class ScheduleComponent implements OnInit {
   }
 
   public dateIsToday(date: Date): boolean {
-    return this.dateService.isDatesEquals(date, this.today);
+    return isDatesEquals(date, this.today);
   }
 
   public getTimeDifference(time1: string, time2: string): number {
-    let minutes1 = this.dateService.stringToMinutes(time1);
-    let minutes2 = this.dateService.stringToMinutes(time2);
+    let minutes1 = stringToMinutes(time1);
+    let minutes2 = stringToMinutes(time2);
     let difference = minutes1 - minutes2
     if (difference < 0) {
       return -difference;
@@ -387,8 +384,8 @@ export class ScheduleComponent implements OnInit {
 
   public sortLessonsByStartTime(ascending: boolean = true): void {
     this.oneDayLessons.sort((a, b) => {
-      const timeA = this.dateService.stringToMinutes(a.startTime);
-      const timeB = this.dateService.stringToMinutes(b.startTime);
+      const timeA = stringToMinutes(a.startTime);
+      const timeB = stringToMinutes(b.startTime);
 
       return ascending ? timeA - timeB : timeB - timeA;
     });
@@ -438,7 +435,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   getCurrentDateInString(): string {
-    return this.dateService.dateToString(this.currentDate);
+    return dateToString(this.currentDate);
   }
 
   public addScheduleObject(): void {
@@ -480,14 +477,14 @@ export class ScheduleComponent implements OnInit {
         }
 
         const worksheet = XLSX.utils.table_to_sheet(tableElement);
-        const sheetName = `${this.dateService.dateToString(this.currentDate)}`;
+        const sheetName = `${dateToString(this.currentDate)}`;
         XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
         this.goToNext();
         await new Promise(resolve => setTimeout(resolve, 300));
       }
 
       this.resetCurrentDate();
-      const fileName = `Расписание ${this.dateService.dateToString(this.currentDate)}.xlsx`;
+      const fileName = `Расписание ${dateToString(this.currentDate)}.xlsx`;
       XLSX.writeFile(workbook, fileName);
       console.log('Экспорт завершен успешно!');
 

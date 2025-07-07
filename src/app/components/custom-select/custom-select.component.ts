@@ -1,13 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, Output, EventEmitter, forwardRef, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, HostListener, OnInit } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-
-interface SelectOption {
-  value: string;
-  text: string;
-  icon?: string;
-}
-
+import { SelectOptionWithIcon } from '../../app.interfaces';
 @Component({
   selector: 'app-custom-select',
   standalone: true,
@@ -22,25 +16,32 @@ interface SelectOption {
     }
   ]
 })
-export class CustomSelectComponent implements ControlValueAccessor {
-  @Input() options: SelectOption[] = [];
-  @Input() placeholder: string = 'Выберите...';
-  @Input() selectedValue: string | null = null;
-  @Input() disabled = false;
-  @Output() selected = new EventEmitter<SelectOption>();
+export class CustomSelectComponent implements ControlValueAccessor, OnInit {
+  @Input()
+  public options: SelectOptionWithIcon[] = [];
+  @Input()
+  public placeholder: string = 'Выберите...';
+  @Input()
+  public selectedValue: string | null = null;
+  @Input()
+  public disabled = false;
+  @Output()
+  public selected = new EventEmitter<SelectOptionWithIcon>();
 
-  selectedOption: SelectOption | null = null;
-  isOpen = false;
+  public selectedOption: SelectOptionWithIcon | null = null;
+  public isOpen = false;
 
-  // Функции для ControlValueAccessor
   private onChange: (value: string) => void = () => { };
+
   private onTouched: () => void = () => { };
-  ngOnInit() {
+
+  public ngOnInit(): void {
     if (this.selectedValue) {
       this.selectedOption = this.options.find(opt => opt.value === this.selectedValue) || null;
     }
   }
-  toggleDropdown(event: Event) {
+
+  public toggleDropdown(event: Event): void {
     if (this.disabled) return;
     event.stopPropagation();
     this.isOpen = !this.isOpen;
@@ -49,15 +50,14 @@ export class CustomSelectComponent implements ControlValueAccessor {
     }
   }
 
-  selectOption(option: SelectOption, event: Event) {
+  public selectOption(option: SelectOptionWithIcon, event: Event): void {
     event.stopPropagation();
     this.selectedOption = option;
-    this.selected.emit(option); // Здесь передается весь объект option
+    this.selected.emit(option);
     this.closeDropdown();
   }
 
-  // ControlValueAccessor методы
-  writeValue(value: string): void {
+  public writeValue(value: string): void {
     if (value) {
       this.selectedOption = this.options.find(opt => opt.value === value) || null;
     } else {
@@ -65,20 +65,20 @@ export class CustomSelectComponent implements ControlValueAccessor {
     }
   }
 
-  registerOnChange(fn: (value: string) => void): void {
+  public registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;
   }
 
-  registerOnTouched(fn: () => void): void {
+  public registerOnTouched(fn: () => void): void {
     this.onTouched = fn;
   }
 
-  setDisabledState?(isDisabled: boolean): void {
+  public setDisabledState?(isDisabled: boolean): void {
     this.disabled = isDisabled;
   }
 
   @HostListener('document:click', ['$event'])
-  onClickOutside(event: Event) {
+  public onClickOutside(event: Event): void {
     if (!this.isOpen) return;
     const target = event.target as HTMLElement;
     if (!target.closest('.custom-select')) {
@@ -87,11 +87,11 @@ export class CustomSelectComponent implements ControlValueAccessor {
   }
 
   @HostListener('document:keydown.escape')
-  onEscapePress() {
+  public onEscapePress(): void {
     this.closeDropdown();
   }
 
-  private closeDropdown() {
+  private closeDropdown(): void {
     this.isOpen = false;
   }
 }

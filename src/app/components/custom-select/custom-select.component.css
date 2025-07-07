@@ -1,4 +1,3 @@
-/* Custom Select Styles */
 .custom-select {
     position: relative;
     flex-grow: 1;
@@ -9,7 +8,6 @@
     transition: all 0.3s ease;
     font-size: 20px;
     height: 48px;
-    /* Высота как у других полей ввода */
     display: flex;
     align-items: center;
 }
@@ -22,7 +20,16 @@
     border-color: #4299e1;
     box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
     z-index: 10;
-    /* Чтобы dropdown был поверх других элементов */
+}
+
+.custom-select.disabled {
+    background-color: #edf2f7;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.custom-select.disabled .selected-option {
+    pointer-events: none;
 }
 
 .selected-option {
@@ -48,7 +55,7 @@
     transition: transform 0.2s ease;
 }
 
-.custom-select.active .arrow {
+.arrow.active {
     transform: rotate(180deg);
 }
 
@@ -66,7 +73,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 100;
     margin-top: -1px;
-    /* Чтобы не было двойной границы */
 }
 
 .option {
@@ -84,33 +90,4 @@
 .option.selected {
     background-color: #ebf8ff;
     font-weight: 500;
-}
-
-/* Для disabled состояния */
-.custom-select.disabled {
-    background-color: #edf2f7;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.custom-select.disabled .selected-option {
-    pointer-events: none;
-}
-
-/* Адаптация для маленьких экранов */
-@media (max-width: 1300px) {
-    .custom-select {
-        font-size: 18px;
-        height: 44px;
-    }
-
-    .selected-option,
-    .option {
-        padding: 10px 12px;
-    }
-
-    .option-icon {
-        width: 20px;
-        height: 20px;
-    }
 }

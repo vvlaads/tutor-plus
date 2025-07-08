@@ -8,14 +8,14 @@ import { LessonService } from '../../services/lesson.service';
 import { StudentService } from '../../services/student.service';
 import { getErrorMessage } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
-import { REPEAT_LESSON_OPTIONS } from '../../app.constants';
+import { HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, REPEAT_LESSON_OPTIONS } from '../../app.constants';
 import {
   realEndTimeRangeValidator, repeatDateRangeValidator,
   requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator
 } from '../../functions/validators';
 import {
   changeDateFormatDotToMinus, changeDateFormatMinusToDot,
-  convertDateToString, convertStringToDate, getWeeklyRecurringDates
+  convertDateToString, convertStringToDate, convertTimeToMinutes, getWeeklyRecurringDates
 } from '../../functions/dates';
 
 
@@ -36,6 +36,7 @@ export class LessonDialogComponent implements OnInit {
   public options: SelectOption[] = []
   public studentCost = 0;
   public formSubmitted = false;
+  public preferredCost = 1000;
 
   public constructor(
     private fb: FormBuilder,
@@ -82,7 +83,7 @@ export class LessonDialogComponent implements OnInit {
   public ngOnInit(): void {
     this.subscribeToStudents();
     if (this.data.lesson?.studentId) {
-      this.getCostByStudentId();
+      this.updateCosts();
     }
   }
 
@@ -232,6 +233,31 @@ export class LessonDialogComponent implements OnInit {
     if (student) {
       this.studentCost = student.cost;
     }
+  }
+
+  public getPreferredCost(): void {
+    const lesson = this.convertFormToLesson();
+    let cost = 1000;
+    if (lesson.startTime && lesson.endTime && lesson.studentId) {
+      if (lesson.hasRealEndTime && lesson.realEndTime) {
+        const start = convertTimeToMinutes(lesson.startTime);
+        const end = convertTimeToMinutes(lesson.realEndTime)
+        cost = this.studentCost * (end - start) / MINUTES_IN_HOUR
+        if (end < start && end + MINUTES_IN_HOUR * HOURS_IN_DAY <= start + MINUTES_IN_HOUR * MAX_LESSON_DURATION) {
+          cost = this.studentCost * (end + MINUTES_IN_HOUR * HOURS_IN_DAY - start) / MINUTES_IN_HOUR
+        }
+      } else {
+        cost = this.studentCost * (convertTimeToMinutes(lesson.endTime) - convertTimeToMinutes(lesson.startTime)) / MINUTES_IN_HOUR
+      }
+      if (cost > 0) {
+        this.preferredCost = cost;
+      }
+    }
+  }
+
+  public async updateCosts(): Promise<void> {
+    await this.getCostByStudentId();
+    this.getPreferredCost();
   }
 
   public getErrorMessage(field: string): string | null {

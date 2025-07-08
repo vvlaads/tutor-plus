@@ -81,7 +81,7 @@
 }
 
 .button-text {
-    font-family: 'Arial', sans-serif;
+    font-family: 'Roboto', sans-serif;
     font-size: 16px;
     white-space: nowrap;
 }
@@ -121,7 +121,6 @@ hr {
 .exit-button:hover .button-icon {
     filter: brightness(0) saturate(100%) invert(16%) sepia(99%) saturate(2590%) hue-rotate(0deg) brightness(98%) contrast(97%);
 }
-
 
 .collapsed .button-text {
     display: none;

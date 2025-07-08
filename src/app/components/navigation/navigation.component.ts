@@ -19,7 +19,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
   public isHide = false;
   private subscriptions: Subscription[] = [];
 
-  constructor(
+  public constructor(
     private router: Router,
     private authService: AuthService,
     private layoutService: LayoutService
@@ -41,6 +41,10 @@ export class NavigationComponent implements OnInit, OnDestroy {
     );
 
     this.updateSelectedSection(this.router.url);
+  }
+
+  public ngOnDestroy(): void {
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
   private updateSelectedSection(url: string): void {
@@ -86,9 +90,5 @@ export class NavigationComponent implements OnInit, OnDestroy {
         return this.selectedSection === Section.Schedule;
     }
     return false;
-  }
-
-  public ngOnDestroy(): void {
-    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

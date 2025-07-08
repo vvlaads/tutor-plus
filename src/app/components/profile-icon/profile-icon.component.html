@@ -1,5 +1,4 @@
 <div class="user-profile">
-    <img *ngIf="photoURL" [src]="photoURL" alt="User photo" [title]="displayName" class="avatar">
-
+    <img *ngIf="photoURL" [src]="photoURL" [title]="displayName" class="avatar">
     <span *ngIf="fullFormat" class="username">{{ displayName }}</span>
 </div>

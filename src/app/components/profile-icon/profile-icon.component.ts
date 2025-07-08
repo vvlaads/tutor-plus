@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 
@@ -8,15 +8,16 @@ import { CommonModule } from '@angular/common';
   templateUrl: './profile-icon.component.html',
   styleUrl: './profile-icon.component.css'
 })
-export class ProfileIconComponent {
-  photoURL: string | null = null;
-  displayName: string | null = null;
+export class ProfileIconComponent implements OnInit {
+  public photoURL: string | null = null;
+  public displayName: string | null = null;
+
   @Input()
-  fullFormat = false;
+  public fullFormat = false;
 
-  constructor(private authService: AuthService) { }
+  public constructor(private authService: AuthService) { }
 
-  ngOnInit() {
+  public ngOnInit(): void {
     this.authService.currentUser$.subscribe(user => {
       this.photoURL = user?.photoURL || null;
       this.displayName = user?.displayName || null;

@@ -1,3 +1,7 @@
+.search-container {
+    width: 100%;
+}
+
 .search-input {
     box-sizing: border-box;
     width: 100%;
@@ -5,8 +9,4 @@
     border: 1px solid #ccc;
     border-radius: 20px;
     font-size: 16px;
-}
-
-.search-container {
-    width: 100%;
 }

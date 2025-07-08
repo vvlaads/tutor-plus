@@ -10,11 +10,12 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './search.component.css'
 })
 export class SearchComponent {
-  searchQuery: string = '';
+  public searchQuery: string = '';
 
-  @Output() searchChange = new EventEmitter<string>();
+  @Output()
+  public searchChange = new EventEmitter<string>();
 
-  onSearch(): void {
+  public onSearch(): void {
     this.searchChange.emit(this.searchQuery);
   }
 }

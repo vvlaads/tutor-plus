@@ -6,31 +6,7 @@ import { DialogMode } from '../../app.enums';
 import { Lesson, SelectOption, Student } from '../../app.interfaces';
 import { LessonService } from '../../services/lesson.service';
 import { StudentService } from '../../services/student.service';
-import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, dateToString, getDatesBetween, stringToDate } from '../../app.functions';
-
-
-function convertTimeToMinutes(timeStr: string): number {
-  const [hours, minutes] = timeStr.split(':').map(Number);
-  return hours * 60 + minutes;
-}
-
-function timeRangeValidator(group: FormGroup): { [key: string]: any } | null {
-  const startTime = group.get('startTime')?.value;
-  const endTime = group.get('endTime')?.value;
-
-  if (!startTime || !endTime) {
-    return null;
-  }
-
-  const startMinutes = convertTimeToMinutes(startTime);
-  const endMinutes = convertTimeToMinutes(endTime);
-
-  if (endMinutes <= startMinutes) {
-    return { timeRangeInvalid: true };
-  }
-
-  return null;
-}
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, dateToString, getDatesBetween, getErrorMessage, stringToDate, timeRangeValidator } from '../../app.functions';
 
 @Component({
   selector: 'app-lesson-dialog',
@@ -39,18 +15,19 @@ function timeRangeValidator(group: FormGroup): { [key: string]: any } | null {
   styleUrl: './lesson-dialog.component.css'
 })
 export class LessonDialogComponent implements OnInit {
-  dialogRef = inject(MatDialogRef<LessonDialogComponent>);
-  lessonForm: FormGroup;
-  mode: DialogMode = DialogMode.Add;
-  title: string = 'Новое занятие'
-  submitMessage: string = 'Добавить'
-  students: Student[] = []
-  options: SelectOption[] = []
+  private dialogRef = inject(MatDialogRef<LessonDialogComponent>);
+  private mode: DialogMode = DialogMode.Add;
+  private students: Student[] = []
+  private lessons: Lesson[] = []
+
+  public lessonForm: FormGroup;
+  public title: string;
+  public submitMessage: string;
+  public options: SelectOption[] = []
   public studentCost = 0;
+  public formSubmitted = false;
 
-  lessons: Lesson[] = []
-
-  constructor(
+  public constructor(
     private fb: FormBuilder,
     private lessonService: LessonService,
     private studentService: StudentService,
@@ -84,13 +61,13 @@ export class LessonDialogComponent implements OnInit {
       isPaid: [data.lesson == null ? false : data.lesson.isPaid],
       isRepeat: [isRepeat, Validators.required],
       realEndTime: [''],
-      note: [''],
+      note: [null],
       baseLessonId: [''],
       repeatEndDate: [''],
     }, { validators: timeRangeValidator });
   }
 
-  public ngOnInit() {
+  public ngOnInit(): void {
     this.studentService.students$.subscribe(students => {
       this.students = students;
       this.students.filter(student => student.isActive == true).forEach(student => {
@@ -110,9 +87,14 @@ export class LessonDialogComponent implements OnInit {
   }
 
 
-  public submit() {
+  public submit(): void {
+    this.formSubmitted = true;
+
+    Object.keys(this.lessonForm.controls).forEach(key => {
+      this.lessonForm.get(key)?.markAsTouched();
+    });
+
     if (this.lessonForm.invalid) {
-      this.lessonForm.markAllAsTouched();
       return;
     }
 
@@ -137,8 +119,10 @@ export class LessonDialogComponent implements OnInit {
           cost: lessonValue.cost,
           isPaid: lessonValue.isPaid,
           isRepeat: lessonValue.isRepeat,
-          realEndTime: '',
-          note: '',
+          realEndTime: null,
+          note: null,
+          baseLessonId: null,
+          repeatEndDate: null
         }
 
         switch (this.mode) {
@@ -159,8 +143,10 @@ export class LessonDialogComponent implements OnInit {
         cost: lessonValue.cost,
         isPaid: lessonValue.isPaid,
         isRepeat: lessonValue.isRepeat,
-        realEndTime: '',
-        note: '',
+        realEndTime: null,
+        note: null,
+        baseLessonId: null,
+        repeatEndDate: null
       }
       switch (this.mode) {
         case DialogMode.Add:
@@ -177,7 +163,7 @@ export class LessonDialogComponent implements OnInit {
     return 'temp-' + Math.random().toString(36).substr(2, 9);
   }
 
-  private addLesson(lessonData: Omit<Lesson, 'id'>) {
+  private addLesson(lessonData: Omit<Lesson, 'id'>): void {
     const lesson: Lesson = {
       ...lessonData,
       id: this.generateTempId(),
@@ -192,7 +178,7 @@ export class LessonDialogComponent implements OnInit {
       });
   }
 
-  private updateLesson(lesson: Partial<Lesson>) {
+  private updateLesson(lesson: Partial<Lesson>): void {
     const updatedLesson = {
       ...this.data.lesson,
       ...lesson
@@ -202,11 +188,11 @@ export class LessonDialogComponent implements OnInit {
 
   }
 
-  public close(status: boolean) {
+  public close(status: boolean): void {
     this.dialogRef.close(status);
   }
 
-  public deleteLesson() {
+  public deleteLesson(): void {
     if (this.data.lesson) {
       const confirmDelete = confirm('Вы уверены, что хотите удалить это занятие?');
       if (confirmDelete) {
@@ -221,10 +207,14 @@ export class LessonDialogComponent implements OnInit {
     return this.mode == DialogMode.Edit;
   }
 
-  public async getCostByStudentId() {
+  public async getCostByStudentId(): Promise<void> {
     const student = await this.studentService.getStudentById(this.lessonForm.value.studentId);
     if (student) {
       this.studentCost = student.cost;
     }
+  }
+
+  public getErrorMessage(field: string): string | null {
+    return getErrorMessage(this.lessonForm, field);
   }
 }

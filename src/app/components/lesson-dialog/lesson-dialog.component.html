@@ -1,100 +1,130 @@
 <div class="form-container">
-    <h2 class="form-title">{{title}}</h2>
+    <span class="form-title">{{title}}</span>
     <div class="form-content">
         <form [formGroup]="lessonForm" class="lesson-form" (ngSubmit)="submit()">
-            <div class="form-group">
-                <label for="input-date" class="form-label">Дата:</label>
-                <input formControlName="date" id="input-date" class="form-input" type="date" placeholder="02.07.2025">
-                <div *ngIf="lessonForm.get('date')?.invalid && lessonForm.get('date')?.touched" class="error-message">
-                    Обязательное поле
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="input-startTime" class="form-label">Время начала:</label>
-                <input formControlName="startTime" id="input-startTime" class="form-input" placeholder="08:00">
-                <div *ngIf="lessonForm.get('startTime')?.invalid && lessonForm.get('startTime')?.touched"
-                    class="error-message">
-                    Обязательное поле
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="input-endTime" class="form-label">Время конца:</label>
-                <input formControlName="endTime" id="input-endTime" class="form-input" placeholder="12:30">
-                <div *ngIf="lessonForm.get('endTime')?.invalid && lessonForm.get('endTime')?.touched"
-                    class="error-message">
-                    Обязательное поле
-                </div>
-                <div *ngIf="lessonForm.hasError('timeRangeInvalid')" class="error-message">
-                    Конец занятия должен быть позже начала!
-                </div>
-            </div>
+            <div class="input-columns">
+                <div class="input-column">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-date" class="form-label">Дата:</label>
+                            <input formControlName="date" id="input-date" class="form-input" type="date">
+                        </div>
+                        <div *ngIf="formSubmitted && lessonForm.get('date')?.errors" class="error-message">
+                            {{ getErrorMessage('date') }}
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label class="form-label">Ученик:</label>
-                <select formControlName="studentId" (change)="getCostByStudentId()">
-                    <option *ngFor="let option of options" [ngValue]="option.value">
-                        {{ option.text }}
-                    </option>
-                </select>
-                <div *ngIf="lessonForm.get('isActive')?.invalid && lessonForm.get('isActive')?.touched"
-                    class="error-message">
-                    Выберите из списка
-                </div>
-                <div>{{studentCost}}</div>
-            </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-startTime" class="form-label">Время начала:</label>
+                            <input formControlName="startTime" id="input-startTime" class="form-input"
+                                placeholder="08:00" type="time">
+                        </div>
+                        <div *ngIf="formSubmitted && lessonForm.get('startTime')?.errors" class="error-message">
+                            {{getErrorMessage('startTime')}}
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <label for="input-cost" class="form-label">Стоимость:</label>
-                <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000">
-                <div *ngIf="lessonForm.get('cost')?.invalid && lessonForm.get('cost')?.touched" class="error-message">
-                    Обязательное поле
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="form-group form-group-inline">
-                    <label for="input-isPaid" class="form-label">Оплачено:</label>
-                    <input type="checkbox" id="input-isPaid" formControlName="isPaid">
-                </div>
-                <div *ngIf="lessonForm.get('isPaid')?.invalid && lessonForm.get('isPaid')?.touched"
-                    class="error-message">
-                    Обязательное поле
-                </div>
-            </div>
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-endTime" class="form-label">Время конца:</label>
+                            <input formControlName="endTime" id="input-endTime" class="form-input" placeholder="12:30"
+                                type="time">
+                        </div>
+                        <div *ngIf="formSubmitted && lessonForm.get('endTime')?.errors" class="error-message">
+                            {{getErrorMessage('endTime')}}
+                        </div>
+                        <div *ngIf="lessonForm.hasError('timeRangeInvalid')" class="error-message">
+                            Конец занятия должен быть позже начала!
+                        </div>
+                    </div>
 
-            <div class="form-group">
-                <div class="form-group form-group-inline">
-                    <label class="form-label">Повторять еженедельно:</label>
-                    <input type="checkbox" id="input-isRepeat" formControlName="isRepeat">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-isRepeat" class="form-label">Повторять еженедельно:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="input-isRepeat" formControlName="isRepeat"
+                                    class="checkbox-input">
+                                <span class="checkbox-custom"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" *ngIf="lessonForm.get('isRepeat')?.value">
+                        <div class="form-row">
+                            <label for="repeat-until" class="form-label">Повторять до:</label>
+                            <input type="date" id="repeat-until" formControlName="repeatUntil" class="form-input">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-column">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label class="form-label">Ученик:</label>
+                            <select formControlName="studentId" (change)="getCostByStudentId()" class="form-select">
+                                <option *ngFor="let option of options" [ngValue]="option.value">
+                                    {{ option.text }}
+                                </option>
+                            </select>
+                        </div>
+                        <div *ngIf="formSubmitted && lessonForm.get('studentId')?.errors" class="error-message">
+                            {{getErrorMessage('studentId')}}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-cost" class="form-label">Стоимость:</label>
+                            <div class="input-with-suffix">
+                                <input formControlName="cost" id="input-cost" class="form-input" placeholder="1000"
+                                    type="number">
+                                <span class="input-suffix">₽</span>
+                            </div>
+                        </div>
+                        <div *ngIf="formSubmitted && lessonForm.get('cost')?.errors" class="error-message">
+                            {{getErrorMessage('cost')}}
+                        </div>
+                    </div>
+
+                    <div class="student-cost-info">Стоимость часа: <span class="cost-value">{{studentCost}} ₽</span>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-isPaid" class="form-label">Оплачено:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="input-isPaid" formControlName="isPaid"
+                                    class="checkbox-input">
+                                <span class="checkbox-custom"></span>
+                            </label>
+                        </div>
+                        <div *ngIf="formSubmitted && lessonForm.get('isPaid')?.errors" class="error-message">
+                            {{getErrorMessage('isPaid')}}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-note" class="form-label">Примечание:</label>
+                            <textarea formControlName="note" id="input-note" class="form-textarea"
+                                placeholder="Первое занятие" rows="3"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="form-group" *ngIf="lessonForm.get('isRepeat')?.value">
-                <label for="repeat-until" class="form-label">Повторять до:</label>
-                <input type="date" id="repeat-until" formControlName="repeatUntil" class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label for="input-note" class="form-label">Примечание:</label>
-                <textarea formControlName="note" id="input-note" class="form-input"
-                    placeholder="Первое занятие"></textarea>
-                <div *ngIf="lessonForm.get('note')?.invalid && lessonForm.get('note')?.touched" class="error-message">
-                    Обязательное поле
-                </div>
-            </div>
-
 
             <div class="form-actions">
-                <button type="submit" class="submit-button" [disabled]="lessonForm.invalid">
+                <button type="submit" class="button submit-button">
                     {{submitMessage}}
                 </button>
-                <button type="button" (click)="deleteLesson()" class="delete-button" *ngIf="isEditMode()">
-                    Удалить
-                </button>
-                <button type="button" (click)="close(false)" class="cancel-button">
+                <button type="button" (click)="close(false)" class="button cancel-button">
                     Отмена
+                </button>
+                <button type="button" (click)="deleteLesson()" class="button delete-button" *ngIf="isEditMode()">
+                    Удалить
                 </button>
             </div>
         </form>
     </div>
-
 </div>

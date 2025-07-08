@@ -2,7 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Lesson } from '../app.interfaces';
-import { stringToDate, stringToMinutes } from '../app.functions';
+import { stringToDate, convertTimeToMinutes } from '../app.functions';
 
 @Injectable({
   providedIn: 'root'
@@ -190,7 +190,7 @@ export class LessonService implements OnDestroy {
 
   private getLessonTimestamp(lesson: Lesson): number {
     const date = stringToDate(lesson.date);
-    date.setHours(0, stringToMinutes(lesson.startTime), 0, 0)
+    date.setHours(0, convertTimeToMinutes(lesson.startTime), 0, 0)
     return date.getTime();
   }
 

@@ -107,7 +107,7 @@ export function stringToDate(formattedDate: string): Date {
     return date;
 }
 
-export function minutesToString(minutes: number): string {
+export function convertMinutesToTime(minutes: number): string {
     if (minutes < 0 || minutes > 1439) {
         throw new Error('Неверные значение минут');
     }
@@ -121,7 +121,7 @@ export function minutesToString(minutes: number): string {
     return `${formattedHours}:${formattedMinutes}`
 }
 
-export function stringToMinutes(formattedTime: string): number {
+export function convertTimeToMinutes(formattedTime: string): number {
     const parts = formattedTime.split(':');
 
     if (parts.length !== 2) {
@@ -167,4 +167,22 @@ export function getDatesBetween(start: Date, end: Date): Date[] {
     }
 
     return dates;
+}
+
+export function timeRangeValidator(group: FormGroup): { [key: string]: any } | null {
+    const startTime = group.get('startTime')?.value;
+    const endTime = group.get('endTime')?.value;
+
+    if (!startTime || !endTime) {
+        return null;
+    }
+
+    const startMinutes = convertTimeToMinutes(startTime);
+    const endMinutes = convertTimeToMinutes(endTime);
+
+    if (endMinutes <= startMinutes) {
+        return { timeRangeInvalid: true };
+    }
+
+    return null;
 }

@@ -10,7 +10,7 @@ import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDU
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
-import { dateToString, isDatesEquals, minutesToString, stringToDate, stringToMinutes } from '../../app.functions';
+import { dateToString, isDatesEquals, convertMinutesToTime, stringToDate, convertTimeToMinutes } from '../../app.functions';
 
 @Component({
   standalone: true,
@@ -207,14 +207,14 @@ export class ScheduleComponent implements OnInit {
   }
 
   private getNextTime(time: string): string {
-    let timeInMinutes = stringToMinutes(time)
+    let timeInMinutes = convertTimeToMinutes(time)
     timeInMinutes += 60;
     let nextTime = ''
     try {
-      nextTime = minutesToString(timeInMinutes)
+      nextTime = convertMinutesToTime(timeInMinutes)
     } catch (error) {
       timeInMinutes -= 5;
-      nextTime = minutesToString(timeInMinutes)
+      nextTime = convertMinutesToTime(timeInMinutes)
     }
     return nextTime;
   }
@@ -240,15 +240,15 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getLessonHeight(lesson: Lesson): string {
-    let startTime = stringToMinutes(lesson.startTime);
-    let endTime = stringToMinutes(lesson.endTime);
+    let startTime = convertTimeToMinutes(lesson.startTime);
+    let endTime = convertTimeToMinutes(lesson.endTime);
     let hours = Math.floor(endTime / 60) - Math.floor(startTime / 60)
 
     return `${(endTime - startTime) * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours)}px`
   }
 
   public getLessonTop(lesson: Lesson): number {
-    const totalMinutes = stringToMinutes(lesson.startTime)
+    const totalMinutes = convertTimeToMinutes(lesson.startTime)
     const hours = Math.floor(totalMinutes / 60);
     return totalMinutes * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours);
   }
@@ -264,15 +264,15 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getSlotHeight(slot: Slot): string {
-    let startTime = stringToMinutes(slot.startTime);
-    let endTime = stringToMinutes(slot.endTime);
+    let startTime = convertTimeToMinutes(slot.startTime);
+    let endTime = convertTimeToMinutes(slot.endTime);
     let hours = Math.floor(endTime / 60) - Math.floor(startTime / 60)
 
     return `${(endTime - startTime) * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours)}px`
   }
 
   public getSlotTop(slot: Slot): number {
-    const totalMinutes = stringToMinutes(slot.startTime)
+    const totalMinutes = convertTimeToMinutes(slot.startTime)
     const hours = Math.floor(totalMinutes / 60);
     return totalMinutes * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours);
   }
@@ -336,16 +336,16 @@ export class ScheduleComponent implements OnInit {
     cellStartDate.setHours(0, 0, 0, 0);
 
     const cellStart = new Date(cellStartDate);
-    cellStart.setMinutes(stringToMinutes(time));
+    cellStart.setMinutes(convertTimeToMinutes(time));
     const cellEnd = new Date(cellStart.getTime());
     cellEnd.setMinutes(cellStart.getMinutes() + 59);
 
     return this.lessons.some(lesson => {
       const lessonDate = new Date(stringToDate(lesson.date));
       const lessonStart = new Date(lessonDate);
-      lessonStart.setMinutes(stringToMinutes(lesson.startTime));
+      lessonStart.setMinutes(convertTimeToMinutes(lesson.startTime));
       const lessonEnd = new Date(lessonDate);
-      lessonEnd.setMinutes(stringToMinutes(lesson.endTime));
+      lessonEnd.setMinutes(convertTimeToMinutes(lesson.endTime));
 
       const result = (lessonStart >= cellStart && lessonStart <= cellEnd) ||
         (lessonEnd > cellStart && lessonEnd <= cellEnd) ||
@@ -373,8 +373,8 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getTimeDifference(time1: string, time2: string): number {
-    let minutes1 = stringToMinutes(time1);
-    let minutes2 = stringToMinutes(time2);
+    let minutes1 = convertTimeToMinutes(time1);
+    let minutes2 = convertTimeToMinutes(time2);
     let difference = minutes1 - minutes2
     if (difference < 0) {
       return -difference;
@@ -384,8 +384,8 @@ export class ScheduleComponent implements OnInit {
 
   public sortLessonsByStartTime(ascending: boolean = true): void {
     this.oneDayLessons.sort((a, b) => {
-      const timeA = stringToMinutes(a.startTime);
-      const timeB = stringToMinutes(b.startTime);
+      const timeA = convertTimeToMinutes(a.startTime);
+      const timeB = convertTimeToMinutes(b.startTime);
 
       return ascending ? timeA - timeB : timeB - timeA;
     });

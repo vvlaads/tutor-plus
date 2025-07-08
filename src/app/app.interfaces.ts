@@ -7,10 +7,10 @@ export interface Lesson {
     cost: number;
     isPaid: boolean;
     isRepeat: boolean;
-    realEndTime?: string;
-    note?: string;
-    baseLessonId?: string;
-    repeatEndDate?: string;
+    realEndTime: string | null;
+    note: string | null;
+    baseLessonId: string | null;
+    repeatEndDate: string | null;
 }
 
 export interface Student {
@@ -32,8 +32,8 @@ export interface Slot {
     startTime: string;
     endTime: string;
     isRepeat: boolean;
-    baseSlotId?: string;
-    repeatEndDate?: string;
+    baseSlotId: string | null;
+    repeatEndDate: string | null;
 }
 
 export interface SelectOptionWithIcon {

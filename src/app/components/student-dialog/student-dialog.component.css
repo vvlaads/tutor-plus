@@ -64,17 +64,12 @@
     font-size: 20px;
     font-weight: 500;
     min-width: 120px;
-    /* Фиксированная ширина для выравнивания */
     text-align: right;
     margin: 0;
-    /* Убираем возможные отступы */
     line-height: normal;
-    /* Сбрасываем line-height */
     display: flex;
     align-items: center;
-    /* Дополнительное выравнивание по центру */
     height: 100%;
-    /* Занимает всю высоту родителя */
 }
 
 /* Поля ввода */

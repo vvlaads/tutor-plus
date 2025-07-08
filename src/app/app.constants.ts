@@ -9,6 +9,7 @@ export const DAYS_IN_WEEK = 7;
 export const MAX_LESSON_DURATION = 5;
 
 export const PHONE_NUMBER_LENGTH = 11;
+export const VISIBLE_LESSONS_COUNT = 3;
 
 export const STATUS_OPTIONS = [{ value: true, text: 'Активный' }, { value: false, text: 'Завершенный' }];
 

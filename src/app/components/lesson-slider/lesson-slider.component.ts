@@ -1,11 +1,11 @@
-import { Component, inject, Input, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { Lesson } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
-import { LessonDialogComponent } from '../lesson-dialog/lesson-dialog.component';
 import { DialogMode } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
-import { Subscription } from 'rxjs';
+import { VISIBLE_LESSONS_COUNT } from '../../app.constants';
+import { DialogService } from '../../services/dialog.service';
+import { convertStringToDate } from '../../functions/dates';
 
 @Component({
   selector: 'app-lesson-slider',
@@ -14,117 +14,81 @@ import { Subscription } from 'rxjs';
   templateUrl: './lesson-slider.component.html',
   styleUrls: ['./lesson-slider.component.css']
 })
-export class LessonSliderComponent implements OnInit, OnDestroy {
-  @Input() studentId: string = '';
-  private lessonsSub!: Subscription;
-
-  lessons: Lesson[] = [];
-  visibleLessons: Lesson[] = [];
-  currentPosition = 0;
-  readonly VISIBLE_LESSONS_COUNT = 3;
-
-  private dialog = inject(MatDialog);
+export class LessonSliderComponent implements OnInit {
+  @Input()
+  private studentId: string = '';
+  private currentPosition = 0;
+  private lessons: Lesson[] = [];
+  private prevLessons: Map<string, Lesson> = new Map();
   private lessonService = inject(LessonService);
+  private dialogService = inject(DialogService);
 
-  ngOnInit(): void {
-    this.loadLessons();
-    this.setupLessonsListener();
+  public visibleLessons: Lesson[] = [];
+
+  public async ngOnInit(): Promise<void> {
+    await this.subscribeToLessons();
+    this.findStartPos();
   }
 
-  ngOnDestroy(): void {
-    this.lessonsSub?.unsubscribe();
-  }
-
-  private setupLessonsListener(): void {
-    this.lessonsSub = this.lessonService.lessons$.subscribe(lessons => {
-      this.lessons = this.sortLessonsByDate(lessons.filter(l => l.studentId === this.studentId));
+  private async subscribeToLessons(): Promise<void> {
+    this.lessonService.lessons$.subscribe(async () => {
+      this.lessons = await this.lessonService.getLessonsByStudentId(this.studentId);
+      this.lessons = this.sortLessonsByDate();
       this.updateVisibleLessons();
     });
+
+    this.lessonService.prevLessons$.subscribe(prevLessons => this.prevLessons = prevLessons);
   }
 
-  private async loadLessons(): Promise<void> {
-    try {
-      this.lessons = this.sortLessonsByDate(
-        await this.lessonService.getLessonsByStudentId(this.studentId)
-      );
-      this.updateVisibleLessons();
-    } catch (error) {
-      console.error('Error loading lessons:', error);
+  private findStartPos(): void {
+    const prevLesson = this.prevLessons.get(this.studentId);
+    if (prevLesson) {
+      for (let i = 0; i <= this.lessons.length - VISIBLE_LESSONS_COUNT; i++) {
+        this.currentPosition = i;
+        if (this.lessons[i].id === prevLesson.id) {
+          break;
+        }
+      }
     }
-    this.lessonService.loadLessons();
+    this.updateVisibleLessons();
   }
 
-  slideLeft(): void {
+  public slideLeft(): void {
     if (this.canSlideLeft()) {
       this.currentPosition--;
       this.updateVisibleLessons();
     }
   }
 
-  slideRight(): void {
+  public slideRight(): void {
     if (this.canSlideRight()) {
       this.currentPosition++;
       this.updateVisibleLessons();
     }
   }
 
-  canSlideLeft(): boolean {
+  public canSlideLeft(): boolean {
     return this.currentPosition > 0;
   }
 
-  canSlideRight(): boolean {
-    return this.currentPosition < this.lessons.length - this.VISIBLE_LESSONS_COUNT;
+  public canSlideRight(): boolean {
+    return this.currentPosition < this.lessons.length - VISIBLE_LESSONS_COUNT;
   }
 
   private updateVisibleLessons(): void {
     this.visibleLessons = this.lessons.slice(
       this.currentPosition,
-      this.currentPosition + this.VISIBLE_LESSONS_COUNT
+      this.currentPosition + VISIBLE_LESSONS_COUNT
     );
   }
 
-  openLessonDialog(lesson: Lesson): void {
-    const dialogRef = this.dialog.open(LessonDialogComponent, {
-      width: '1200px',
-      disableClose: true,
-      data: {
-        mode: DialogMode.Edit,
-        lesson: { ...lesson }
-      }
-    });
-
-    dialogRef.afterClosed().subscribe(updated => {
-      this.loadLessons();
-    });
+  public openLessonDialog(lesson: Lesson): void {
+    const dialogRef = this.dialogService.openLessonDialog(DialogMode.Edit, lesson);
   }
 
-  addNewLesson(): void {
-    const dialogRef = this.dialog.open(LessonDialogComponent, {
-      width: '1200px',
-      disableClose: true,
-      data: {
-        mode: DialogMode.Add,
-        lesson: { studentId: this.studentId } as Lesson
-      }
+  private sortLessonsByDate(): Lesson[] {
+    return this.lessons.sort((a, b) => {
+      return convertStringToDate(a.date).getTime() - convertStringToDate(b.date).getTime();
     });
-
-    dialogRef.afterClosed().subscribe(added => {
-      if (added) this.loadLessons();
-    });
-  }
-
-  private sortLessonsByDate(lessons: Lesson[]): Lesson[] {
-    return [...lessons].sort((a, b) => {
-      return this.parseDateString(a.date).getTime() - this.parseDateString(b.date).getTime();
-    });
-  }
-
-  private parseDateString(dateStr: string): Date {
-    const [day, month, year] = dateStr.split('.').map(Number);
-    return new Date(year, month - 1, day);
-  }
-
-  trackByLessonId(index: number, lesson: Lesson): string {
-    return lesson.id;
   }
 }

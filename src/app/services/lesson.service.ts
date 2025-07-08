@@ -173,22 +173,6 @@ export class LessonService implements OnDestroy {
     return studentLessons;
   }
 
-  public async getPrevLessonByStudentId(studentId: string): Promise<Lesson | null> {
-    const studentLessons = await this.getPrevLessonsByStudentId(studentId);
-    if (studentLessons.length === 0) {
-      return null;
-    }
-    return studentLessons[-1];
-  }
-
-  public async getNextLessonByStudentId(studentId: string): Promise<Lesson | null> {
-    const studentLessons = await this.getNextLessonsByStudentId(studentId);
-    if (studentLessons.length === 0) {
-      return null;
-    }
-    return studentLessons[0];
-  }
-
   private getLessonTimestamp(lesson: Lesson): number {
     const date = convertStringToDate(lesson.date);
     date.setHours(0, convertTimeToMinutes(lesson.startTime), 0, 0)

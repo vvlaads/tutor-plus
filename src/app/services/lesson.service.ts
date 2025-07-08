@@ -261,4 +261,22 @@ export class LessonService implements OnDestroy {
     }
     return null;
   }
+
+  public async getFutureRepeatedLessons(id: string): Promise<Lesson[]> {
+    let lessons: Lesson[] = [];
+    const lesson = await this.getLessonById(id);
+    if (!lesson) {
+      return lessons;
+    }
+    if (!lesson.baseLessonId || !lesson.isRepeat) {
+      return lessons;
+    }
+    const baseId = lesson.baseLessonId;
+    const date = lesson.date;
+    lessons = await this.getLessons();
+    lessons = lessons
+      .filter(lesson => (lesson.baseLessonId == baseId) && (convertStringToDate(lesson.date).getTime() >= convertStringToDate(date).getTime()))
+      .sort((a, b) => convertStringToDate(a.date).getTime() - convertStringToDate(b.date).getTime());
+    return lessons;
+  }
 }

@@ -101,9 +101,10 @@ export function isDatesEquals(date1: Date, date2: Date): boolean {
     return false;
 }
 
-export function getDatesBetween(start: Date, end: Date): Date[] {
-    const dates = []
-    let date = new Date(start)
+export function getWeeklyRecurringDates(start: Date, end: Date): Date[] {
+    const dates = [];
+    let date = new Date(start);
+    date.setDate(date.getDate() + DAYS_IN_WEEK);
     while (date.getTime() <= end.getTime()) {
         dates.push(new Date(date));
         date.setDate(date.getDate() + DAYS_IN_WEEK);

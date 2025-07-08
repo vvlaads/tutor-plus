@@ -139,10 +139,10 @@
                 <button type="submit" class="button submit-button">
                     {{submitMessage}}
                 </button>
-                <button type="button" (click)="close(false)" class="button cancel-button">
+                <button type="button" (click)="close()" class="button cancel-button">
                     Отмена
                 </button>
-                <button type="button" (click)="deleteLesson()" class="button delete-button" *ngIf="isEditMode()">
+                <button type="button" (click)="delete()" class="button delete-button" *ngIf="isEditMode()">
                     Удалить
                 </button>
             </div>

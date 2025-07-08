@@ -1,6 +1,6 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR } from "../app.constants";
-import { changeDateFormatMinusToDot, convertTimeToMinutes } from "./dates";
+import { changeDateFormatMinusToDot, convertStringToDate, convertTimeToMinutes } from "./dates";
 
 export function timeRangeValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -39,7 +39,9 @@ export function repeatDateRangeValidator(): ValidatorFn {
             if (date && startDate) {
                 date = changeDateFormatMinusToDot(date);
                 startDate = changeDateFormatMinusToDot(startDate);
-                return { repeatEndDateInvalid: true };
+                if (convertStringToDate(date).getTime() <= convertStringToDate(startDate).getTime()) {
+                    return { repeatEndDateInvalid: true };
+                }
             }
         }
         return null;

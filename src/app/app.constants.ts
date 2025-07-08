@@ -33,5 +33,10 @@ export const FROM_OPTIONS = [
     { value: 'Сарафан', text: 'Сарафан', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' }
 ];
 
+export const REPEAT_LESSON_OPTIONS = [
+    { value: 'ONE', text: 'Только это занятие' },
+    { value: 'FUTURE', text: 'Это и будущие занятия' }
+]
+
 export const MONTH_NAMES = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
 export const SCHEDULE_OBJECT_OPTIONS = [{ value: ScheduleObject.Slot, text: "Добавить окно" }, { value: ScheduleObject.Lesson, text: "Добавить занятие" }]

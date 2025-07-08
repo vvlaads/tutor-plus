@@ -6,7 +6,9 @@ import { DialogMode } from '../../app.enums';
 import { Lesson, SelectOption, Student } from '../../app.interfaces';
 import { LessonService } from '../../services/lesson.service';
 import { StudentService } from '../../services/student.service';
-import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, dateToString, getDatesBetween, getErrorMessage, stringToDate, timeRangeValidator } from '../../app.functions';
+import { getErrorMessage } from '../../app.functions';
+import { realEndTimeRangeValidator, requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator } from '../../functions/validators';
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, convertDateToString, convertStringToDate, getDatesBetween } from '../../functions/dates';
 
 @Component({
   selector: 'app-lesson-dialog',
@@ -26,6 +28,7 @@ export class LessonDialogComponent implements OnInit {
   public options: SelectOption[] = []
   public studentCost = 0;
   public formSubmitted = false;
+  public hasRealEndTime = false;
 
   public constructor(
     private fb: FormBuilder,
@@ -60,11 +63,11 @@ export class LessonDialogComponent implements OnInit {
       cost: [data.lesson?.cost, [Validators.required, Validators.min(0)]],
       isPaid: [data.lesson == null ? false : data.lesson.isPaid],
       isRepeat: [isRepeat, Validators.required],
-      realEndTime: [''],
-      note: [null],
-      baseLessonId: [''],
-      repeatEndDate: [''],
-    }, { validators: timeRangeValidator });
+      repeatEndDate: [data.lesson?.repeatEndDate],
+      hasRealEndTime: [data.lesson?.hasRealEndTime],
+      realEndTime: [data.lesson?.realEndTime],
+      note: [data.lesson?.note],
+    }, { validators: [timeRangeValidator(), requiredRepeatDateValidator(), requiredRealEndTimeValidator(), realEndTimeRangeValidator()] });
   }
 
   public ngOnInit(): void {
@@ -84,6 +87,7 @@ export class LessonDialogComponent implements OnInit {
       }
       repeatUntil?.updateValueAndValidity();
     });
+    this.getCostByStudentId();
   }
 
 
@@ -105,15 +109,15 @@ export class LessonDialogComponent implements OnInit {
 
       let dates: Date[] = []
       if (lessonValue.isRepeat) {
-        let start = stringToDate(lessonValue.date);
-        let end = stringToDate(lessonValue.repeatUntil);
+        let start = convertStringToDate(lessonValue.date);
+        let end = convertStringToDate(lessonValue.repeatUntil);
         dates = getDatesBetween(start, end);
       }
       console.log(dates)
       for (const date of dates) {
         let lesson = {
           studentId: lessonValue.studentId,
-          date: dateToString(date),
+          date: convertDateToString(date),
           startTime: lessonValue.startTime,
           endTime: lessonValue.endTime,
           cost: lessonValue.cost,
@@ -121,6 +125,7 @@ export class LessonDialogComponent implements OnInit {
           isRepeat: lessonValue.isRepeat,
           realEndTime: null,
           note: null,
+          hasRealEndTime: false,
           baseLessonId: null,
           repeatEndDate: null
         }
@@ -146,6 +151,7 @@ export class LessonDialogComponent implements OnInit {
         realEndTime: null,
         note: null,
         baseLessonId: null,
+        hasRealEndTime: false,
         repeatEndDate: null
       }
       switch (this.mode) {
@@ -216,5 +222,26 @@ export class LessonDialogComponent implements OnInit {
 
   public getErrorMessage(field: string): string | null {
     return getErrorMessage(this.lessonForm, field);
+  }
+
+  getFormErrorMessage(): string | null {
+    if (!this.lessonForm.errors) return null;
+
+    const errors = this.lessonForm.errors;
+
+    // Определяем порядок приоритета ошибок
+    if (errors['timeRangeInvalid']) {
+      return 'Время окончания должно быть позже времени начала!';
+    }
+
+    if (errors['repeatEndDateInvalid']) {
+      return 'Укажите дату для повторения';
+    }
+
+    if (errors['realEndTimeInvalid']) {
+      return 'Укажите настоящее время окончания';
+    }
+
+    return null;
   }
 }

@@ -7,7 +7,7 @@ import { Slot } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../services/dialog.service';
 import { LessonService } from '../../services/lesson.service';
-import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../app.functions';
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../functions/dates';
 
 @Component({
   selector: 'app-slot-dialog',

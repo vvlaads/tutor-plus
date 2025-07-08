@@ -34,8 +34,23 @@
                         <div *ngIf="formSubmitted && lessonForm.get('endTime')?.errors" class="error-message">
                             {{getErrorMessage('endTime')}}
                         </div>
-                        <div *ngIf="lessonForm.hasError('timeRangeInvalid')" class="error-message">
-                            Конец занятия должен быть позже начала!
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-hasRealEndTime" class="form-label">Другое время окончания:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="input-hasRealEndTime" class="checkbox-input"
+                                    formControlName="hasRealEndTime">
+                                <span class="checkbox-custom"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" *ngIf="lessonForm.get('hasRealEndTime')?.value">
+                        <div class="form-row">
+                            <label for="real-end-time" class="form-label">Настоящее время окончания:</label>
+                            <input type="time" id="real-end-time" formControlName="realEndTime" class="form-input">
                         </div>
                     </div>
 
@@ -52,8 +67,8 @@
 
                     <div class="form-group" *ngIf="lessonForm.get('isRepeat')?.value">
                         <div class="form-row">
-                            <label for="repeat-until" class="form-label">Повторять до:</label>
-                            <input type="date" id="repeat-until" formControlName="repeatUntil" class="form-input">
+                            <label for="repeat-end-date" class="form-label">Повторять до:</label>
+                            <input type="date" id="repeat-end-date" formControlName="repeatEndDate" class="form-input">
                         </div>
                     </div>
                 </div>
@@ -111,6 +126,12 @@
                                 placeholder="Первое занятие" rows="3"></textarea>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div *ngIf="formSubmitted && lessonForm.errors" class="form-errors">
+                <div class="error-message">
+                    {{ getFormErrorMessage() }}
                 </div>
             </div>
 

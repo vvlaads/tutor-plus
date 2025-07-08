@@ -7,10 +7,11 @@ export interface Lesson {
     cost: number;
     isPaid: boolean;
     isRepeat: boolean;
-    realEndTime: string | null;
-    note: string | null;
     baseLessonId: string | null;
     repeatEndDate: string | null;
+    hasRealEndTime: boolean;
+    realEndTime: string | null;
+    note: string | null;
 }
 
 export interface Student {

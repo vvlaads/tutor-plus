@@ -238,3 +238,13 @@ input {
     margin-top: 4px;
     margin-left: 156px;
 }
+
+.form-errors {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+.form-errors .error-message {
+    margin: 0;
+}

@@ -10,7 +10,7 @@ import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDU
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
-import { dateToString, isDatesEquals, convertMinutesToTime, stringToDate, convertTimeToMinutes } from '../../app.functions';
+import { convertDateToString, convertMinutesToTime, convertStringToDate, convertTimeToMinutes, isDatesEquals } from '../../functions/dates';
 
 @Component({
   standalone: true,
@@ -84,7 +84,7 @@ export class ScheduleComponent implements OnInit {
   private updateLessons(lessons: Lesson[]): void {
     this.oneDayLessons = lessons.filter(lesson => {
       try {
-        const lessonDate = stringToDate(lesson.date);
+        const lessonDate = convertStringToDate(lesson.date);
         return isDatesEquals(this.currentDate, lessonDate);
       } catch (e) {
         console.error('Ошибка преобразования:', e);
@@ -97,7 +97,7 @@ export class ScheduleComponent implements OnInit {
 
     this.lessons = lessons.filter(lesson => {
       try {
-        const lessonDate = stringToDate(lesson.date);
+        const lessonDate = convertStringToDate(lesson.date);
         return this.currentWeekDates.some(date => isDatesEquals(date, lessonDate));
       } catch (e) {
         console.error('Ошибка преобразования:', e);
@@ -130,7 +130,7 @@ export class ScheduleComponent implements OnInit {
   private updateSlots(slots: Slot[]): void {
     this.slots = slots.filter(slot => {
       try {
-        const slotDate = stringToDate(slot.date);
+        const slotDate = convertStringToDate(slot.date);
         return this.currentWeekDates.some(date => isDatesEquals(date, slotDate));
       } catch (e) {
         console.error('Ошибка преобразования:', e);
@@ -195,7 +195,7 @@ export class ScheduleComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       console.log(`Переход к дате ${result}`)
       if (result !== undefined) {
-        this.updateCurrentDate(stringToDate(result));
+        this.updateCurrentDate(convertStringToDate(result));
       } else {
         console.log("Дата для перехода не найдена")
       }
@@ -254,7 +254,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getLessonLeft(lesson: Lesson): number {
-    const lessonDate = stringToDate(lesson.date);
+    const lessonDate = convertStringToDate(lesson.date);
     for (let i = 0; i < this.currentWeekDates.length; i++) {
       if (isDatesEquals(lessonDate, this.currentWeekDates[i])) {
         return this.timeColumnWidthPercetage + i * this.blockWidthPercentage;
@@ -278,7 +278,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getSlotLeft(slot: Slot): number {
-    const lessonDate = stringToDate(slot.date);
+    const lessonDate = convertStringToDate(slot.date);
     for (let i = 0; i < this.currentWeekDates.length; i++) {
       if (isDatesEquals(lessonDate, this.currentWeekDates[i])) {
         return this.timeColumnWidthPercetage + i * this.blockWidthPercentage;
@@ -315,11 +315,11 @@ export class ScheduleComponent implements OnInit {
     dialogRef.afterClosed().subscribe((option) => {
       switch (option) {
         case ScheduleObject.Slot:
-          const slot = { date: dateToString(date), startTime: time, endTime: endTime }
+          const slot = { date: convertDateToString(date), startTime: time, endTime: endTime }
           this.dialogService.openSlotDialog(DialogMode.Add, slot);
           break;
         case ScheduleObject.Lesson:
-          const lesson = { date: dateToString(date), startTime: time, endTime: endTime }
+          const lesson = { date: convertDateToString(date), startTime: time, endTime: endTime }
           this.dialogService.openLessonDialog(DialogMode.Add, lesson)
           break;
       }
@@ -341,7 +341,7 @@ export class ScheduleComponent implements OnInit {
     cellEnd.setMinutes(cellStart.getMinutes() + 59);
 
     return this.lessons.some(lesson => {
-      const lessonDate = new Date(stringToDate(lesson.date));
+      const lessonDate = new Date(convertStringToDate(lesson.date));
       const lessonStart = new Date(lessonDate);
       lessonStart.setMinutes(convertTimeToMinutes(lesson.startTime));
       const lessonEnd = new Date(lessonDate);
@@ -435,7 +435,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   getCurrentDateInString(): string {
-    return dateToString(this.currentDate);
+    return convertDateToString(this.currentDate);
   }
 
   public addScheduleObject(): void {
@@ -477,14 +477,14 @@ export class ScheduleComponent implements OnInit {
         }
 
         const worksheet = XLSX.utils.table_to_sheet(tableElement);
-        const sheetName = `${dateToString(this.currentDate)}`;
+        const sheetName = `${convertDateToString(this.currentDate)}`;
         XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
         this.goToNext();
         await new Promise(resolve => setTimeout(resolve, 300));
       }
 
       this.resetCurrentDate();
-      const fileName = `Расписание ${dateToString(this.currentDate)}.xlsx`;
+      const fileName = `Расписание ${convertDateToString(this.currentDate)}.xlsx`;
       XLSX.writeFile(workbook, fileName);
       console.log('Экспорт завершен успешно!');
 

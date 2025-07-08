@@ -2,7 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, HostListener, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogRef } from '@angular/material/dialog';
-import { changeDateFormatMinusToDot, getErrorMessage } from '../../app.functions';
+import { getErrorMessage } from '../../app.functions';
+import { changeDateFormatMinusToDot } from '../../functions/dates';
 
 @Component({
   selector: 'app-find-date-dialog',

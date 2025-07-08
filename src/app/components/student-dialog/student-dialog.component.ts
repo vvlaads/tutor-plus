@@ -7,7 +7,8 @@ import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
-import { allowedValuesValidator, generateColor } from '../../app.functions';
+import { generateColor } from '../../app.functions';
+import { allowedValuesValidator } from '../../functions/validators';
 
 @Component({
   selector: 'app-student-dialog',

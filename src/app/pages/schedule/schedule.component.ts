@@ -6,7 +6,7 @@ import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student } from '../../app.interfaces';
 import { take } from 'rxjs';
 import { StudentService } from '../../services/student.service';
-import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
+import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
@@ -373,6 +373,17 @@ export class ScheduleComponent implements OnInit {
       return -difference;
     }
     return difference;
+  }
+
+  public getRealTimeDifference(lesson: Lesson): number {
+    if (lesson.hasRealEndTime && lesson.realEndTime) {
+      const start = convertTimeToMinutes(lesson.startTime);
+      const end = convertTimeToMinutes(lesson.realEndTime);
+      if (start > end && end + HOURS_IN_DAY * MINUTES_IN_HOUR <= start + MAX_LESSON_DURATION * MINUTES_IN_HOUR) {
+        return end + HOURS_IN_DAY * MINUTES_IN_HOUR - start;
+      }
+    }
+    return this.getTimeDifference(lesson.startTime, lesson.endTime);
   }
 
   public sortLessonsByStartTime(ascending: boolean = true): void {

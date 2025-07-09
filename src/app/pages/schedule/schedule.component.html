@@ -102,12 +102,18 @@
                     <ng-container *ngFor="let lesson of oneDayLessons; let i = index">
                         <tr class="lesson-info-row">
                             <td class="time-start-cell">{{lesson.startTime}}</td>
-                            <td class="time-end-cell">{{lesson.endTime}}</td>
-                            <td class="time-distance-cell" [class.not-default]="notDefaultTime(lesson)">
-                                {{getTimeDifference(lesson.startTime,
-                                lesson.endTime)}} мин
+                            <td class="time-end-cell">{{lesson.hasRealEndTime ? lesson.realEndTime: lesson.endTime}}
                             </td>
-                            <td class="student-cell">{{getStudentByLesson(lesson)?.name}}</td>
+                            <td class="time-distance-cell" [class.not-default]="notDefaultTime(lesson)">
+                                {{ lesson.hasRealEndTime? getRealTimeDifference(lesson)
+                                :getTimeDifference(lesson.startTime, lesson.endTime)}}
+                                мин
+                            </td>
+                            <td class="student-cell">
+                                <span class="student-name-in-cell">{{getStudentByLesson(lesson)?.name}}</span>
+                                <br />
+                                <span class="note">{{lesson.note}}</span>
+                            </td>
                             <td class="communication-cell"
                                 [style.background-color]="getAppColor(getStudentByLesson(lesson)?.communication)">
                                 {{getStudentByLesson(lesson)?.communication}}</td>

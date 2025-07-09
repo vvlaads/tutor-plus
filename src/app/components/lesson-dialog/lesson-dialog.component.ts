@@ -303,8 +303,21 @@ export class LessonDialogComponent implements OnInit {
 
   public getPreferredCost(): void {
     let cost = 1000;
-    const lessonValue = this.lessonForm.value;
-    if (lessonValue.startTime && lessonValue.endTime && this.data.lesson?.studentId) {
+    let lessonValue = this.lessonForm.value;
+    if (!lessonValue.startTime) {
+      lessonValue.startTime = this.data.lesson?.startTime;
+    }
+    if (!lessonValue.endTime) {
+      lessonValue.endTime = this.data.lesson?.endTime;
+    }
+    if (!lessonValue.realEndTime) {
+      lessonValue.realEndTime = this.data.lesson?.realEndTime;
+    }
+    if (!lessonValue.studentId) {
+      lessonValue.studentId = this.data.lesson?.studentId;
+    }
+
+    if (lessonValue.startTime && lessonValue.endTime && lessonValue.studentId) {
       if (lessonValue.hasRealEndTime && lessonValue.realEndTime) {
         const start = convertTimeToMinutes(lessonValue.startTime);
         const end = convertTimeToMinutes(lessonValue.realEndTime)

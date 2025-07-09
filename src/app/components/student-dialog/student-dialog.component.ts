@@ -54,13 +54,6 @@ export class StudentDialogComponent {
         break;
     }
 
-    let isActive = true;
-    let color = generateColor();
-    if (data.student) {
-      color = data.student.color;
-      isActive = data.student.isActive;
-    }
-
     this.studentForm = this.fb.group({
       name: [data.student?.name, [Validators.required]],
       phone: [data.student?.phone, [Validators.required, Validators.pattern(/^\+79\d{9}$/)]],
@@ -68,10 +61,18 @@ export class StudentDialogComponent {
       communication: [data.student?.communication, [Validators.required, allowedValuesValidator(this.communicationOptions, 'value')]],
       platform: [data.student?.platform, [Validators.required, allowedValuesValidator(this.platformOptions, 'value')]],
       cost: [data.student?.cost, [Validators.required, Validators.min(0)]],
-      isActive: [isActive, [Validators.required, allowedValuesValidator(this.statusOptions, 'value')]],
+      isActive: [data.student == null ? false : data.student.isActive, [Validators.required, allowedValuesValidator(this.statusOptions, 'value')]],
       from: [data.student?.from, [Validators.required, allowedValuesValidator(this.fromOptions, 'value')]],
-      color: [color, [Validators.required]]
+      color: [data.student == null ? generateColor() : data.student.color, [Validators.required]]
     });
+  }
+
+  private convertFormToStudent(): Omit<Student, 'id'> {
+    const studentValue = this.studentForm.value;
+    const student = {
+      ...studentValue
+    }
+    return student;
   }
 
   public submit(): void {
@@ -93,31 +94,25 @@ export class StudentDialogComponent {
         this.updateStudent();
         break;
     }
+    this.close();
   }
 
   public addStudent(): void {
-    const newStudent: Student = {
-      ...this.studentForm.value
-    };
+    const student = this.convertFormToStudent();
 
-    this.studentService.addStudent(newStudent).catch(error => {
+    this.studentService.addStudent(student).catch(error => {
       console.error('Ошибка при добавлении:', error);
     });
-
-    this.close();
   }
 
   public updateStudent(): void {
-    const updatedStudent: Student = {
-      ...this.data.student,
-      ...this.studentForm.value
-    };
-
-    this.studentService.updateStudent(updatedStudent.id, updatedStudent).catch(error => {
-      console.error('Ошибка при обновлении:', error);
-    });
-
-    this.close();
+    const student = this.convertFormToStudent();
+    const id = this.data.student?.id
+    if (id) {
+      this.studentService.updateStudent(id, student).catch(error => {
+        console.error('Ошибка при обновлении:', error);
+      });
+    }
   }
 
   public onSelectCommunication(optionValue: string): void {

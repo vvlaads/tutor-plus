@@ -1,4 +1,4 @@
-import { Component, Inject, inject, OnInit } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogMode } from '../../app.enums';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -6,8 +6,7 @@ import { SlotService } from '../../services/slot.service';
 import { Slot } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../services/dialog.service';
-import { LessonService } from '../../services/lesson.service';
-import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, convertDateToString, convertStringToDate, getWeeklyRecurringDates } from '../../functions/dates';
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, convertDateToString, convertStringToDate, convertTimeToMinutes, getWeeklyRecurringDates } from '../../functions/dates';
 import { getErrorMessage } from '../../app.functions';
 import { realEndTimeRangeValidator, repeatDateRangeValidator, requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator } from '../../functions/validators';
 import { REPEAT_SLOT_OPTIONS } from '../../app.constants';
@@ -31,7 +30,6 @@ export class SlotDialogComponent {
     private fb: FormBuilder,
     private slotService: SlotService,
     private dialogService: DialogService,
-    private lessonService: LessonService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, slot: Partial<Slot> | null }
   ) {
     this.mode = data.mode;
@@ -94,6 +92,7 @@ export class SlotDialogComponent {
         this.update();
         break;
     }
+    this.close();
   }
 
   private async add(): Promise<void> {
@@ -150,7 +149,7 @@ export class SlotDialogComponent {
           }
         })
       } else {
-        confirmed = confirm("Вы уверены, что хотите удалить это занятие");
+        confirmed = confirm("Вы уверены, что хотите удалить это окно");
         if (confirmed) {
           this.deleteSlot(id);
           this.close();
@@ -193,16 +192,31 @@ export class SlotDialogComponent {
     this.dialogRef.close();
   }
 
-  public isEditMode() {
+  public isEditMode(): boolean {
     return this.mode == DialogMode.Edit;
   }
 
   public convertToLesson(): void {
     const slot = this.convertFormToSlot();
     const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, slot);
-    dialigRef.afterClosed().subscribe(result => {
-      if (result) {
-        console.log('Нужно сделать удаление окон');
+    dialigRef.afterClosed().subscribe(async result => {
+      if (result && this.isEditMode() && this.data.slot?.baseSlotId) {
+        console.log(result);
+        const slots = await this.slotService.getSlotsByBaseId(this.data.slot.baseSlotId);
+        console.log(slots);
+        const idsToDelete = [];
+        for (let lesson of result) {
+          const lessonStart = convertTimeToMinutes(lesson.startTime);
+          const lessonEnd = convertTimeToMinutes(lesson.endTime);
+          for (let s of slots) {
+            const start = convertTimeToMinutes(s.startTime);
+            const end = convertTimeToMinutes(s.endTime);
+            if (s.date === lesson.date && ((start >= lessonStart && start <= lessonEnd) || (end >= lessonStart && end <= lessonEnd))) {
+              idsToDelete.push(s.id);
+            }
+          }
+        }
+        idsToDelete.forEach(id => this.deleteSlot(id));
       }
     })
     this.close();

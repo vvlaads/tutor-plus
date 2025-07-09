@@ -29,6 +29,7 @@ export class LessonDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<LessonDialogComponent>);
   private mode: DialogMode;
   private students: Student[] = []
+  private touchedLessons: Lesson[] = [];
 
   public lessonForm: FormGroup;
   public title: string;
@@ -124,21 +125,27 @@ export class LessonDialogComponent implements OnInit {
         this.update();
         break;
     }
-    this.close();
+    this.close(this.touchedLessons);
   }
 
   private async add(): Promise<void> {
     let lesson = this.convertFormToLesson();
     const baseLessonId = await this.addLesson(lesson);
-    if (lesson.isRepeat && baseLessonId && lesson.repeatEndDate) {
-      lesson.baseLessonId = baseLessonId;
-      this.updateLesson(lesson, baseLessonId);
-      const startDate = convertStringToDate(lesson.date);
-      const endDate = convertStringToDate(lesson.repeatEndDate);
-      const dates = getWeeklyRecurringDates(startDate, endDate);
-      for (let date of dates) {
-        lesson.date = convertDateToString(date);
-        this.addLesson(lesson);
+    if (baseLessonId) {
+      this.touchedLessons.push({ ...lesson, id: baseLessonId })
+      if (lesson.isRepeat && lesson.repeatEndDate) {
+        lesson.baseLessonId = baseLessonId;
+        this.updateLesson(lesson, baseLessonId);
+        const startDate = convertStringToDate(lesson.date);
+        const endDate = convertStringToDate(lesson.repeatEndDate);
+        const dates = getWeeklyRecurringDates(startDate, endDate);
+        for (let date of dates) {
+          lesson.date = convertDateToString(date);
+          let id = await this.addLesson(lesson);
+          if (id) {
+            this.touchedLessons.push({ ...lesson, id: id })
+          }
+        }
       }
     }
   }
@@ -148,6 +155,7 @@ export class LessonDialogComponent implements OnInit {
     const id = this.data.lesson?.id;
     if (id) {
       this.updateLesson(lesson, id);
+      this.touchedLessons.push({ ...lesson, id: id })
     }
   }
 
@@ -165,7 +173,7 @@ export class LessonDialogComponent implements OnInit {
               if (confirmed) {
                 this.changeBaseLesson(id);
                 this.deleteLesson(id);
-                this.close();
+                this.close(null);
               }
               break;
             case 'FUTURE':
@@ -175,7 +183,7 @@ export class LessonDialogComponent implements OnInit {
                 for (let lesson of lessons) {
                   this.deleteLesson(lesson.id);
                 }
-                this.close();
+                this.close(null);
               }
               break;
           }
@@ -184,7 +192,7 @@ export class LessonDialogComponent implements OnInit {
         confirmed = confirm("Вы уверены, что хотите удалить это занятие");
         if (confirmed) {
           this.deleteLesson(id);
-          this.close();
+          this.close(null);
         }
       }
     }
@@ -220,8 +228,8 @@ export class LessonDialogComponent implements OnInit {
     })
   }
 
-  public close(): void {
-    this.dialogRef.close();
+  public close(result: Lesson[] | null): void {
+    this.dialogRef.close(result);
   }
 
   public isEditMode(): boolean {

@@ -84,6 +84,17 @@ export class SlotService implements OnDestroy {
     await deleteDoc(doc(this.firestore, 'slots', id));
   }
 
+  public async getSlotsByBaseId(baseId: string): Promise<Slot[]> {
+    let slots: Slot[] = []
+    const baseSlot = await this.getSlotById(baseId);
+    if (!baseSlot) {
+      return slots;
+    }
+    slots = await this.getFutureRepeatedSlots(baseId);
+    slots.push(baseSlot);
+    return slots;
+  }
+
   public async getFutureRepeatedSlots(id: string): Promise<Slot[]> {
     let slots: Slot[] = [];
     const slot = await this.getSlotById(id);

@@ -50,8 +50,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
   public isNextLessonsLoading = true;
   public prevLessons$ = this.lessonService.prevLessons$;
   public nextLessons$ = this.lessonService.nextLessons$;
-
-
+  public unpaidLessonsCount: Map<string, number> = new Map();
 
   public ngOnInit(): void {
     this.subscribeToLayoutChanges();
@@ -130,6 +129,9 @@ export class StudentsComponent implements OnInit, OnDestroy {
       : students.filter(s => !s.isActive);
 
     this.applySearchFilter();
+    this.students.forEach(async student => {
+      this.unpaidLessonsCount.set(student.id, await this.getUnpaidLessonsCount(student))
+    })
   }
 
   public setActiveFormat(isActive: boolean): void {
@@ -162,5 +164,11 @@ export class StudentsComponent implements OnInit, OnDestroy {
     (s.name.toLowerCase().includes(this.searchQuery) ||
       (s.phone.includes(this.searchQuery))
       && (s.isActive === this.isActiveFormat)));
+  }
+
+
+  public async getUnpaidLessonsCount(student: Student): Promise<number> {
+    const lessons = await this.lessonService.getUnpaidLessonsByStudentId(student.id);
+    return lessons.length;
   }
 }

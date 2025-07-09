@@ -17,7 +17,12 @@
     <div class="student-list">
         <div *ngFor="let student of filteredStudents" class="student-block" [style.background-color]="student.color"
             (click)="openStudentProfile(student.id)">
-            <h2 class="student-name">{{ student.name }}</h2>
+            <div class="student-block-header">
+                <h2 class="student-name">{{ student.name }}</h2>
+                <span class="lesson-paid-badge" [class.paid]="unpaidLessonsCount.get(student.id)===0">
+                    {{unpaidLessonsCount.get(student.id)===0 ? '✓' : '₽'}}
+                </span>
+            </div>
 
             <div class="divider"></div>
 

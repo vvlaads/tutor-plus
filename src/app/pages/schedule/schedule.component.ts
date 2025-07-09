@@ -5,7 +5,7 @@ import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student } from '../../app.interfaces';
 import { StudentService } from '../../services/student.service';
-import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
+import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
@@ -494,5 +494,18 @@ export class ScheduleComponent implements OnInit {
       console.error('Ошибка при экспорте:', error);
       this.resetCurrentDate();
     }
+  }
+
+  public getFromIcon(lesson: Lesson): string | null {
+    const options = FROM_OPTIONS;
+    const student = this.getStudentByLesson(lesson);
+    if (student) {
+      for (let option of options) {
+        if (student.from == option.value) {
+          return option.icon;
+        }
+      }
+    }
+    return null;
   }
 }

@@ -1,4 +1,4 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Lesson } from '../app.interfaces';
@@ -7,8 +7,7 @@ import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
 @Injectable({
   providedIn: 'root'
 })
-export class LessonService implements OnDestroy {
-  private firestore = inject(Firestore);
+export class LessonService implements OnInit, OnDestroy {
   private unsubscribe!: () => void;
   private lessonsSubject = new BehaviorSubject<Lesson[]>([]);
   private prevLessonsSubject = new BehaviorSubject<Map<string, Lesson>>(new Map());
@@ -18,7 +17,11 @@ export class LessonService implements OnDestroy {
   public prevLessons$ = this.prevLessonsSubject.asObservable();
   public nextLessons$ = this.nextLessonsSubject.asObservable();
 
-  public constructor() {
+  public constructor(private firestore: Firestore) {
+
+  }
+
+  public ngOnInit(): void {
     this.startListening();
   }
 
@@ -124,10 +127,13 @@ export class LessonService implements OnDestroy {
     };
   }
 
-  public loadLessons(): void {
-    getDocs(collection(this.firestore, 'lessons')).then(() => {
-      console.log('Загрузка данных занятий');
-    });
+  public async loadLessons(): Promise<void> {
+    try {
+      const snapshot = await getDocs(collection(this.firestore, 'lessons'));
+      console.log('Загружено уроков:', snapshot.size);
+    } catch (error) {
+      console.error('Ошибка загрузки:', error);
+    }
   }
 
   public async getLessons(): Promise<Lesson[]> {

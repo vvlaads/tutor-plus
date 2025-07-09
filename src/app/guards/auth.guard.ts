@@ -1,8 +1,7 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
-import { Auth } from '@angular/fire/auth';
+import { Auth, user } from '@angular/fire/auth';
 import { map } from 'rxjs/operators';
-import { user } from '@angular/fire/auth';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(Auth);

@@ -252,12 +252,13 @@ export class SlotDialogComponent {
   }
 
   public convertToLesson(): void {
-    const slot = this.convertFormToSlot();
     const idsToDelete: string[] = [];
-    const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, slot, false);
+    const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, this.convertFormToSlot(), false);
+
     dialigRef.afterClosed().subscribe(async result => {
       if (result && this.data.slot?.id) {
-        if (slot.baseSlotId && slot.isRepeat) {
+        const slot = await this.slotService.getSlotById(this.data.slot.id);
+        if (slot && slot.baseSlotId && slot.isRepeat) {
           const slots = await this.slotService.getSlotsByBaseId(slot.baseSlotId);
           for (let lesson of result) {
             const lessonStart = convertTimeToMinutes(lesson.startTime);
@@ -270,15 +271,18 @@ export class SlotDialogComponent {
               }
             }
           }
-        } else {
+        }
+        else {
           idsToDelete.push(this.data.slot.id);
         }
+
         idsToDelete.forEach(async id => {
           await this.changeBaseSlot(id);
           this.deleteSlot(id)
         });
       }
-    })
+    });
+
     this.close();
   }
 

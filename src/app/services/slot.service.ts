@@ -8,13 +8,12 @@ import { convertStringToDate } from '../functions/dates';
   providedIn: 'root'
 })
 export class SlotService implements OnDestroy {
-  private firestore = inject(Firestore);
   private unsubscribe!: () => void;
   private slotsSubject = new BehaviorSubject<Slot[]>([]);
 
   public slots$ = this.slotsSubject.asObservable();
 
-  public constructor() {
+  public constructor(private firestore: Firestore) {
     this.startListening();
   }
 

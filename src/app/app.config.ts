@@ -9,7 +9,7 @@ import { DatePipe } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    { provide: DatePipe, useValue: new DatePipe('ru-Ru') },
+    { provide: DatePipe, useValue: new DatePipe('ru-RU') },
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideFirestore(() => getFirestore()),
     provideAuth(() => getAuth()),

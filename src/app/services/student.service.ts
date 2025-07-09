@@ -6,13 +6,12 @@ import { LessonService } from './lesson.service';
 
 @Injectable({ providedIn: 'root' })
 export class StudentService implements OnDestroy {
-  private firestore = inject(Firestore);
   private unsubscribe!: () => void;
   private studentsSubject = new BehaviorSubject<Student[]>([]);
 
   public students$ = this.studentsSubject.asObservable();
 
-  public constructor(private lessonService: LessonService) {
+  public constructor(private firestore: Firestore, private lessonService: LessonService) {
     this.startListening();
   }
 

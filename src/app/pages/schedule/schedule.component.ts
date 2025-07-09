@@ -4,7 +4,6 @@ import { LayoutService } from '../../services/layout.service';
 import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student } from '../../app.interfaces';
-import { take } from 'rxjs';
 import { StudentService } from '../../services/student.service';
 import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
@@ -71,7 +70,7 @@ export class ScheduleComponent implements OnInit {
     });
   }
 
-  private subscribeToLessons(): void {
+  private async subscribeToLessons() {
     this.lessonService.loadLessons();
     this.lessonService.lessons$.subscribe(lessons => {
       this.lessons = lessons;
@@ -80,8 +79,7 @@ export class ScheduleComponent implements OnInit {
   }
 
   private updateLessons(): void {
-    const lessons = this.lessons;
-    this.oneDayLessons = lessons.filter(lesson => {
+    this.oneDayLessons = this.lessons.filter(lesson => {
       try {
         const lessonDate = convertStringToDate(lesson.date);
         return isDatesEquals(this.currentDate, lessonDate);
@@ -93,7 +91,7 @@ export class ScheduleComponent implements OnInit {
 
     this.sortLessonsByStartTime();
 
-    this.currentWeekLessons = lessons.filter(lesson => {
+    this.currentWeekLessons = this.lessons.filter(lesson => {
       try {
         const lessonDate = convertStringToDate(lesson.date);
         return this.currentWeekDates.some(date => isDatesEquals(date, lessonDate));
@@ -102,6 +100,7 @@ export class ScheduleComponent implements OnInit {
         return false;
       }
     });
+    console.log('cur les:', this.currentWeekLessons);
   }
 
   private subscribeToStudents(): void {

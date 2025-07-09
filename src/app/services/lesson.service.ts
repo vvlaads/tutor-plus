@@ -7,7 +7,7 @@ import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
 @Injectable({
   providedIn: 'root'
 })
-export class LessonService implements OnInit, OnDestroy {
+export class LessonService implements OnDestroy {
   private unsubscribe!: () => void;
   private lessonsSubject = new BehaviorSubject<Lesson[]>([]);
   private prevLessonsSubject = new BehaviorSubject<Map<string, Lesson>>(new Map());
@@ -18,10 +18,6 @@ export class LessonService implements OnInit, OnDestroy {
   public nextLessons$ = this.nextLessonsSubject.asObservable();
 
   public constructor(private firestore: Firestore) {
-
-  }
-
-  public ngOnInit(): void {
     this.startListening();
   }
 
@@ -127,13 +123,10 @@ export class LessonService implements OnInit, OnDestroy {
     };
   }
 
-  public async loadLessons(): Promise<void> {
-    try {
-      const snapshot = await getDocs(collection(this.firestore, 'lessons'));
-      console.log('Загружено уроков:', snapshot.size);
-    } catch (error) {
-      console.error('Ошибка загрузки:', error);
-    }
+  public loadLessons(): void {
+    getDocs(collection(this.firestore, 'lessons')).then(() => {
+      console.log('Загрузка данных занятий');
+    });
   }
 
   public async getLessons(): Promise<Lesson[]> {

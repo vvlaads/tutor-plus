@@ -90,11 +90,7 @@ export class SlotService implements OnDestroy {
     if (!baseSlot) {
       return slots;
     }
-    if (baseSlot.baseSlotId) {
-      return this.getFutureRepeatedSlots(baseId);
-    }
-    slots.push(baseSlot);
-    return slots;
+    return this.getFutureRepeatedSlots(baseId);
   }
 
   public async getFutureRepeatedSlots(id: string): Promise<Slot[]> {

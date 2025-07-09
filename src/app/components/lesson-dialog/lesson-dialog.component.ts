@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { DialogMode } from '../../app.enums';
-import { Lesson, SelectOption, Student } from '../../app.interfaces';
+import { Lesson, SelectOption, Student, TimeBlock } from '../../app.interfaces';
 import { LessonService } from '../../services/lesson.service';
 import { StudentService } from '../../services/student.service';
 import { getErrorMessage } from '../../app.functions';
@@ -17,6 +17,7 @@ import {
   changeDateFormatDotToMinus, changeDateFormatMinusToDot,
   convertDateToString, convertStringToDate, convertTimeToMinutes, getWeeklyRecurringDates
 } from '../../functions/dates';
+import { SlotService } from '../../services/slot.service';
 
 
 @Component({
@@ -44,10 +45,12 @@ export class LessonDialogComponent implements OnInit {
     private fb: FormBuilder,
     private lessonService: LessonService,
     private studentService: StudentService,
+    private slotService: SlotService,
     private dialogService: DialogService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Partial<Lesson> | null, checkCollisions: boolean }
   ) {
     this.mode = data.mode;
+    this.checkCollisions = data.checkCollisions;
     switch (this.mode) {
       case DialogMode.Add:
         this.title = 'Новое занятие'
@@ -134,7 +137,7 @@ export class LessonDialogComponent implements OnInit {
     let lesson = this.convertFormToLesson();
     const collision = await this.checkCollision(lesson, null)
     if (collision) {
-      alert(`Наложение на занятие, добавление отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+      alert(`Наложение занятия, добавление отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
       return;
     }
     const baseLessonId = await this.addLesson(lesson);
@@ -161,7 +164,7 @@ export class LessonDialogComponent implements OnInit {
       }
     }
     if (collisions.length > 0) {
-      let line = `Наложение на занятие, добавление отменено:`;
+      let line = `Наложение занятиий, добавление отменено:`;
       for (let collision of collisions) {
         line += `\n${collision.date} (${collision.startTime} - ${collision.endTime})`
       }
@@ -175,8 +178,12 @@ export class LessonDialogComponent implements OnInit {
     if (id) {
       const collision = await this.checkCollision(lesson, id)
       if (collision) {
-        alert(`Наложение на занятие, изменение отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+        alert(`Наложение занятия, изменение отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
         return;
+      }
+      if (!lesson.isRepeat) {
+        lesson.baseLessonId = null;
+        lesson.repeatEndDate = null;
       }
       this.updateLesson(lesson, id);
       this.touchedLessons.push({ ...lesson, id: id })
@@ -256,7 +263,7 @@ export class LessonDialogComponent implements OnInit {
     this.dialogRef.close(result);
   }
 
-  private async checkCollision(lesson: Omit<Lesson, 'id'>, id: string | null): Promise<Lesson | null> {
+  private async checkCollision(lesson: Omit<Lesson, 'id'>, id: string | null): Promise<TimeBlock | null> {
     const lessons = await this.lessonService.getLessons();
     const startLesson = convertTimeToMinutes(lesson.startTime);
     const endLesson = convertTimeToMinutes(lesson.endTime);
@@ -265,11 +272,21 @@ export class LessonDialogComponent implements OnInit {
       const end = convertTimeToMinutes(l.endTime);
       if (id && id === l.id) { continue; }
       if (l.date === lesson.date && ((startLesson >= start && startLesson < end) || (endLesson > start && endLesson <= end))) {
-        console.log(l.date, start, end)
-        console.log(lesson.date, startLesson, endLesson)
-        return l;
+        return { date: l.date, startTime: l.startTime, endTime: l.endTime };
       }
     }
+
+    if (this.checkCollisions) {
+      const slots = await this.slotService.getSlots();
+      for (let s of slots) {
+        const start = convertTimeToMinutes(s.startTime);
+        const end = convertTimeToMinutes(s.endTime);
+        if (s.date === lesson.date && ((startLesson >= start && startLesson < end) || (endLesson > start && endLesson <= end))) {
+          return { date: s.date, startTime: s.startTime, endTime: s.endTime };
+        }
+      }
+    }
+
     return null;
   }
 

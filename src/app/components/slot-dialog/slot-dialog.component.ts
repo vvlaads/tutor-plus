@@ -3,13 +3,14 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { DialogMode } from '../../app.enums';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { SlotService } from '../../services/slot.service';
-import { Slot } from '../../app.interfaces';
+import { Slot, TimeBlock } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../services/dialog.service';
 import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, convertDateToString, convertStringToDate, convertTimeToMinutes, getWeeklyRecurringDates } from '../../functions/dates';
 import { getErrorMessage } from '../../app.functions';
 import { realEndTimeRangeValidator, repeatDateRangeValidator, requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator } from '../../functions/validators';
 import { REPEAT_SLOT_OPTIONS } from '../../app.constants';
+import { LessonService } from '../../services/lesson.service';
 
 @Component({
   selector: 'app-slot-dialog',
@@ -30,6 +31,7 @@ export class SlotDialogComponent {
     private fb: FormBuilder,
     private slotService: SlotService,
     private dialogService: DialogService,
+    private lessonService: LessonService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, slot: Partial<Slot> | null }
   ) {
     this.mode = data.mode;
@@ -96,7 +98,13 @@ export class SlotDialogComponent {
   }
 
   private async add(): Promise<void> {
+    const collisions = [];
     let slot = this.convertFormToSlot();
+    const collision = await this.checkCollision(slot, null)
+    if (collision) {
+      alert(`Наложение окна, добавление отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+      return;
+    }
     const baseSlotId = await this.addSlot(slot);
     if (slot.isRepeat && baseSlotId && slot.repeatEndDate) {
       slot.baseSlotId = baseSlotId;
@@ -106,15 +114,37 @@ export class SlotDialogComponent {
       const dates = getWeeklyRecurringDates(startDate, endDate);
       for (let date of dates) {
         slot.date = convertDateToString(date);
+        const collision = await this.checkCollision(slot, null)
+        if (collision) {
+          collisions.push(collision);
+          continue;
+        }
         this.addSlot(slot);
       }
     }
+    if (collisions.length > 0) {
+      let line = `Наложение окон, добавление отменено:`;
+      for (let collision of collisions) {
+        line += `\n${collision.date} (${collision.startTime} - ${collision.endTime})`
+      }
+      alert(line)
+    }
+
   }
 
-  private update(): void {
+  private async update(): Promise<void> {
     const slot = this.convertFormToSlot();
     const id = this.data.slot?.id;
     if (id) {
+      const collision = await this.checkCollision(slot, id)
+      if (collision) {
+        alert(`Наложение окна, изменение отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+        return;
+      }
+      if (!slot.isRepeat) {
+        slot.baseSlotId = null;
+        slot.repeatEndDate = null;
+      }
       this.updateSlot(slot, id);
     }
   }
@@ -192,27 +222,56 @@ export class SlotDialogComponent {
     this.dialogRef.close();
   }
 
+  private async checkCollision(slot: Omit<Slot, 'id'>, id: string | null): Promise<TimeBlock | null> {
+    const lessons = await this.lessonService.getLessons();
+    const startSlot = convertTimeToMinutes(slot.startTime);
+    const endSlot = convertTimeToMinutes(slot.endTime);
+    for (let l of lessons) {
+      const start = convertTimeToMinutes(l.startTime);
+      const end = convertTimeToMinutes(l.endTime);
+      if (id && id === l.id) { continue; }
+      if (l.date === slot.date && ((startSlot >= start && startSlot < end) || (endSlot > start && endSlot <= end))) {
+        return { date: l.date, startTime: l.startTime, endTime: l.endTime };
+      }
+    }
+
+    const slots = await this.slotService.getSlots();
+    for (let s of slots) {
+      const start = convertTimeToMinutes(s.startTime);
+      const end = convertTimeToMinutes(s.endTime);
+      if (s.date === slot.date && ((startSlot >= start && startSlot < end) || (endSlot > start && endSlot <= end))) {
+        return { date: s.date, startTime: s.startTime, endTime: s.endTime };
+      }
+    }
+
+    return null;
+  }
+
   public isEditMode(): boolean {
     return this.mode == DialogMode.Edit;
   }
 
   public convertToLesson(): void {
     const slot = this.convertFormToSlot();
+    const idsToDelete: string[] = [];
     const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, slot, false);
     dialigRef.afterClosed().subscribe(async result => {
-      if (result && this.isEditMode() && this.data.slot?.baseSlotId) {
-        const slots = await this.slotService.getSlotsByBaseId(this.data.slot.baseSlotId);
-        const idsToDelete = [];
-        for (let lesson of result) {
-          const lessonStart = convertTimeToMinutes(lesson.startTime);
-          const lessonEnd = convertTimeToMinutes(lesson.endTime);
-          for (let s of slots) {
-            const start = convertTimeToMinutes(s.startTime);
-            const end = convertTimeToMinutes(s.endTime);
-            if (s.date === lesson.date && ((start >= lessonStart && start <= lessonEnd) || (end >= lessonStart && end <= lessonEnd))) {
-              idsToDelete.push(s.id);
+      if (result && this.data.slot?.id) {
+        if (slot.baseSlotId && slot.isRepeat) {
+          const slots = await this.slotService.getSlotsByBaseId(slot.baseSlotId);
+          for (let lesson of result) {
+            const lessonStart = convertTimeToMinutes(lesson.startTime);
+            const lessonEnd = convertTimeToMinutes(lesson.endTime);
+            for (let s of slots) {
+              const start = convertTimeToMinutes(s.startTime);
+              const end = convertTimeToMinutes(s.endTime);
+              if (s.date === lesson.date && ((start >= lessonStart && start <= lessonEnd) || (end >= lessonStart && end <= lessonEnd))) {
+                idsToDelete.push(s.id);
+              }
             }
           }
+        } else {
+          idsToDelete.push(this.data.slot.id);
         }
         idsToDelete.forEach(async id => {
           await this.changeBaseSlot(id);

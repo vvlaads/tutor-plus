@@ -43,6 +43,8 @@
             </div>
         </div>
 
+
+
         <div class="calendar-body" *ngIf="!isOneDayFormat">
             <div *ngFor="let time of times" class="calendar-row" [style.height.px]="blockHeightPixels">
                 <div class="time-value">
@@ -58,7 +60,7 @@
                 </div>
             </div>
 
-            <div *ngFor="let lesson of lessons" class="lesson" [style.min-height]="getLessonHeight(lesson)"
+            <div *ngFor="let lesson of currentWeekLessons" class="lesson" [style.min-height]="getLessonHeight(lesson)"
                 [style.height]="getLessonHeight(lesson)" [style.width.%]=" blockWidthPercentage"
                 [style.top.px]="getLessonTop(lesson)" [style.left.%]="getLessonLeft(lesson)"
                 (click)="editLesson(lesson)">
@@ -72,7 +74,7 @@
                 </div>
             </div>
 
-            <div *ngFor="let slot of slots" class="slot" [style.min-height]="getSlotHeight(slot)"
+            <div *ngFor="let slot of currentWeekSlots" class="slot" [style.min-height]="getSlotHeight(slot)"
                 [style.height]="getSlotHeight(slot)" [style.width.%]=" blockWidthPercentage"
                 [style.top.px]="getSlotTop(slot)" [style.left.%]="getSlotLeft(slot)" (click)="editSlot(slot)">
 
@@ -82,6 +84,7 @@
             </div>
 
         </div>
+
 
         <div class="one-day-calendar" *ngIf="isOneDayFormat">
             <table class="one-day-table" id="schedule-table">
@@ -122,6 +125,7 @@
             </table>
         </div>
     </div>
+
 
     <div class="fixed-block">
         <button (click)="addScheduleObject()" class="add-lesson-button">

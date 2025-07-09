@@ -6,7 +6,7 @@ import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student } from '../../app.interfaces';
 import { take } from 'rxjs';
 import { StudentService } from '../../services/student.service';
-import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS } from '../../app.constants';
+import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
@@ -21,28 +21,25 @@ import { convertDateToString, convertMinutesToTime, convertStringToDate, convert
 })
 export class ScheduleComponent implements OnInit {
   private dialogService = inject(DialogService);
-
-  public currentDate: Date = new Date();
-  public today: Date = new Date();
-
-  public isOneDayFormat: boolean = false;
+  private lessons: Lesson[] = [];
+  private slots: Slot[] = []
+  private students: Student[] = [];
 
   public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
-  public blockHeightPixels: number = 50;
-  public blockWidthPercentage: number = 13;
-  public timeColumnWidthPercetage: number = 9;
-
-  public monthNames: string[] = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"]
-  public weekDayNames: string[] = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+  public blockHeightPixels: number = BLOCK_HEIGHT_PIXELS;
+  public blockWidthPercentage: number = BLOCK_WIDTH_PERCENTAGE;
+  public timeColumnWidthPercetage: number = TIME_COLUMN_WIDTH_PERCENTAGE;
+  public times: string[] = TIMES;
+  public monthNames: string[] = MONTH_NAMES;
+  public weekDayNames: string[] = WEEKDAY_NAMES;
+  public currentDate: Date = new Date();
+  public today: Date = new Date();
+  public isOneDayFormat: boolean = false;
   public currentWeekDates: Date[] = [];
-  public times: string[] = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00',
-    '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
 
-  public lessons: Lesson[] = []
-  public slots: Slot[] = []
-  public oneDayLessons: Lesson[] = []
-  private students: Map<string, Student> = new Map<string, Student>();
-
+  public currentWeekLessons: Lesson[] = [];
+  public oneDayLessons: Lesson[] = [];
+  public currentWeekSlots: Slot[] = [];
 
   public constructor(
     private layoutService: LayoutService,
@@ -77,11 +74,13 @@ export class ScheduleComponent implements OnInit {
   private subscribeToLessons(): void {
     this.lessonService.loadLessons();
     this.lessonService.lessons$.subscribe(lessons => {
-      this.updateLessons(lessons);
+      this.lessons = lessons;
+      this.updateLessons();
     });
   }
 
-  private updateLessons(lessons: Lesson[]): void {
+  private updateLessons(): void {
+    const lessons = this.lessons;
     this.oneDayLessons = lessons.filter(lesson => {
       try {
         const lessonDate = convertStringToDate(lesson.date);
@@ -92,10 +91,9 @@ export class ScheduleComponent implements OnInit {
       }
     });
 
-    // Сортируем уроки по времени начала (по возрастанию)
     this.sortLessonsByStartTime();
 
-    this.lessons = lessons.filter(lesson => {
+    this.currentWeekLessons = lessons.filter(lesson => {
       try {
         const lessonDate = convertStringToDate(lesson.date);
         return this.currentWeekDates.some(date => isDatesEquals(date, lessonDate));
@@ -109,26 +107,20 @@ export class ScheduleComponent implements OnInit {
   private subscribeToStudents(): void {
     this.studentService.loadStudents();
     this.studentService.students$.subscribe(students => {
-      students.forEach(student => {
-        this.updateStudents(student);
-      })
+      this.students = students;
     })
-  }
-
-
-  private updateStudents(student: Student) {
-    this.students.set(student.id, student);
   }
 
   private subscribeToSlots(): void {
     this.slotService.loadSlots();
     this.slotService.slots$.subscribe(slots => {
-      this.updateSlots(slots);
+      this.slots = slots;
+      this.updateSlots();
     });
   }
 
-  private updateSlots(slots: Slot[]): void {
-    this.slots = slots.filter(slot => {
+  private updateSlots(): void {
+    this.currentWeekSlots = this.slots.filter(slot => {
       try {
         const slotDate = convertStringToDate(slot.date);
         return this.currentWeekDates.some(date => isDatesEquals(date, slotDate));
@@ -142,9 +134,8 @@ export class ScheduleComponent implements OnInit {
   private updateCurrentDate(newDate: Date): void {
     this.currentDate = new Date(newDate);
     this.updateCurrentWeek();
-    this.lessonService.lessons$.pipe(take(1)).subscribe(lessons => {
-      this.updateLessons(lessons);
-    });
+    this.updateLessons();
+    this.updateSlots();
   }
 
   private getDateByDayName(dayName: string): Date | null {
@@ -159,10 +150,12 @@ export class ScheduleComponent implements OnInit {
   }
 
   public getStudentByLesson(lesson: Lesson): Student | null {
-    const student = this.students.get(lesson.studentId);
-    if (student) {
-      return student;
+    for (let student of this.students) {
+      if (student.id === lesson.studentId) {
+        return student;
+      }
     }
+
     return null;
   }
 
@@ -434,7 +427,7 @@ export class ScheduleComponent implements OnInit {
     return 'rgb(255,255,255)'
   }
 
-  getCurrentDateInString(): string {
+  public getCurrentDateInString(): string {
     return convertDateToString(this.currentDate);
   }
 
@@ -455,7 +448,6 @@ export class ScheduleComponent implements OnInit {
   }
 
   public async exportTables(): Promise<void> {
-
     const rangeWeeks = 2;
     this.resetCurrentDate();
     this.updateCurrentDate(this.currentWeekDates[0]);

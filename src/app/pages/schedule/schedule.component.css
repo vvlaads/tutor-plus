@@ -42,11 +42,6 @@
     border: 1px solid #e0e0e0;
 }
 
-.change-schedule-status-button.isActive {
-    background-color: #4299e1;
-    color: white;
-}
-
 .change-schedule-status-button:hover {
     transform: scale(1.01);
     background-color: #4299e1;
@@ -56,6 +51,11 @@
 .change-schedule-status-button:active {
     transform: scale(0.98);
     background-color: #4299e1;
+}
+
+.change-schedule-status-button.isActive {
+    background-color: #4299e1;
+    color: white;
 }
 
 .change-schedule-status-button.isActive:hover {
@@ -107,13 +107,43 @@
     gap: 16px;
 }
 
-.print-button {
-    margin-left: auto;
-    margin-bottom: 0;
-}
-
 #today-info {
     font-weight: 600;
+}
+
+.print-button {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+}
+
+.print-button:hover {
+    background: #3182ce;
+}
+
+.export-button {
+    background: #4299e1;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    font-size: 16px;
+}
+
+.export-button:hover {
+    background: #3182ce;
 }
 
 #week-info {
@@ -149,25 +179,6 @@
     background-color: rgba(0, 0, 0, 0.1);
 }
 
-.wrapper {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    height: 80px;
-}
-
-.one-day {
-    width: 91%;
-    border: 1px solid rgba(0, 0, 0, 0.4);
-    justify-content: center;
-    text-align: center;
-    font-weight: 500;
-}
-
-.one-day.today {
-    background-color: rgba(0, 0, 0, 0.1);
-}
-
 .calendar-body {
     width: 100%;
     position: relative;
@@ -191,16 +202,6 @@
     justify-items: center;
 }
 
-.cell:hover {
-    background-color: rgb(0, 0, 0, 0.2);
-    cursor: pointer;
-}
-
-.cell.disabled:hover {
-    background-color: transparent;
-    cursor: auto
-}
-
 .cell {
     position: relative;
     justify-content: center;
@@ -210,6 +211,16 @@
     align-items: center;
     box-sizing: border-box;
     border-left: 1px solid #2c3e50;
+}
+
+.cell:hover {
+    background-color: rgb(0, 0, 0, 0.2);
+    cursor: pointer;
+}
+
+.cell.disabled:hover {
+    background-color: transparent;
+    cursor: auto
 }
 
 .hover-only {
@@ -266,6 +277,8 @@
     padding: 10px;
     padding-top: 4px;
     overflow: hidden;
+    padding-left: 10px;
+    padding-right: 10px;
     text-overflow: ellipsis;
 }
 
@@ -274,19 +287,6 @@
     overflow: visible;
     min-height: initial;
     height: 200px;
-}
-
-.lesson:hover .student-name {
-    white-space: normal;
-    overflow: visible;
-}
-
-.lesson-content {
-    width: 100%;
-    padding-left: 10px;
-    padding-right: 10px;
-    box-sizing: border-box;
-    text-overflow: ellipsis;
 }
 
 .lesson-time {
@@ -299,14 +299,37 @@
     font-weight: 500;
     color: #555;
     font-size: small;
-
     display: block;
     white-space: normal;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.lesson:hover .student-name {
+    white-space: normal;
+    overflow: visible;
+}
 
+.lesson-paid-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+    background-color: #e74c3c;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.lesson-paid-badge.paid {
+    background-color: #2ecc71;
+}
 
 .slot {
     position: absolute;
@@ -352,13 +375,6 @@
     height: 200px;
 }
 
-.slot-content {
-    width: 100%;
-    padding-left: 10px;
-    padding-right: 10px;
-    box-sizing: border-box;
-}
-
 .slot-time {
     font-weight: 600;
     color: #ff0000;
@@ -376,17 +392,6 @@
     font-size: 16px;
 }
 
-.not-default {
-    border: 1px solid #ff9c9c;
-    background-color: #ffbdbd;
-}
-
-
-.one-day-table td {
-    border: 1px solid #e2e8f0;
-    padding: 12px;
-}
-
 .one-day-table th {
     background-color: #4299e1;
     font-weight: 500;
@@ -394,8 +399,53 @@
     padding: 12px;
 }
 
+.lesson-info-row {
+    height: 80px;
+}
+
+.one-day-table td {
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+}
+
+.time-start-cell {
+    font-size: 24px;
+    font-weight: bolder;
+}
+
+.time-end-cell {
+    font-size: 24px;
+    font-weight: bolder;
+}
+
+.time-distance-cell {
+    font-weight: 600;
+}
+
 .time-distance-cell.not-default {
     font-weight: 600;
+}
+
+.not-default {
+    border: 1px solid #ff9c9c;
+    background-color: #ffbdbd;
+}
+
+.student-cell {
+    font-weight: 600;
+    font-size: 20px;
+}
+
+.communication-cell {
+    font-weight: 600;
+}
+
+.platform-cell {
+    font-weight: 600;
+}
+
+.break-row {
+    height: 40px;
 }
 
 .break-cell {
@@ -406,26 +456,12 @@
     color: #232323;
 }
 
-.break-row {
-    height: 40px;
-}
-
-.student-cell {
-    font-weight: 600;
-    font-size: 20px;
-}
-
 .fixed-block {
     position: fixed;
     bottom: 20px;
     right: 20px;
     z-index: 1000;
     background: transparent;
-}
-
-.add-lesson-icon {
-    width: 24px;
-    height: 24px;
 }
 
 .add-lesson-button {
@@ -459,24 +495,22 @@
     box-shadow: 0 3px 8px rgba(41, 128, 185, 0.3);
 }
 
+.add-lesson-icon {
+    width: 24px;
+    height: 24px;
+}
 
-/* В ваш файл стилей добавьте: */
 @media print {
 
     @page {
         margin: 0;
-        /* Убираем отступы */
         size: auto;
-        /* Автоматический размер */
     }
-
 
     body::after {
         display: none;
-        /* Скрываем footer */
     }
 
-    /* Скрываем заголовки и адреса */
     @page :footer {
         display: none;
     }
@@ -512,94 +546,9 @@
 
     .one-day-table {
         font-size: 12pt;
-        /* Стандартный размер для печати */
     }
 
     .lesson-info-row {
         page-break-inside: avoid;
-        /* Не разрывать строки между страницами */
     }
-}
-
-/* Стили для кнопки печати (не для печати) */
-.print-button {
-    background: #4299e1;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 16px;
-}
-
-.print-button:hover {
-    background: #3182ce;
-}
-
-.export-button {
-    background: #4299e1;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-}
-
-.export-button:hover {
-    background: #3182ce;
-}
-
-.lesson-info-row {
-    height: 80px;
-}
-
-.time-start-cell {
-    font-size: 24px;
-    font-weight: bolder;
-}
-
-.time-end-cell {
-    font-size: 24px;
-    font-weight: bolder;
-}
-
-.communication-cell {
-    font-weight: 600;
-}
-
-.platform-cell {
-    font-weight: 600;
-}
-
-.time-distance-cell {
-    font-weight: 600;
-}
-
-.lesson-paid-badge {
-    position: absolute;
-    top: 4px;
-    right: 4px;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    font-weight: bold;
-    color: white;
-    background-color: #e74c3c;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-}
-
-.lesson-paid-badge.paid {
-    background-color: #2ecc71;
 }

@@ -10,6 +10,9 @@ export const MAX_LESSON_DURATION = 5;
 
 export const PHONE_NUMBER_LENGTH = 11;
 export const VISIBLE_LESSONS_COUNT = 3;
+export const BLOCK_HEIGHT_PIXELS = 50;
+export const BLOCK_WIDTH_PERCENTAGE = 13;
+export const TIME_COLUMN_WIDTH_PERCENTAGE = 9;
 
 export const STATUS_OPTIONS = [{ value: true, text: 'Активный' }, { value: false, text: 'Завершенный' }];
 
@@ -46,4 +49,7 @@ export const REPEAT_SLOT_OPTIONS = [
 
 
 export const MONTH_NAMES = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
+export const WEEKDAY_NAMES = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+export const TIMES = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00',
+    '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
 export const SCHEDULE_OBJECT_OPTIONS = [{ value: ScheduleObject.Slot, text: "Добавить окно" }, { value: ScheduleObject.Lesson, text: "Добавить занятие" }]

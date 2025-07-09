@@ -201,9 +201,7 @@ export class SlotDialogComponent {
     const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, slot);
     dialigRef.afterClosed().subscribe(async result => {
       if (result && this.isEditMode() && this.data.slot?.baseSlotId) {
-        console.log(result);
         const slots = await this.slotService.getSlotsByBaseId(this.data.slot.baseSlotId);
-        console.log(slots);
         const idsToDelete = [];
         for (let lesson of result) {
           const lessonStart = convertTimeToMinutes(lesson.startTime);
@@ -216,7 +214,10 @@ export class SlotDialogComponent {
             }
           }
         }
-        idsToDelete.forEach(id => this.deleteSlot(id));
+        idsToDelete.forEach(async id => {
+          await this.changeBaseSlot(id);
+          this.deleteSlot(id)
+        });
       }
     })
     this.close();

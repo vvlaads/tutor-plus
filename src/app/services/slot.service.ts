@@ -90,7 +90,9 @@ export class SlotService implements OnDestroy {
     if (!baseSlot) {
       return slots;
     }
-    slots = await this.getFutureRepeatedSlots(baseId);
+    if (baseSlot.baseSlotId) {
+      return this.getFutureRepeatedSlots(baseId);
+    }
     slots.push(baseSlot);
     return slots;
   }

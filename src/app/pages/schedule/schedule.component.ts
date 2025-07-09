@@ -313,7 +313,7 @@ export class ScheduleComponent implements OnInit {
           break;
         case ScheduleObject.Lesson:
           const lesson = { date: convertDateToString(date), startTime: time, endTime: endTime }
-          this.dialogService.openLessonDialog(DialogMode.Add, lesson)
+          this.dialogService.openLessonDialog(DialogMode.Add, lesson, true)
           break;
       }
     });

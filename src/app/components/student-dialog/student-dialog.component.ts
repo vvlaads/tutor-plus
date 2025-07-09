@@ -61,7 +61,7 @@ export class StudentDialogComponent {
       communication: [data.student?.communication, [Validators.required, allowedValuesValidator(this.communicationOptions, 'value')]],
       platform: [data.student?.platform, [Validators.required, allowedValuesValidator(this.platformOptions, 'value')]],
       cost: [data.student?.cost, [Validators.required, Validators.min(0)]],
-      isActive: [data.student == null ? false : data.student.isActive, [Validators.required, allowedValuesValidator(this.statusOptions, 'value')]],
+      isActive: [data.student == null ? true : data.student.isActive, [Validators.required, allowedValuesValidator(this.statusOptions, 'value')]],
       from: [data.student?.from, [Validators.required, allowedValuesValidator(this.fromOptions, 'value')]],
       color: [data.student == null ? generateColor() : data.student.color, [Validators.required]]
     });

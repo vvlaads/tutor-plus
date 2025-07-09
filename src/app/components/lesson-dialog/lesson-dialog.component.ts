@@ -28,6 +28,7 @@ import {
 export class LessonDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<LessonDialogComponent>);
   private mode: DialogMode;
+  private checkCollisions = false;
   private students: Student[] = []
   private touchedLessons: Lesson[] = [];
 
@@ -44,7 +45,7 @@ export class LessonDialogComponent implements OnInit {
     private lessonService: LessonService,
     private studentService: StudentService,
     private dialogService: DialogService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Partial<Lesson> | null }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Partial<Lesson> | null, checkCollisions: boolean }
   ) {
     this.mode = data.mode;
     switch (this.mode) {
@@ -129,7 +130,13 @@ export class LessonDialogComponent implements OnInit {
   }
 
   private async add(): Promise<void> {
+    const collisions = [];
     let lesson = this.convertFormToLesson();
+    const collision = await this.checkCollision(lesson, null)
+    if (collision) {
+      alert(`Наложение на занятие, добавление отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+      return;
+    }
     const baseLessonId = await this.addLesson(lesson);
     if (baseLessonId) {
       this.touchedLessons.push({ ...lesson, id: baseLessonId })
@@ -141,6 +148,11 @@ export class LessonDialogComponent implements OnInit {
         const dates = getWeeklyRecurringDates(startDate, endDate);
         for (let date of dates) {
           lesson.date = convertDateToString(date);
+          const collision = await this.checkCollision(lesson, null)
+          if (collision) {
+            collisions.push(collision);
+            continue;
+          }
           let id = await this.addLesson(lesson);
           if (id) {
             this.touchedLessons.push({ ...lesson, id: id })
@@ -148,12 +160,24 @@ export class LessonDialogComponent implements OnInit {
         }
       }
     }
+    if (collisions.length > 0) {
+      let line = `Наложение на занятие, добавление отменено:`;
+      for (let collision of collisions) {
+        line += `\n${collision.date} (${collision.startTime} - ${collision.endTime})`
+      }
+      alert(line)
+    }
   }
 
-  private update(): void {
+  private async update(): Promise<void> {
     const lesson = this.convertFormToLesson();
     const id = this.data.lesson?.id;
     if (id) {
+      const collision = await this.checkCollision(lesson, id)
+      if (collision) {
+        alert(`Наложение на занятие, изменение отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+        return;
+      }
       this.updateLesson(lesson, id);
       this.touchedLessons.push({ ...lesson, id: id })
     }
@@ -230,6 +254,23 @@ export class LessonDialogComponent implements OnInit {
 
   public close(result: Lesson[] | null): void {
     this.dialogRef.close(result);
+  }
+
+  private async checkCollision(lesson: Omit<Lesson, 'id'>, id: string | null): Promise<Lesson | null> {
+    const lessons = await this.lessonService.getLessons();
+    const startLesson = convertTimeToMinutes(lesson.startTime);
+    const endLesson = convertTimeToMinutes(lesson.endTime);
+    for (let l of lessons) {
+      const start = convertTimeToMinutes(l.startTime);
+      const end = convertTimeToMinutes(l.endTime);
+      if (id && id === l.id) { continue; }
+      if (l.date === lesson.date && ((startLesson >= start && startLesson < end) || (endLesson > start && endLesson <= end))) {
+        console.log(l.date, start, end)
+        console.log(lesson.date, startLesson, endLesson)
+        return l;
+      }
+    }
+    return null;
   }
 
   public isEditMode(): boolean {

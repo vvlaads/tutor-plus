@@ -198,7 +198,7 @@ export class SlotDialogComponent {
 
   public convertToLesson(): void {
     const slot = this.convertFormToSlot();
-    const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, slot);
+    const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, slot, false);
     dialigRef.afterClosed().subscribe(async result => {
       if (result && this.isEditMode() && this.data.slot?.baseSlotId) {
         const slots = await this.slotService.getSlotsByBaseId(this.data.slot.baseSlotId);

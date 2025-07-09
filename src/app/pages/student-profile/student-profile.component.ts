@@ -2,7 +2,6 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { StudentService } from '../../services/student.service';
-import { MatDialog } from '@angular/material/dialog';
 import { LayoutService } from '../../services/layout.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
@@ -20,7 +19,6 @@ import { DialogService } from '../../services/dialog.service';
 })
 export class StudentProfileComponent implements OnInit {
   public student: Student | null = null;
-  private dialog = inject(MatDialog);
   private dialogService = inject(DialogService);
   public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
@@ -84,7 +82,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   public addLesson(): void {
-    this.dialogService.openLessonDialog(DialogMode.Add, { studentId: this.student?.id });
+    this.dialogService.openLessonDialog(DialogMode.Add, { studentId: this.student?.id }, true);
   }
 
   public getPlatformIcon(platformName: string): string {

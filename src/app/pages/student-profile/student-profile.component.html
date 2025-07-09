@@ -1,6 +1,5 @@
 <main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
     <div *ngIf="student" class="profile-container">
-        <!-- Заголовок профиля -->
         <div class="profile-header">
             <h2 class="student-name">{{ student.name }}</h2>
             <div class="actions">
@@ -36,16 +35,13 @@
 
         <div class="divider"></div>
 
-        <!-- Блок с уроками -->
         <div class="student-lessons">
             <app-lesson-slider [studentId]="student.id"></app-lesson-slider>
         </div>
 
         <div class="divider"></div>
 
-        <!-- Основная информация о студенте -->
         <div class="student-info">
-            <!-- Первый столбец -->
             <div class="info-column">
                 <div class="info-item">
                     <span class="info-label">Телефон:</span>
@@ -73,7 +69,6 @@
                 </div>
             </div>
 
-            <!-- Второй столбец -->
             <div class="info-column">
                 <div class="info-item">
                     <span class="info-label">Способ связи:</span>
@@ -101,7 +96,6 @@
             </div>
         </div>
 
-        <!-- Стоимость -->
         <div class="cost-block">
             <h3 class="cost-title">Стоимость часа:</h3>
             <div class="cost-amount">{{ student.cost }} ₽</div>

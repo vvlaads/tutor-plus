@@ -39,6 +39,12 @@ export interface Slot {
     realEndTime: string | null;
 }
 
+export interface TimeBlock {
+    date: string;
+    startTime: string;
+    endTime: string;
+}
+
 export interface SelectOptionWithIcon {
     value: string;
     text: string;

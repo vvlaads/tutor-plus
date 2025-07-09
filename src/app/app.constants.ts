@@ -39,5 +39,11 @@ export const REPEAT_LESSON_OPTIONS = [
     { value: 'FUTURE', text: 'Это и будущие занятия' }
 ]
 
+export const REPEAT_SLOT_OPTIONS = [
+    { value: 'ONE', text: 'Только это окно' },
+    { value: 'FUTURE', text: 'Это и будущие окна' }
+]
+
+
 export const MONTH_NAMES = ["Января", "Февраля", "Марта", "Апреля", "Мая", "Июня", "Июля", "Августа", "Сентября", "Октября", "Ноября", "Декабря"];
 export const SCHEDULE_OBJECT_OPTIONS = [{ value: ScheduleObject.Slot, text: "Добавить окно" }, { value: ScheduleObject.Lesson, text: "Добавить занятие" }]

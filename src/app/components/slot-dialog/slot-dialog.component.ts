@@ -7,7 +7,10 @@ import { Slot } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../services/dialog.service';
 import { LessonService } from '../../services/lesson.service';
-import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../functions/dates';
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, convertDateToString, convertStringToDate, getWeeklyRecurringDates } from '../../functions/dates';
+import { getErrorMessage } from '../../app.functions';
+import { realEndTimeRangeValidator, repeatDateRangeValidator, requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator } from '../../functions/validators';
+import { REPEAT_SLOT_OPTIONS } from '../../app.constants';
 
 @Component({
   selector: 'app-slot-dialog',
@@ -15,144 +18,212 @@ import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../fu
   templateUrl: './slot-dialog.component.html',
   styleUrl: './slot-dialog.component.css'
 })
-export class SlotDialogComponent implements OnInit {
+export class SlotDialogComponent {
   private dialogRef = inject(MatDialogRef<SlotDialogComponent>);
   private mode: DialogMode = DialogMode.Add;
 
   public slotForm: FormGroup;
-  public title: string = 'Добавление слота'
-  public submitMessage: string = 'Добавить'
+  public title: string;
+  public submitMessage: string;
   public formSubmitted = false;
 
-  constructor(
+  public constructor(
     private fb: FormBuilder,
     private slotService: SlotService,
     private dialogService: DialogService,
     private lessonService: LessonService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, slot: Slot | null }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, slot: Partial<Slot> | null }
   ) {
     this.mode = data.mode;
     switch (this.mode) {
       case DialogMode.Add:
-        this.title = 'Добавление слота'
+        this.title = 'Добавление окна'
         this.submitMessage = 'Добавить'
         break;
       case DialogMode.Edit:
-        this.title = 'Обновить слот'
+        this.title = 'Редактировать окно'
         this.submitMessage = 'Сохранить'
         break;
     }
-    let date = null;
-    if (data.slot) {
-      date = changeDateFormatDotToMinus(data.slot.date);
-    }
 
     this.slotForm = this.fb.group({
-      date: [date, [Validators.required]],
+      date: [data.slot?.date == null ? null : changeDateFormatDotToMinus(data.slot.date), [Validators.required]],
       startTime: [data.slot?.startTime, [Validators.required]],
-      endTime: [data.slot?.endTime, Validators.required],
-      isRepeat: [false, Validators.required]
+      endTime: [data.slot?.endTime, [Validators.required]],
+      isRepeat: [data.slot == null ? false : data.slot.isRepeat],
+      repeatEndDate: [data.slot?.repeatEndDate ? changeDateFormatDotToMinus(data.slot.repeatEndDate) : null],
+      hasRealEndTime: [data.slot == null ? false : data.slot.hasRealEndTime],
+      realEndTime: [data.slot?.realEndTime]
+    }, {
+      validators: [
+        timeRangeValidator(),
+        requiredRepeatDateValidator(),
+        requiredRealEndTimeValidator(),
+        realEndTimeRangeValidator(),
+        repeatDateRangeValidator()
+      ]
     });
   }
 
-  public async ngOnInit() {
-    this.lessonService.lessons$.subscribe(async lessons => {
-      if (this.data.slot) {
-        let lesson = await this.lessonService.getLessonByTime(this.data.slot.date, this.data.slot.startTime)
-        if (lesson) {
-          this.slotService.deleteSlot(this.data.slot.id).catch(error => { console.error('Ошибка при удалении:', error); })
-          this.close(true);
-        }
-      }
-    })
+  private convertFormToSlot(): Omit<Slot, 'id'> {
+    const slotValue = this.slotForm.value;
+    const slot = {
+      ...slotValue,
+      date: changeDateFormatMinusToDot(slotValue.date),
+      repeatEndDate: slotValue.repeatEndDate ? changeDateFormatMinusToDot(slotValue.repeatEndDate) : null
+    }
+    return slot;
   }
 
   public submit(): void {
     this.formSubmitted = true;
+
     Object.keys(this.slotForm.controls).forEach(key => {
       this.slotForm.get(key)?.markAsTouched();
     });
+
     if (this.slotForm.invalid) {
       return;
     }
 
-    const slotValue = { ...this.slotForm.value };
-    slotValue.date = changeDateFormatMinusToDot(slotValue.date);
-
     switch (this.mode) {
       case DialogMode.Add:
-        this.addSlot(slotValue);
+        this.add();
         break;
       case DialogMode.Edit:
-        this.updateSlot(slotValue);
+        this.update();
         break;
     }
   }
 
+  private async add(): Promise<void> {
+    let slot = this.convertFormToSlot();
+    const baseSlotId = await this.addSlot(slot);
+    if (slot.isRepeat && baseSlotId && slot.repeatEndDate) {
+      slot.baseSlotId = baseSlotId;
+      this.updateSlot(slot, baseSlotId);
+      const startDate = convertStringToDate(slot.date);
+      const endDate = convertStringToDate(slot.repeatEndDate);
+      const dates = getWeeklyRecurringDates(startDate, endDate);
+      for (let date of dates) {
+        slot.date = convertDateToString(date);
+        this.addSlot(slot);
+      }
+    }
+  }
 
-  public addSlot(slot: Slot): void {
-    this.slotService.addSlot(slot).then(_ => {
-      this.close(true);
+  private update(): void {
+    const slot = this.convertFormToSlot();
+    const id = this.data.slot?.id;
+    if (id) {
+      this.updateSlot(slot, id);
+    }
+  }
+
+  public delete(): void {
+    let currentSlot = this.convertFormToSlot();
+    if (this.data.slot?.id) {
+      const id = this.data.slot.id;
+      let confirmed = false;
+      if (currentSlot.isRepeat) {
+        const dialogRef = this.dialogService.openChoiceDialog(REPEAT_SLOT_OPTIONS);
+        dialogRef.afterClosed().subscribe(async result => {
+          switch (result) {
+            case 'ONE':
+              confirmed = confirm("Вы уверены, что хотите удалить это окно");
+              if (confirmed) {
+                this.changeBaseSlot(id);
+                this.deleteSlot(id);
+                this.close();
+              }
+              break;
+            case 'FUTURE':
+              confirmed = confirm("Вы уверены, что хотите удалить это и будущие окна");
+              if (confirmed) {
+                const slots = await this.slotService.getFutureRepeatedSlots(id);
+                for (let slot of slots) {
+                  this.deleteSlot(slot.id);
+                }
+                this.close();
+              }
+              break;
+          }
+        })
+      } else {
+        confirmed = confirm("Вы уверены, что хотите удалить это занятие");
+        if (confirmed) {
+          this.deleteSlot(id);
+          this.close();
+        }
+      }
+    }
+  }
+
+  private async changeBaseSlot(id: string): Promise<void> {
+    const slots = await this.slotService.getFutureRepeatedSlots(id);
+    if (this.data.slot?.baseSlotId === id && slots.length > 1) {
+      const newId = slots[1].id;
+      for (let slot of slots) {
+        this.updateSlot({ baseSlotId: newId }, slot.id);
+      }
+    }
+  }
+
+  private async addSlot(slot: Omit<Slot, 'id'>): Promise<string | null> {
+    const id = await this.slotService.addSlot(slot).catch(error => {
+      console.error('Ошибка при добавлении:', error);
+      return null;
+    });
+    return id;
+  }
+
+  private updateSlot(slot: Partial<Slot>, id: string): void {
+    this.slotService.updateSlot(id, slot).catch(error => {
+      console.error('Ошибка при обновлении:', error);
+    });
+  }
+
+  private deleteSlot(id: string): void {
+    this.slotService.deleteSlot(id).catch(error => {
+      console.error('Ошибка при удалении:', error);
     })
-      .catch(error => {
-        console.error('Ошибка при добавлении:', error);
-        this.close(false);
-      });
   }
 
-  public updateSlot(slot: Slot): void {
-    const updatedSlot: Slot = {
-      ...this.data.slot,
-      ...slot
-    };
-
-    this.slotService.updateSlot(updatedSlot.id, updatedSlot).then(_ => {
-      this.close(true);
-    })
-      .catch(error => { console.error('Ошибка при обновлении:', error); this.close(false); });
-
-  }
-
-  public compareFn(option1: boolean, option2: boolean): boolean {
-    return option1 === option2;
-  }
-
-  public close(status: boolean): void {
-    this.dialogRef.close(status);
-  }
-
-  public getError(field: string): string | null {
-    const control = this.slotForm.get(field);
-    if (!control || !control.errors) return null;
-
-    if (control.errors['required']) return '*Поле обязательно';
-    if (control.errors['pattern']) return '*Неверный формат';
-    if (control.errors['min']) return '*Слишком маленькое значение';
-    return null;
+  public close(): void {
+    this.dialogRef.close();
   }
 
   public isEditMode() {
     return this.mode == DialogMode.Edit;
   }
 
-  public deleteSlot() {
-    if (this.data.slot) {
-      const confirmDelete = confirm('Вы уверены, что хотите удалить это окно?');
-      if (confirmDelete) {
-        this.slotService.deleteSlot(this.data.slot.id).catch(error => { console.error('Ошибка при удалении:', error); })
-        this.close(true);
+  public convertToLesson(): void {
+    const slot = this.convertFormToSlot();
+    const dialigRef = this.dialogService.openLessonDialog(DialogMode.Add, slot);
+    dialigRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Нужно сделать удаление окон');
       }
-    }
+    })
+    this.close();
   }
 
-  public convertToLesson() {
-    const slot = this.data.slot;
-    if (slot) {
-      const lesson = { date: slot?.date, startTime: slot?.startTime, endTime: slot?.endTime }
-      this.dialogService.openLessonDialog(DialogMode.Add, lesson);
-    } else {
-      this.dialogService.openLessonDialog(DialogMode.Add, null);
-      this.close(true);
+  public getErrorMessage(field: string): string | null {
+    return getErrorMessage(this.slotForm, field);
+  }
+
+  public getFormErrorMessage(): string | null {
+    if (!this.slotForm.errors) return null;
+    const errors = this.slotForm.errors;
+    if (errors['timeRangeInvalid']) {
+      return 'Время окончания должно быть позже времени начала!';
     }
+    if (errors['repeatEndDateInvalid']) {
+      return 'Укажите дату для повторения';
+    }
+    if (errors['realEndTimeInvalid']) {
+      return 'Укажите настоящее время окончания';
+    }
+    return null;
   }
 }

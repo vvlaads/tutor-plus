@@ -214,7 +214,7 @@ export class LessonDialogComponent implements OnInit {
     });
   }
 
-  public deleteLesson(id: string): void {
+  private deleteLesson(id: string): void {
     this.lessonService.deleteLesson(id).catch(error => {
       console.error('Ошибка при удалении:', error);
     })

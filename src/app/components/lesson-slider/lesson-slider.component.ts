@@ -15,14 +15,14 @@ import { convertStringToDate } from '../../functions/dates';
   styleUrls: ['./lesson-slider.component.css']
 })
 export class LessonSliderComponent implements OnInit {
-  @Input()
-  private studentId: string = '';
   private currentPosition = 0;
   private lessons: Lesson[] = [];
   private prevLessons: Map<string, Lesson> = new Map();
   private lessonService = inject(LessonService);
   private dialogService = inject(DialogService);
 
+  @Input()
+  public studentId: string = '';
   public visibleLessons: Lesson[] = [];
 
   public async ngOnInit(): Promise<void> {

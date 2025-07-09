@@ -35,6 +35,8 @@ export interface Slot {
     isRepeat: boolean;
     baseSlotId: string | null;
     repeatEndDate: string | null;
+    hasRealEndTime: boolean;
+    realEndTime: string | null;
 }
 
 export interface SelectOptionWithIcon {

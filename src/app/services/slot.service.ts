@@ -2,6 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Slot } from '../app.interfaces';
+import { convertStringToDate } from '../functions/dates';
 
 @Injectable({
   providedIn: 'root'
@@ -47,8 +48,10 @@ export class SlotService implements OnDestroy {
       startTime: data.startTime || '',
       endTime: data.endTime || '',
       isRepeat: data.isRepeat || false,
-      baseSlotId: data.baseSlotId || '',
-      repeatEndDate: data.repeatEndDate || ''
+      baseSlotId: data.baseSlotId || null,
+      repeatEndDate: data.repeatEndDate || null,
+      hasRealEndTime: data.hasRealEndTime || false,
+      realEndTime: data.realEndTime || null
     };
   }
 
@@ -79,5 +82,23 @@ export class SlotService implements OnDestroy {
 
   public async deleteSlot(id: string): Promise<void> {
     await deleteDoc(doc(this.firestore, 'slots', id));
+  }
+
+  public async getFutureRepeatedSlots(id: string): Promise<Slot[]> {
+    let slots: Slot[] = [];
+    const slot = await this.getSlotById(id);
+    if (!slot) {
+      return slots;
+    }
+    if (!slot.baseSlotId || !slot.isRepeat) {
+      return slots;
+    }
+    const baseId = slot.baseSlotId;
+    const date = slot.date;
+    slots = await this.getSlots();
+    slots = slots
+      .filter(slot => (slot.baseSlotId == baseId) && (convertStringToDate(slot.date).getTime() >= convertStringToDate(date).getTime()))
+      .sort((a, b) => convertStringToDate(a.date).getTime() - convertStringToDate(b.date).getTime());
+    return slots;
   }
 }

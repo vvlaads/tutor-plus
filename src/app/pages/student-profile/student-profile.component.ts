@@ -18,8 +18,9 @@ import { DialogService } from '../../services/dialog.service';
   styleUrl: './student-profile.component.css'
 })
 export class StudentProfileComponent implements OnInit {
-  public student: Student | null = null;
   private dialogService = inject(DialogService);
+
+  public student: Student | null = null;
   public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
   public communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
@@ -29,7 +30,7 @@ export class StudentProfileComponent implements OnInit {
   public prepaidLessonsCount: number = 0;
   public formatPhoneNumber = formatPhoneNumber;
 
-  constructor(private route: ActivatedRoute,
+  public constructor(private route: ActivatedRoute,
     private studentService: StudentService,
     private layoutService: LayoutService,
     private lessonService: LessonService) {

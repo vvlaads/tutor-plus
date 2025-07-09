@@ -302,18 +302,18 @@ export class LessonDialogComponent implements OnInit {
   }
 
   public getPreferredCost(): void {
-    const lesson = this.convertFormToLesson();
     let cost = 1000;
-    if (lesson.startTime && lesson.endTime && lesson.studentId) {
-      if (lesson.hasRealEndTime && lesson.realEndTime) {
-        const start = convertTimeToMinutes(lesson.startTime);
-        const end = convertTimeToMinutes(lesson.realEndTime)
+    const lessonValue = this.lessonForm.value;
+    if (lessonValue.startTime && lessonValue.endTime && this.data.lesson?.studentId) {
+      if (lessonValue.hasRealEndTime && lessonValue.realEndTime) {
+        const start = convertTimeToMinutes(lessonValue.startTime);
+        const end = convertTimeToMinutes(lessonValue.realEndTime)
         cost = this.studentCost * (end - start) / MINUTES_IN_HOUR
         if (end < start && end + MINUTES_IN_HOUR * HOURS_IN_DAY <= start + MINUTES_IN_HOUR * MAX_LESSON_DURATION) {
           cost = this.studentCost * (end + MINUTES_IN_HOUR * HOURS_IN_DAY - start) / MINUTES_IN_HOUR
         }
       } else {
-        cost = this.studentCost * (convertTimeToMinutes(lesson.endTime) - convertTimeToMinutes(lesson.startTime)) / MINUTES_IN_HOUR
+        cost = this.studentCost * (convertTimeToMinutes(lessonValue.endTime) - convertTimeToMinutes(lessonValue.startTime)) / MINUTES_IN_HOUR
       }
       if (cost > 0) {
         this.preferredCost = cost;

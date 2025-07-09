@@ -44,13 +44,13 @@ export class StudentProfileComponent implements OnInit {
   }
 
   private subscribeToLessons(): void {
-    this.lessonService.lessons$.subscribe(lessons => {
+    this.lessonService.lessons$.subscribe(() => {
       this.loadStudent();
     })
   }
 
   private subscribeToStudents(): void {
-    this.studentService.students$.subscribe(students => {
+    this.studentService.students$.subscribe(() => {
       this.loadStudent();
     })
   }
@@ -72,6 +72,7 @@ export class StudentProfileComponent implements OnInit {
   public updateStudent(): void {
     this.dialogService.openStudentDialog(DialogMode.Edit, this.student);
   }
+
   public deleteStudent(studentId: string): void {
     const confirmDelete = confirm('Вы уверены, что хотите удалить этого студента?');
 
@@ -82,7 +83,7 @@ export class StudentProfileComponent implements OnInit {
   }
 
   public addLesson(): void {
-    this.dialogService.openLessonDialog(DialogMode.Add, { studentId: this.student?.id }, true);
+    this.dialogService.openLessonDialog(DialogMode.Add, { studentId: this.student?.id });
   }
 
   public getPlatformIcon(platformName: string): string {

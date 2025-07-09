@@ -1,12 +1,12 @@
 import { inject, Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { StudentDialogComponent } from '../components/student-dialog/student-dialog.component';
+import { StudentDialogComponent } from '../dialogs/student-dialog/student-dialog.component';
 import { DialogMode } from '../app.enums';
 import { Lesson, SelectOption, Slot, Student } from '../app.interfaces';
-import { LessonDialogComponent } from '../components/lesson-dialog/lesson-dialog.component';
-import { SlotDialogComponent } from '../components/slot-dialog/slot-dialog.component';
-import { ChoiceDialogComponent } from '../components/choice-dialog/choice-dialog.component';
-import { FindDateDialogComponent } from '../components/find-date-dialog/find-date-dialog.component';
+import { LessonDialogComponent } from '../dialogs/lesson-dialog/lesson-dialog.component';
+import { SlotDialogComponent } from '../dialogs/slot-dialog/slot-dialog.component';
+import { ChoiceDialogComponent } from '../dialogs/choice-dialog/choice-dialog.component';
+import { FindDateDialogComponent } from '../dialogs/find-date-dialog/find-date-dialog.component';
 
 @Injectable({
   providedIn: 'root'

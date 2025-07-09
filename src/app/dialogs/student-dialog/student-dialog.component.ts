@@ -2,13 +2,13 @@ import { Component, ElementRef, HostListener, Inject, inject, ViewChild } from '
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { CustomSelectComponent } from '../custom-select/custom-select.component';
 import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PAID_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
 import { generateColor } from '../../app.functions';
 import { allowedValuesValidator, parentValidator } from '../../functions/validators';
+import { CustomSelectComponent } from '../../components/custom-select/custom-select.component';
 
 @Component({
   selector: 'app-student-dialog',

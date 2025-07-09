@@ -11,20 +11,6 @@
     z-index: 1000;
 }
 
-hr {
-    width: auto;
-}
-
-.search-block {
-    width: 100%;
-    margin-bottom: 20px;
-    justify-content: center;
-    display: flex;
-}
-
-app-search {
-    width: 80%;
-}
 
 .change-student-status-buttons {
     display: flex;
@@ -79,6 +65,21 @@ app-search {
     color: white;
 }
 
+hr {
+    width: auto;
+}
+
+.search-block {
+    width: 100%;
+    margin-bottom: 20px;
+    justify-content: center;
+    display: flex;
+}
+
+app-search {
+    width: 80%;
+}
+
 .student-list {
     display: flex;
     flex-direction: column;
@@ -93,15 +94,9 @@ app-search {
     padding: 16px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    background-color: #f9f9f9;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     cursor: pointer;
     transition: background-color 0.2s ease;
-
-    &:hover {
-        background-color: #f5f5f5;
-        /* Подсветка при наведении */
-    }
 }
 
 .student-block h2 {
@@ -114,7 +109,29 @@ app-search {
     color: #555;
 }
 
-/* Основные стили */
+.student-block-content {
+    display: flex;
+    flex-direction: row;
+}
+
+.student-block-info {
+    margin-right: 10%;
+}
+
+.student-value {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.no-data {
+    color: red;
+}
+
+.divider {
+    height: 1px;
+    background: #000;
+}
+
 .button-container {
     margin: 20px 0;
     display: flex;
@@ -158,7 +175,6 @@ app-search {
     box-shadow: 0 3px 8px rgba(41, 128, 185, 0.3);
 }
 
-/* Иконка */
 .add-icon {
     width: 24px;
     height: 24px;
@@ -169,13 +185,11 @@ app-search {
     transform: scale(1.1);
 }
 
-/* Текст кнопки */
 .button-text {
     position: relative;
     z-index: 1;
 }
 
-/* Эффект "волны" при клике */
 .add-student-button::after {
     content: '';
     position: absolute;
@@ -192,40 +206,4 @@ app-search {
 
 .add-student-button:focus:not(:active)::after {
     animation: ripple 0.6s ease-out;
-}
-
-@keyframes ripple {
-    0% {
-        transform: scale(0, 0);
-        opacity: 0.5;
-    }
-
-    100% {
-        transform: scale(20, 20);
-        opacity: 0;
-    }
-}
-
-.student-block-content {
-    display: flex;
-    flex-direction: row;
-}
-
-.student-block-info {
-    margin-right: 10%;
-}
-
-.student-value {
-    color: #2c3e50;
-    font-weight: 600;
-}
-
-.no-data {
-    color: red;
-}
-
-/* Разделители */
-.divider {
-    height: 1px;
-    background: #000;
 }

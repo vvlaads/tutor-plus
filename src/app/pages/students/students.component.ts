@@ -34,6 +34,10 @@ export class StudentsComponent implements OnInit, OnDestroy {
   private layoutService = inject(LayoutService);
   private router = inject(Router);
   private dialogService = inject(DialogService);
+  private studentsSubscription!: Subscription;
+  private layoutSubscription!: Subscription;
+  private prevLessonsSubscription!: Subscription;
+  private nextLessonsSubscription!: Subscription;
 
   public students: Student[] = [];
   public filteredStudents: Student[] = [];
@@ -42,18 +46,12 @@ export class StudentsComponent implements OnInit, OnDestroy {
   public isLoading = false;
   public searchQuery = '';
   public formatPhoneNumber = formatPhoneNumber;
-
   public isPrevLessonsLoading = true;
   public isNextLessonsLoading = true;
-
-  private studentsSubscription!: Subscription;
-  private layoutSubscription!: Subscription;
-
   public prevLessons$ = this.lessonService.prevLessons$;
   public nextLessons$ = this.lessonService.nextLessons$;
 
-  private prevLessonsSubscription!: Subscription;
-  private nextLessonsSubscription!: Subscription;
+
 
   public ngOnInit(): void {
     this.subscribeToLayoutChanges();

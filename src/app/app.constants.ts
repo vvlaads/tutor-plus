@@ -15,6 +15,7 @@ export const BLOCK_WIDTH_PERCENTAGE = 13;
 export const TIME_COLUMN_WIDTH_PERCENTAGE = 9;
 
 export const STATUS_OPTIONS = [{ value: true, text: 'Активный' }, { value: false, text: 'Завершенный' }];
+export const PAID_OPTIONS = [{ value: true, text: 'Студент' }, { value: false, text: 'Родитель' }];
 
 export const COMMUNICATION_OPTIONS = [
     { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' },

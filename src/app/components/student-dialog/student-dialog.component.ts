@@ -6,9 +6,9 @@ import { CustomSelectComponent } from '../custom-select/custom-select.component'
 import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
-import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
+import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PAID_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
 import { generateColor } from '../../app.functions';
-import { allowedValuesValidator } from '../../functions/validators';
+import { allowedValuesValidator, parentValidator } from '../../functions/validators';
 
 @Component({
   selector: 'app-student-dialog',
@@ -25,6 +25,7 @@ export class StudentDialogComponent {
   public submitMessage: string;
   public formSubmitted = false;
   public statusOptions = STATUS_OPTIONS;
+  public paidOptions = PAID_OPTIONS;
   public communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
   public fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;
@@ -63,8 +64,16 @@ export class StudentDialogComponent {
       cost: [data.student?.cost, [Validators.required, Validators.min(0)]],
       isActive: [data.student == null ? true : data.student.isActive, [Validators.required, allowedValuesValidator(this.statusOptions, 'value')]],
       from: [data.student?.from, [Validators.required, allowedValuesValidator(this.fromOptions, 'value')]],
-      color: [data.student == null ? generateColor() : data.student.color, [Validators.required]]
-    });
+      color: [data.student == null ? generateColor() : data.student.color, [Validators.required]],
+      hasParent: [data.student == null ? false : data.student.hasParent],
+      parentName: [data.student?.parentName],
+      parentPhone: [data.student?.parentPhone, [Validators.pattern(/^\+79\d{9}$/)]],
+      parentCommunication: [data.student?.parentCommunication],
+      paidByStudent: [data.student == null ? true : data.student.paidByStudent],
+    },
+      {
+        validators: [parentValidator()]
+      });
   }
 
   private convertFormToStudent(): Omit<Student, 'id'> {
@@ -127,6 +136,10 @@ export class StudentDialogComponent {
     this.studentForm.get('from')?.setValue(optionValue);
   }
 
+  public onSelectParentCommunication(optionValue: string): void {
+    this.studentForm.get('parentCommunication')?.setValue(optionValue);
+  }
+
   public close(): void {
     this.dialogRef.close();
   }
@@ -140,6 +153,24 @@ export class StudentDialogComponent {
     if (control.errors['min']) return '*Слишком маленькое значение';
     if (control.errors['allowedValues']) return '*Недопустимое значение';
 
+    return null;
+  }
+
+  public getFormErrorMessage(): string | null {
+    if (!this.studentForm.errors) return null;
+    const errors = this.studentForm.errors;
+    if (errors['invalidParentName']) {
+      return 'Укажите имя родителя';
+    }
+    if (errors['invalidParentPhone']) {
+      return 'Укажите верный номер телефона';
+    }
+    if (errors['invalidParentCommunication']) {
+      return 'Выберите где общаемся';
+    }
+    if (errors['invalidPaidByStudent']) {
+      return 'Выберите кто оплачивает';
+    }
     return null;
   }
 

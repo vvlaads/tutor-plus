@@ -10,6 +10,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    max-height: 95vh;
 }
 
 .form-content {
@@ -220,11 +221,80 @@ app-custom-select {
     transform: scale(0.95);
 }
 
-/* Ошибки */
+.checkbox-container {
+    display: inline-flex;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+    padding-left: 30px;
+    min-height: 20px;
+}
+
+.checkbox-input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    height: 0;
+    width: 0;
+    left: 0;
+    top: 0;
+}
+
+.checkbox-custom {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 20px;
+    width: 20px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.checkbox-input:checked~.checkbox-custom {
+    background-color: #4299e1;
+    border-color: #4299e1;
+}
+
+.checkbox-custom:after {
+    content: "";
+    position: absolute;
+    display: none;
+    left: 7px;
+    top: 3px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.checkbox-input:checked~.checkbox-custom:after {
+    display: block;
+}
+
+input,
+select,
+app-custom-select {
+    max-width: 300px;
+}
+
 .error-message {
     color: #e74646;
     font-size: 20px;
     margin-top: 4px;
     min-height: 20px;
     margin-left: 136px;
+}
+
+.form-errors {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+}
+
+.form-errors .error-message {
+    margin: 0;
 }

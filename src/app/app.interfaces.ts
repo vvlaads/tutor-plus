@@ -25,6 +25,11 @@ export interface Student {
     isActive: boolean;
     from: string;
     color: string;
+    hasParent: boolean;
+    parentName: string | null;
+    parentPhone: string | null;
+    parentCommunication: string | null;
+    paidByStudent: boolean;
 }
 
 export interface Slot {

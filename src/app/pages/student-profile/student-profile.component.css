@@ -94,23 +94,6 @@
     justify-content: space-between;
 }
 
-.stat-value {
-    font-size: 30px;
-    font-weight: 600;
-}
-
-.stat-label {
-    font-size: 24px;
-}
-
-.red {
-    color: #dc3545;
-}
-
-.green {
-    color: #28a745;
-}
-
 .divider {
     height: 2px;
     background: #e0e0e0;
@@ -280,4 +263,21 @@
 .empty-state p {
     color: #95a5a6;
     font-size: 20px;
+}
+
+.stat-value {
+    font-size: 30px;
+    font-weight: 600;
+}
+
+.stat-label {
+    font-size: 24px;
+}
+
+.red {
+    color: #dc3545;
+}
+
+.green {
+    color: #28a745;
 }

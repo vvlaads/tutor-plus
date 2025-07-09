@@ -1,5 +1,5 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
-import { HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR } from "../app.constants";
+import { COMMUNICATION_OPTIONS, HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, PAID_OPTIONS } from "../app.constants";
 import { changeDateFormatMinusToDot, convertStringToDate, convertTimeToMinutes } from "./dates";
 
 export function timeRangeValidator(): ValidatorFn {
@@ -103,4 +103,49 @@ export function allowedValuesValidator(allowedOptions: any[], valueField = 'valu
         }
         return null;
     };
+}
+
+export function parentValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const hasParent = control.get('hasParent')?.value;
+        if (hasParent) {
+            const name = control.get('parentName')?.value;
+            if (!name) {
+                return { invalidParentName: true };
+            }
+
+            const phone = control.get('parentPhone')?.value;
+            if (!phone) {
+                return { invalidParentPhone: true };
+            }
+
+            const communication = control.get('parentCommunication')?.value;
+            if (!communication) {
+                return { invalidParentCommunication: true };
+            }
+            let communicationIsValid = false;
+            for (let option of COMMUNICATION_OPTIONS) {
+                if (option.value === communication) {
+                    communicationIsValid = true;
+                }
+            }
+            if (!communicationIsValid) {
+                return { invalidParentCommunication: true };
+            }
+            const paid = control.get('paidByStudent')?.value;
+            if (!paid) {
+                return { invalidParentPaidByStudent: true };
+            }
+            let paidIsValid = false;
+            for (let option of PAID_OPTIONS) {
+                if (option.value === communication) {
+                    paidIsValid = true;
+                }
+            }
+            if (!paidIsValid) {
+                return { invalidParentPaidByStudent: true };
+            }
+        }
+        return null;
+    }
 }

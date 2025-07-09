@@ -49,7 +49,12 @@ export class StudentService implements OnDestroy {
       cost: data.cost || 0,
       isActive: data.isActive !== false,
       from: data.from || '',
-      color: data.color || '#ffffff'
+      color: data.color || '#ffffff',
+      hasParent: data.hasParent || false,
+      parentName: data.parentName || null,
+      parentPhone: data.parentPhone || null,
+      parentCommunication: data.parentCommunication || null,
+      paidByStudent: data.paidByStudent || true
     };
   }
 

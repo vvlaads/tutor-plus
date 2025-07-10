@@ -7,6 +7,8 @@
     top: 0;
     display: flex;
     flex-direction: column;
+    transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .navigation-panel.collapsed {
@@ -24,6 +26,7 @@
     align-items: center;
     justify-content: center;
     padding-top: 15px;
+    transition: opacity 0.3s ease;
 }
 
 .profile-icon {
@@ -84,6 +87,7 @@
     font-family: 'Roboto', sans-serif;
     font-size: 16px;
     white-space: nowrap;
+    transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
 hr {
@@ -123,6 +127,8 @@ hr {
 }
 
 .collapsed .button-text {
+    opacity: 0;
+    transform: translateX(-10px);
     display: none;
 }
 

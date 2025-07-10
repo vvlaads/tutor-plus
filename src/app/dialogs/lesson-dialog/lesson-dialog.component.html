@@ -78,11 +78,8 @@
                     <div class="form-group">
                         <div class="form-row">
                             <label class="form-label">Ученик:</label>
-                            <select formControlName="studentId" (change)="updateCosts()" class="form-select">
-                                <option *ngFor="let option of options" [ngValue]="option.value">
-                                    {{ option.text }}
-                                </option>
-                            </select>
+                            <app-search-select formControlName="studentId" [options]="options"
+                                placeholder="Выберите ученика" (selected)="updateCosts()"></app-search-select>
                         </div>
                         <div *ngIf="formSubmitted && lessonForm.get('studentId')?.errors" class="error-message">
                             {{getErrorMessage('studentId')}}

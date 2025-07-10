@@ -1,1 +1,10 @@
-<p>search-select works!</p>
+<div class="search-select">
+    <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="filterOptions()" (focus)="toggleDropdown()"
+        (blur)="onBlur()" [placeholder]="placeholder" class="search-input" />
+
+    <div class="dropdown" *ngIf="isOpen && filteredOptions.length">
+        <div *ngFor="let option of filteredOptions" (click)="selectOption(option)" class="dropdown-item">
+            {{ option.text }}
+        </div>
+    </div>
+</div>

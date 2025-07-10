@@ -18,11 +18,12 @@ import {
   convertDateToString, convertStringToDate, convertTimeToMinutes, getWeeklyRecurringDates
 } from '../../functions/dates';
 import { SlotService } from '../../services/slot.service';
+import { SearchSelectComponent } from "../../components/search-select/search-select.component";
 
 
 @Component({
   selector: 'app-lesson-dialog',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, SearchSelectComponent],
   templateUrl: './lesson-dialog.component.html',
   styleUrl: './lesson-dialog.component.css'
 })

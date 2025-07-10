@@ -1,4 +1,4 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Slot } from '../app.interfaces';
@@ -59,6 +59,7 @@ export class SlotService implements OnDestroy {
     getDocs(collection(this.firestore, 'slots')).then(() => {
       console.log('Загрузка данных окон в расписании');
     });
+    this.cleanupOldSlots();
   }
 
   public async getSlots(): Promise<Slot[]> {
@@ -112,6 +113,7 @@ export class SlotService implements OnDestroy {
   }
 
   public async cleanupOldSlots(): Promise<void> {
+    console.log('Очистка старых окон');
     const slots = await this.getSlots();
     const today = new Date();
 

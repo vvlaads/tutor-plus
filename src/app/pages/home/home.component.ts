@@ -1,19 +1,22 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
-import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN } from '../../app.constants';
+import { DeviceService } from '../../services/device.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
-  public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
+  public pageMarginLeftPercentage: number = 0;
+  private deviceService = inject(DeviceService);
+  public deviceType$ = this.deviceService.deviceType$;
 
   public constructor(private layoutService: LayoutService) {
-    this.layoutService.isHide$.subscribe(isHide => {
-      this.pageMarginLeftPercentage = isHide ? PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN : PAGE_MARGIN_LEFT_PERCENTAGE
+    this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
+      this.pageMarginLeftPercentage = pageMarginLeftPercentage;
     })
   }
 }

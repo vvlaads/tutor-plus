@@ -2,36 +2,39 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
-import { ProfileIconComponent } from "../profile-icon/profile-icon.component";
 import { AuthService } from '../../services/auth.service';
-import { LayoutService } from '../../services/layout.service';
 import { Section } from '../../app.enums';
+import { DeviceService, DeviceType } from '../../services/device.service';
+import { CommonModule } from '@angular/common';
+import { DesktopNavigationComponent } from "./desktop-navigation/desktop-navigation.component";
+import { MobileNavigationComponent } from "./mobile-navigation/mobile-navigation.component";
+import { TabletNavigationComponent } from "./tablet-navigation/tablet-navigation.component";
 
 @Component({
   selector: 'app-navigation',
   standalone: true,
-  imports: [ProfileIconComponent],
+  imports: [CommonModule, DesktopNavigationComponent, MobileNavigationComponent, TabletNavigationComponent],
   templateUrl: './navigation.component.html',
   styleUrls: ['./navigation.component.css']
 })
 export class NavigationComponent implements OnInit, OnDestroy {
-  public selectedSection = Section.Home;
-  public isHide = false;
   private subscriptions: Subscription[] = [];
+
+  public selectedSection = Section.Home;
+  public deviceType: DeviceType;
 
   public constructor(
     private router: Router,
     private authService: AuthService,
-    private layoutService: LayoutService
-  ) { }
+    private deviceService: DeviceService
+  ) {
+    this.deviceType = this.deviceService.currentDeviceType;
+    this.deviceService.deviceType$.subscribe(type => {
+      this.deviceType = type;
+    })
+  }
 
   public ngOnInit(): void {
-    this.subscriptions.push(
-      this.layoutService.isHide$.subscribe(isHide => {
-        this.isHide = isHide;
-      })
-    );
-
     this.subscriptions.push(
       this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
@@ -74,10 +77,6 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   public logout(): void {
     this.authService.signOut();
-  }
-
-  public clickToHideButton(): void {
-    this.layoutService.toggleNavigation();
   }
 
   public targetIsSelected(target: string): boolean {

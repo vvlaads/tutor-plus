@@ -47,8 +47,8 @@ export class ScheduleComponent implements OnInit {
     private lessonService: LessonService,
     private studentService: StudentService,
     private slotService: SlotService) {
-    this.layoutService.isHide$.subscribe(isHide => {
-      this.pageMarginLeftPercentage = isHide ? PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN : PAGE_MARGIN_LEFT_PERCENTAGE
+    this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
+      this.pageMarginLeftPercentage = pageMarginLeftPercentage;
     })
   }
 

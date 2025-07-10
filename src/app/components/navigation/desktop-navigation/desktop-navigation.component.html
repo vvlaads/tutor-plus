@@ -1,0 +1,44 @@
+<nav class="desktop-navigation" [class.collapsed]="isHide">
+    <div class="panel-content">
+        <div class="profile-section" [class.collapsed]="isHide">
+            <app-profile-icon class="profile-icon" [fullFormat]="false"></app-profile-icon>
+        </div>
+
+        <div class="nav-buttons">
+            <button class="nav-button" (click)="clickToHideButton()">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Menu%20Icon.png"
+                    class="button-icon">
+                <span class="button-text">Скрыть меню</span>
+            </button>
+
+            <button class="nav-button" (click)="navigate.emit('')" [class.isActive]="targetIsSelected('')">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Home%20Icon.png"
+                    class="button-icon">
+                <span class="button-text">Главная</span>
+            </button>
+
+            <button class="nav-button" (click)="navigate.emit('students')"
+                [class.isActive]="targetIsSelected('students')">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Students%20Icon.png"
+                    class="button-icon">
+                <span class="button-text">Ученики</span>
+            </button>
+
+            <button class="nav-button" (click)="navigate.emit('schedule')"
+                [class.isActive]="targetIsSelected('schedule')">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Calendar%20Icon.png"
+                    class="button-icon">
+                <span class="button-text">Расписание</span>
+            </button>
+        </div>
+        <hr>
+    </div>
+
+    <div class="exit-section">
+        <button class="exit-button" (click)="logout.emit()">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Cross%20Icon.png"
+                class="button-icon">
+            <span class="button-text">Выход</span>
+        </button>
+    </div>
+</nav>

@@ -66,6 +66,10 @@
     color: white;
 }
 
+.change-student-status-buttons.mobile .change-student-status-button {
+    width: 50%;
+}
+
 hr {
     width: auto;
 }
@@ -158,7 +162,7 @@ app-search {
     background: #000;
 }
 
-.button-container {
+.button-container.desktop {
     margin: 20px 0;
     display: flex;
     justify-content: center;
@@ -167,6 +171,16 @@ app-search {
     right: 20px;
     z-index: 1000;
     background: transparent;
+}
+
+.button-container.mobile {
+    bottom: 60px;
+    justify-content: center;
+    position: fixed;
+    margin: 20px 0;
+    left: 0;
+    right: 0;
+    display: flex;
 }
 
 .add-student-button {

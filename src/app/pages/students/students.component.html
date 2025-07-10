@@ -1,6 +1,7 @@
 <main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
     <div class="work-panel">
-        <div class="change-student-status-buttons">
+        <div class="change-student-status-buttons" [class.desktop]="(deviceType$ | async) === 'desktop'"
+            [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
             <button class="change-student-status-button" (click)="setActiveFormat(true)"
                 [class.isActive]="isActiveFormat">Актуальные</button>
             <button class="change-student-status-button" (click)="setActiveFormat(false)"
@@ -59,7 +60,8 @@
         </div>
     </div>
 
-    <div class="button-container">
+    <div class="button-container" [class.desktop]="(deviceType$ | async) === 'desktop'"
+        [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
         <button (click)="addStudent()" class="add-student-button">
             <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
                 class="add-icon">

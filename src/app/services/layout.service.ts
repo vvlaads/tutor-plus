@@ -5,11 +5,13 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class LayoutService {
-  private isHide = new BehaviorSubject<boolean>(false);
+  private pageMarginLeftPercentage = new BehaviorSubject<number>(0);
 
-  public isHide$ = this.isHide.asObservable();
+  public pageMarginLeftPercentage$ = this.pageMarginLeftPercentage.asObservable();
 
-  public toggleNavigation(): void {
-    this.isHide.next(!this.isHide.value);
+  public setPageMarginLeft(percentage: number): void {
+    if (percentage < 100 && percentage >= 0) {
+      this.pageMarginLeftPercentage.next(percentage);
+    }
   }
 }

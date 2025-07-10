@@ -1,43 +1,11 @@
-<nav class="navigation-panel" [class.collapsed]="isHide">
-    <div class="panel-content">
-        <div class="profile-section" [class.collapsed]="isHide">
-            <app-profile-icon class="profile-icon" [fullFormat]="false"></app-profile-icon>
-        </div>
+<app-desktop-navigation *ngIf="deviceType === 'desktop'" [selectedSection]="selectedSection"
+    (navigate)="redirectToTarget($event)" (logout)="logout()" [targetIsSelected]="targetIsSelected.bind(this)">
+</app-desktop-navigation>
 
-        <div class="nav-buttons">
-            <button class="nav-button" (click)="clickToHideButton()">
-                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Menu%20Icon.png"
-                    class="button-icon">
-                <span class="button-text">Скрыть меню</span>
-            </button>
-            <button class="nav-button" (click)="redirectToTarget('')" [class.isActive]="targetIsSelected('')">
-                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Home%20Icon.png"
-                    class="button-icon">
-                <span class="button-text">Главная</span>
-            </button>
+<app-tablet-navigation *ngIf="deviceType === 'tablet'" [selectedSection]="selectedSection"
+    (navigate)="redirectToTarget($event)" (logout)="logout()" [targetIsSelected]="targetIsSelected.bind(this)">
+</app-tablet-navigation>
 
-            <button class="nav-button" (click)="redirectToTarget('students')"
-                [class.isActive]="targetIsSelected('students')">
-                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Students%20Icon.png"
-                    class="button-icon">
-                <span class="button-text">Ученики</span>
-            </button>
-
-            <button class="nav-button" (click)="redirectToTarget('schedule')"
-                [class.isActive]="targetIsSelected('schedule')">
-                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Calendar%20Icon.png"
-                    class="button-icon">
-                <span class="button-text">Расписание</span>
-            </button>
-        </div>
-        <hr>
-    </div>
-
-    <div class="exit-section">
-        <button class="exit-button" (click)="logout()">
-            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Cross%20Icon.png"
-                class="button-icon">
-            <span class="button-text">Выход</span>
-        </button>
-    </div>
-</nav>
+<app-mobile-navigation *ngIf="deviceType === 'mobile'" [selectedSection]="selectedSection"
+    (navigate)="redirectToTarget($event)" (logout)="logout()">
+</app-mobile-navigation>

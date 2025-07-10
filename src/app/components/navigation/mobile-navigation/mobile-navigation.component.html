@@ -1,0 +1,25 @@
+<nav class="mobile-navigation">
+    <div class="mobile-buttons">
+        <button class="mobile-button" (click)="navigate.emit('')" [class.isActive]="targetIsSelected('')">
+            <img class="button-icon"
+                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Home%20Icon.png">
+        </button>
+
+        <button class="mobile-button" (click)="navigate.emit('students')"
+            [class.isActive]="targetIsSelected('students')">
+            <img class="button-icon"
+                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Students%20Icon.png">
+        </button>
+
+        <button class="mobile-button" (click)="navigate.emit('schedule')"
+            [class.isActive]="targetIsSelected('schedule')">
+            <img class="button-icon"
+                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Calendar%20Icon.png">
+        </button>
+
+        <button class="mobile-button exit" (click)="logout.emit()">
+            <img class="button-icon"
+                src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Cross%20Icon.png">
+        </button>
+    </div>
+</nav>

@@ -1,0 +1,42 @@
+.mobile-navigation {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    z-index: 1000;
+    background: #3498db;
+}
+
+.mobile-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-items: center;
+    width: 100%;
+}
+
+.mobile-button {
+    height: 60px;
+    width: 25%;
+    border: none;
+    background: #3498db;
+    box-sizing: border-box;
+}
+
+.mobile-button:hover,
+.mobile-button.isActive {
+    background: #3182ce;
+}
+
+.button-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.exit {
+    background-color: #fd7566;
+}
+
+.exit:hover {
+    background-color: #e74c3c;
+}

@@ -9,11 +9,12 @@ import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SearchComponent } from '../../components/search/search.component';
 import { Lesson, Student } from '../../app.interfaces';
-import { PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN } from '../../app.constants';
+import { PAGE_MARGIN_LEFT_PERCENTAGE } from '../../app.constants';
 import { take, Subscription } from 'rxjs';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-students',
@@ -34,10 +35,13 @@ export class StudentsComponent implements OnInit, OnDestroy {
   private layoutService = inject(LayoutService);
   private router = inject(Router);
   private dialogService = inject(DialogService);
+  private deviceService = inject(DeviceService);
   private studentsSubscription!: Subscription;
   private layoutSubscription!: Subscription;
   private prevLessonsSubscription!: Subscription;
   private nextLessonsSubscription!: Subscription;
+
+  public deviceType$ = this.deviceService.deviceType$;
 
   public students: Student[] = [];
   public filteredStudents: Student[] = [];
@@ -97,12 +101,9 @@ export class StudentsComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToLayoutChanges(): void {
-    this.layoutSubscription = this.layoutService.isHide$
-      .subscribe(isHide => {
-        this.pageMarginLeftPercentage = isHide
-          ? PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN
-          : PAGE_MARGIN_LEFT_PERCENTAGE;
-      });
+    this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
+      this.pageMarginLeftPercentage = pageMarginLeftPercentage;
+    })
   }
 
   private subscribeToStudents(): void {

@@ -30,6 +30,8 @@
             <div *ngIf="!isOneDayFormat" class="info">
                 <span id="year-info" *ngIf="!isOneDayFormat">{{currentDate.getFullYear()}} </span>
                 <span id="week-info" *ngIf="showWeekMessage()">Текущая неделя</span>
+                <label>Скрыть окна:</label>
+                <input type="checkbox" [(ngModel)]="slotsIsHidden">
             </div>
 
             <div class="calendar-header" *ngIf="!isOneDayFormat">
@@ -74,16 +76,16 @@
                     <span class="student-name">{{getStudentByLesson(lesson)?.name}}</span>
                 </div>
             </div>
+            <ng-container *ngIf="!slotsIsHidden">
+                <div *ngFor="let slot of currentWeekSlots" class="slot" [style.min-height]="getSlotHeight(slot)"
+                    [style.height]="getSlotHeight(slot)" [style.width.%]=" blockWidthPercentage"
+                    [style.top.px]="getSlotTop(slot)" [style.left.%]="getSlotLeft(slot)" (click)="editSlot(slot)">
 
-            <div *ngFor="let slot of currentWeekSlots" class="slot" [style.min-height]="getSlotHeight(slot)"
-                [style.height]="getSlotHeight(slot)" [style.width.%]=" blockWidthPercentage"
-                [style.top.px]="getSlotTop(slot)" [style.left.%]="getSlotLeft(slot)" (click)="editSlot(slot)">
-
-                <div class="slot-content">
-                    <span class="slot-time">{{slot.startTime}} - {{slot.endTime}}</span>
+                    <div class="slot-content">
+                        <span class="slot-time">{{slot.startTime}} - {{slot.endTime}}</span>
+                    </div>
                 </div>
-            </div>
-
+            </ng-container>
         </div>
 
 

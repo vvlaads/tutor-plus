@@ -2,7 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Slot } from '../app.interfaces';
-import { convertStringToDate } from '../functions/dates';
+import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +15,7 @@ export class SlotService implements OnDestroy {
 
   public constructor(private firestore: Firestore) {
     this.startListening();
+    this.cleanupOldSlots();
   }
 
   public ngOnDestroy(): void {
@@ -108,5 +109,18 @@ export class SlotService implements OnDestroy {
       .filter(slot => (slot.baseSlotId == baseId) && (convertStringToDate(slot.date).getTime() >= convertStringToDate(date).getTime()))
       .sort((a, b) => convertStringToDate(a.date).getTime() - convertStringToDate(b.date).getTime());
     return slots;
+  }
+
+  public async cleanupOldSlots(): Promise<void> {
+    const slots = await this.getSlots();
+    const today = new Date();
+
+    const oldSlots = slots.filter(slot => {
+      const slotDate = convertStringToDate(slot.date);
+      slotDate.setHours(0, convertTimeToMinutes(slot.startTime), 0, 0)
+      return slotDate < today;
+    });
+
+    await Promise.all(oldSlots.map(slot => this.deleteSlot(slot.id)));
   }
 }

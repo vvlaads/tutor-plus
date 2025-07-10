@@ -10,11 +10,12 @@ import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
 import { convertDateToString, convertMinutesToTime, convertStringToDate, convertTimeToMinutes, isDatesEquals } from '../../functions/dates';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
   selector: 'app-schedule',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.css'
 })
@@ -35,6 +36,7 @@ export class ScheduleComponent implements OnInit {
   public today: Date = new Date();
   public isOneDayFormat: boolean = false;
   public currentWeekDates: Date[] = [];
+  public slotsIsHidden = false;
 
   public currentWeekLessons: Lesson[] = [];
   public oneDayLessons: Lesson[] = [];

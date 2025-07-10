@@ -3,6 +3,7 @@ import { addDoc, collection, doc, Firestore, getDoc, updateDoc, deleteDoc, onSna
 import { BehaviorSubject } from 'rxjs';
 import { Student } from '../app.interfaces';
 import { LessonService } from './lesson.service';
+import { convertStringToDate } from '../functions/dates';
 
 @Injectable({ providedIn: 'root' })
 export class StudentService implements OnDestroy {
@@ -54,7 +55,9 @@ export class StudentService implements OnDestroy {
       parentName: data.parentName || null,
       parentPhone: data.parentPhone || null,
       parentCommunication: data.parentCommunication || null,
-      paidByStudent: data.paidByStudent || true
+      paidByStudent: data.paidByStudent,
+      isStopped: data.isStopped || false,
+      stopDate: data.stopDate || null
     };
   }
 
@@ -95,6 +98,10 @@ export class StudentService implements OnDestroy {
     if (student) {
       if (!student.isActive) {
         this.lessonService.deleteNextLessonsByStudentId(id);
+      }
+      else if (student.isStopped && student.stopDate) {
+        const date = convertStringToDate(student.stopDate);
+        this.lessonService.deleteNextLessonsBeforeDateByStudentId(id, date);
       }
     }
   }

@@ -166,6 +166,13 @@ export class LessonService implements OnDestroy {
     }
   }
 
+  public async deleteNextLessonsBeforeDateByStudentId(studentId: string, date: Date): Promise<void> {
+    const lessons = await this.getNextLessonsBeforeDateByStudentId(studentId, date);
+    for (let i = 0; i < lessons.length; i++) {
+      this.deleteLesson(lessons[i].id);
+    }
+  }
+
   public async getLessonsByStudentId(studentId: string): Promise<Lesson[]> {
     const currentLessons = this.lessonsSubject.value;
     const studentLessons = currentLessons.filter(lesson => lesson.studentId === studentId);
@@ -215,7 +222,29 @@ export class LessonService implements OnDestroy {
 
       return nextLessons;
     } catch (error) {
-      console.error('Ошибка при получении предыдущих уроков:', error);
+      console.error('Ошибка при получении будущих уроков:', error);
+      return [];
+    }
+  }
+
+  public async getNextLessonsBeforeDateByStudentId(studentId: string, date: Date): Promise<Lesson[]> {
+    try {
+      const now = new Date();
+      const endDate = new Date(date);
+      const studentLessons = await this.getLessonsByStudentId(studentId);
+
+      const nextLessons = studentLessons.filter(lesson => {
+        try {
+          return this.getLessonTimestamp(lesson) > now.getTime() && this.getLessonTimestamp(lesson) < endDate.getTime();
+        } catch {
+          return false;
+        }
+      });
+      nextLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
+
+      return nextLessons;
+    } catch (error) {
+      console.error('Ошибка при получении будущих уроков:', error);
       return [];
     }
   }

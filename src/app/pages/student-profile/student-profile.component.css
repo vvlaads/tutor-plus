@@ -100,7 +100,8 @@
     margin: 32px 0;
 }
 
-.student-info {
+.student-info,
+.parent-info {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
@@ -166,6 +167,10 @@
 .info-value.status.inactive {
     background: #ffeef0;
     color: #dc3545;
+}
+
+.parent-label {
+    margin-right: 20px;
 }
 
 .value-icon {

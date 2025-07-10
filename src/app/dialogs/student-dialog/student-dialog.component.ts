@@ -7,8 +7,9 @@ import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PAID_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
 import { generateColor } from '../../app.functions';
-import { allowedValuesValidator, parentValidator } from '../../functions/validators';
+import { allowedValuesValidator, parentValidator, stopDateValidator } from '../../functions/validators';
 import { CustomSelectComponent } from '../../components/custom-select/custom-select.component';
+import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../functions/dates';
 
 @Component({
   selector: 'app-student-dialog',
@@ -70,16 +71,19 @@ export class StudentDialogComponent {
       parentPhone: [data.student?.parentPhone, [Validators.pattern(/^\+79\d{9}$/)]],
       parentCommunication: [data.student?.parentCommunication],
       paidByStudent: [data.student == null ? true : data.student.paidByStudent],
+      isStopped: [data.student == null ? false : data.student.isStopped],
+      stopDate: [data.student?.stopDate == null ? null : changeDateFormatDotToMinus(data.student.stopDate)]
     },
       {
-        validators: [parentValidator()]
+        validators: [parentValidator(), stopDateValidator()]
       });
   }
 
   private convertFormToStudent(): Omit<Student, 'id'> {
     const studentValue = this.studentForm.value;
     const student = {
-      ...studentValue
+      ...studentValue,
+      stopDate: studentValue.stopDate ? changeDateFormatMinusToDot(studentValue.stopDate) : null
     }
     return student;
   }
@@ -170,6 +174,9 @@ export class StudentDialogComponent {
     }
     if (errors['invalidPaidByStudent']) {
       return 'Выберите кто оплачивает';
+    }
+    if (errors['invalidStopDate']) {
+      return 'Укажите дату приостановления';
     }
     return null;
   }

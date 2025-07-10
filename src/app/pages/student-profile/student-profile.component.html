@@ -93,6 +93,44 @@
                         <span>{{ student.from }}</span>
                     </div>
                 </div>
+
+                <div class="info-item" *ngIf="student.isStopped">
+                    <span class="info-label">Приостановлен до:</span>
+                    <div class="info-value">
+                        <span class="info-value stopDate">{{ student.stopDate }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="parent-info" *ngIf="student.hasParent">
+            <div class="info-column">
+                <div class="info-item">
+                    <span class="info-label">Имя родителя:</span>
+                    <span class="info-value parentName">{{ student.parentName }}</span>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label parent-label">Телефон родителя:</span>
+                    <span class="info-value phone">{{ student.parentPhone ?
+                        formatPhoneNumber(student.parentPhone): null }}</span>
+                </div>
+            </div>
+
+            <div class="info-column">
+                <div class="info-item">
+                    <span class="info-label">Где общаемся с родителем:</span>
+                    <div class="info-value with-icon">
+                        <img class="value-icon" *ngIf="student.parentCommunication"
+                            [src]="getCommunicationIcon(student.parentCommunication)">
+                        <span>{{ student.parentCommunication }}</span>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <span class="info-label">Кто оплачивает:</span>
+                    <span class="info-value paidByStudent">{{ student.paidByStudent ? 'Студент':'Родитель' }}</span>
+                </div>
             </div>
         </div>
 

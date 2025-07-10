@@ -133,17 +133,30 @@ export function parentValidator(): ValidatorFn {
                 return { invalidParentCommunication: true };
             }
             const paid = control.get('paidByStudent')?.value;
-            if (!paid) {
-                return { invalidParentPaidByStudent: true };
+            if (paid == null) {
+                return { invalidPaidByStudent: true };
             }
             let paidIsValid = false;
             for (let option of PAID_OPTIONS) {
-                if (option.value === communication) {
+                if (option.value === paid) {
                     paidIsValid = true;
                 }
             }
             if (!paidIsValid) {
-                return { invalidParentPaidByStudent: true };
+                return { invalidPaidByStudent: true };
+            }
+        }
+        return null;
+    }
+}
+
+export function stopDateValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const isStopped = control.get('isStopped')?.value;
+        if (isStopped) {
+            const date = control.get('stopDate')?.value;
+            if (!date) {
+                return { invalidStopDate: true };
             }
         }
         return null;

@@ -30,6 +30,8 @@ export interface Student {
     parentPhone: string | null;
     parentCommunication: string | null;
     paidByStudent: boolean;
+    isStopped: boolean;
+    stopDate: string | null;
 }
 
 export interface Slot {

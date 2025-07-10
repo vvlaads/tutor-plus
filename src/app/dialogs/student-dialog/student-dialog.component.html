@@ -69,23 +69,21 @@
                         </div>
                     </div>
 
-                    <div class="form-group" *ngIf="studentForm.get('hasParent')?.value">
+                    <div class="form-group">
                         <div class="form-row">
-                            <label for="parent-name" class="form-label">Имя родителя:</label>
-                            <input id="parent-name" formControlName="parentName" class="form-input"
-                                placeholder="Введите имя родителя">
+                            <label for="input-isStopped" class="form-label">Приостановлен:</label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="input-isStopped" class="checkbox-input"
+                                    formControlName="isStopped">
+                                <span class="checkbox-custom"></span>
+                            </label>
                         </div>
                     </div>
 
-                    <div class="form-group" *ngIf="studentForm.get('hasParent')?.value">
+                    <div class="form-group" *ngIf="studentForm.get('isStopped')?.value">
                         <div class="form-row">
-                            <label for="parent-phone" class="form-label">Телефон родителя:</label>
-                            <input id="parent-phone" formControlName="parentPhone" class="form-input" type="tel"
-                                placeholder="+7XXXXXXXXXX">
-                        </div>
-
-                        <div *ngIf="formSubmitted && studentForm.get('parentPhone')?.errors" class="error-message">
-                            {{ getError('parentPhone') }}
+                            <label for="stop-date" class="form-label">Приостановлен до:</label>
+                            <input id="stop-date" formControlName="stopDate" class="form-input" type="date">
                         </div>
                     </div>
                 </div>
@@ -155,6 +153,26 @@
                                     formControlName="hasParent">
                                 <span class="checkbox-custom"></span>
                             </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group" *ngIf="studentForm.get('hasParent')?.value">
+                        <div class="form-row">
+                            <label for="parent-name" class="form-label">Имя родителя:</label>
+                            <input id="parent-name" formControlName="parentName" class="form-input"
+                                placeholder="Введите имя родителя">
+                        </div>
+                    </div>
+
+                    <div class="form-group" *ngIf="studentForm.get('hasParent')?.value">
+                        <div class="form-row">
+                            <label for="parent-phone" class="form-label">Телефон родителя:</label>
+                            <input id="parent-phone" formControlName="parentPhone" class="form-input" type="tel"
+                                placeholder="+7XXXXXXXXXX">
+                        </div>
+
+                        <div *ngIf="formSubmitted && studentForm.get('parentPhone')?.errors" class="error-message">
+                            {{ getError('parentPhone') }}
                         </div>
                     </div>
 

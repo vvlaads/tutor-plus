@@ -150,6 +150,7 @@ export class LessonDialogComponent implements OnInit {
         const startDate = convertStringToDate(lesson.date);
         const endDate = convertStringToDate(lesson.repeatEndDate);
         const dates = getWeeklyRecurringDates(startDate, endDate);
+        lesson.isPaid = false;
         for (let date of dates) {
           lesson.date = convertDateToString(date);
           const collision = await this.checkCollision(lesson, null)

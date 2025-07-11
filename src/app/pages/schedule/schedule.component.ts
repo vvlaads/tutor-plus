@@ -214,23 +214,24 @@ export class ScheduleComponent implements OnInit {
   }
 
   private getConstantToFixOffset(hours: number): number {
-    let c = 0;
-    let counter = 0
-    for (let i = 0; i <= hours; i++) {
-      counter += 1;
-      if (Number.isInteger(c)) {
-        if (counter == 2) {
-          counter = 0
-          c += 0.5
-        }
-      } else {
-        if (counter == 3) {
-          counter = 0
-          c += 0.5
-        }
-      }
-    }
-    return hours - c;
+    // let c = 0;
+    // let counter = 0
+    // for (let i = 0; i <= hours; i++) {
+    //   counter += 1;
+    //   if (Number.isInteger(c)) {
+    //     if (counter == 2) {
+    //       counter = 0
+    //       c += 0.5
+    //     }
+    //   } else {
+    //     if (counter == 3) {
+    //       counter = 0
+    //       c += 0.5
+    //     }
+    //   }
+    // }
+    // return hours - c;
+    return hours;
   }
 
   public getLessonHeight(lesson: Lesson): string {

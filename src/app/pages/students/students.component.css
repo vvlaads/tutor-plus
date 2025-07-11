@@ -139,8 +139,8 @@ app-search {
 }
 
 .student-block-content {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
 }
 
 .student-block-info {
@@ -153,7 +153,7 @@ app-search {
 }
 
 .no-data {
-    color: #6b1414;
+    color: #cc0d0d;
 }
 
 .divider {

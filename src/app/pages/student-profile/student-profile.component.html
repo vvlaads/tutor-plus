@@ -134,6 +134,11 @@
             </div>
         </div>
 
+        <div class="note" *ngIf="student.note">
+            <span class="info-label">Примечание:</span>
+            <span class="note-block">{{ student.note }}</span>
+        </div>
+
         <div class="cost-block">
             <h3 class="cost-title">Стоимость часа:</h3>
             <div class="cost-amount">{{ student.cost }} ₽</div>

@@ -102,7 +102,8 @@
 }
 
 .student-info,
-.parent-info {
+.parent-info,
+.note {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
@@ -179,6 +180,15 @@
     height: 32px;
     object-fit: contain;
     border-radius: 50%;
+}
+
+.note {
+    display: flex;
+    flex-direction: row;
+}
+
+.note-block {
+    width: auto;
 }
 
 .cost-block {

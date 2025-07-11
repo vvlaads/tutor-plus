@@ -72,7 +72,8 @@ export class StudentDialogComponent {
       parentCommunication: [data.student?.parentCommunication],
       paidByStudent: [data.student == null ? true : data.student.paidByStudent],
       isStopped: [data.student == null ? false : data.student.isStopped],
-      stopDate: [data.student?.stopDate == null ? null : changeDateFormatDotToMinus(data.student.stopDate)]
+      stopDate: [data.student?.stopDate == null ? null : changeDateFormatDotToMinus(data.student.stopDate)],
+      note: [data.student?.note]
     },
       {
         validators: [parentValidator(), stopDateValidator()]

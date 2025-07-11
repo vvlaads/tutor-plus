@@ -32,6 +32,7 @@ export interface Student {
     paidByStudent: boolean;
     isStopped: boolean;
     stopDate: string | null;
+    note: string | null;
 }
 
 export interface Slot {

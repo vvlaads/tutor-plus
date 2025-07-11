@@ -281,6 +281,10 @@ app-custom-select {
     max-width: 300px;
 }
 
+textarea {
+    font-family: 'Roboto', sans-serif;
+}
+
 .error-message {
     color: #e74646;
     font-size: 20px;

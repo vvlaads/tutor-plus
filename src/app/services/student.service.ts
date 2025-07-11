@@ -57,7 +57,8 @@ export class StudentService implements OnDestroy {
       parentCommunication: data.parentCommunication || null,
       paidByStudent: data.paidByStudent,
       isStopped: data.isStopped || false,
-      stopDate: data.stopDate || null
+      stopDate: data.stopDate || null,
+      note: data.note || null
     };
   }
 

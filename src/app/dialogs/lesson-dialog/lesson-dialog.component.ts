@@ -331,6 +331,9 @@ export class LessonDialogComponent implements OnInit {
       }
       if (cost > 0) {
         this.preferredCost = cost;
+        this.lessonForm.patchValue({
+          cost: cost
+        });
       }
     }
   }

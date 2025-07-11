@@ -128,6 +128,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
     this.students = this.isActiveFormat
       ? students.filter(s => s.isActive)
       : students.filter(s => !s.isActive);
+    this.students.sort((a, b) => a.name.localeCompare(b.name));
 
     this.applySearchFilter();
     this.students.forEach(async student => {

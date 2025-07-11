@@ -1,16 +1,20 @@
 <main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
     <div *ngIf="student" class="profile-container">
+        <div class="sticky-button">
+            <button class="back-button" (click)="goBack()"> <img
+                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png"
+                    class="button-icon">
+                <span class="button-content">Назад</span>
+            </button>
+        </div>
+
+
         <div class="profile-header">
             <h2 class="student-name">{{ student.name }}</h2>
             <div class="actions">
-                <button class="delete-button" (click)="deleteStudent(student.id)">
-                    <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
-                        class="delete-icon">
-                    <span class="button-content">Удалить</span>
-                </button>
                 <button class="edit-button" (click)="updateStudent()">
                     <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png"
-                        class="edit-icon">
+                        class="button-icon">
                     <span class="button-content">Изменить</span>
                 </button>
             </div>
@@ -143,7 +147,16 @@
             <h3 class="cost-title">Стоимость часа:</h3>
             <div class="cost-amount">{{ student.cost }} ₽</div>
         </div>
+
+        <div class="delete-button-container">
+            <button class="delete-button" (click)="deleteStudent(student.id)">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
+                    class="button-icon delete-icon">
+                <span class="button-content">Удалить</span>
+            </button>
+        </div>
     </div>
+
 
     <div class="lesson-button-container">
         <button class="lesson-button floating-button" (click)="addLesson()">

@@ -20,6 +20,14 @@
     max-width: none;
 }
 
+.sticky-button {
+    position: sticky;
+    top: 0;
+    background-color: transparent;
+    z-index: 1000;
+    width: 100%;
+}
+
 .profile-header {
     display: flex;
     justify-content: space-between;
@@ -65,7 +73,8 @@
     filter: brightness(0) saturate(100%) invert(16%) sepia(99%) saturate(2590%) hue-rotate(0deg) brightness(98%) contrast(97%) brightness(1.5);
 }
 
-.edit-button {
+.edit-button,
+.back-button {
     display: flex;
     align-items: center;
     gap: 12px;
@@ -84,7 +93,7 @@
     background: #3182ce;
 }
 
-.edit-button .edit-icon {
+.button-icon {
     width: 22px;
     height: 22px;
 }
@@ -261,6 +270,11 @@
     width: 24px;
     height: 24px;
     transition: transform 0.3s ease;
+}
+
+.delete-button-container {
+    display: flex;
+    margin-top: 10px;
 }
 
 .empty-state {

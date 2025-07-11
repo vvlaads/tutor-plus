@@ -98,11 +98,9 @@
                     </div>
                 </div>
 
-                <div class="info-item" *ngIf="student.isStopped">
-                    <span class="info-label">Приостановлен до:</span>
-                    <div class="info-value">
-                        <span class="info-value stopDate">{{ student.stopDate }}</span>
-                    </div>
+                <div class="info-item" *ngIf="student.note">
+                    <span class="info-label">Примечание:</span>
+                    <span class="note-block">{{ student.note }}</span>
                 </div>
             </div>
         </div>
@@ -138,9 +136,11 @@
             </div>
         </div>
 
-        <div class="note" *ngIf="student.note">
-            <span class="info-label">Примечание:</span>
-            <span class="note-block">{{ student.note }}</span>
+        <div class="stopped" *ngIf="student.isStopped">
+            <span class="info-label">Приостановлен до:</span>
+            <div class="info-value">
+                <span class="info-value stopDate">{{ student.stopDate }}</span>
+            </div>
         </div>
 
         <div class="cost-block">

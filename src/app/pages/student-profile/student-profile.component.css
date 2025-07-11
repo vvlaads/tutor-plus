@@ -112,7 +112,7 @@
 
 .student-info,
 .parent-info,
-.note {
+.stopped {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
@@ -191,9 +191,13 @@
     border-radius: 50%;
 }
 
-.note {
+.stopped {
     display: flex;
     flex-direction: row;
+}
+
+.stopped .info-label {
+    width: 200px;
 }
 
 .note-block {

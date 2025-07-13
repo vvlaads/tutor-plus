@@ -258,8 +258,6 @@
     background-color: transparent;
     pointer-events: none;
     z-index: 1;
-    border: 4px solid rgb(0, 0, 0, 0.2);
-    border-radius: 8px;
 }
 
 .lesson-content {
@@ -272,6 +270,8 @@
     padding-left: 10px;
     padding-right: 10px;
     text-overflow: ellipsis;
+    border: 2px solid rgb(0, 0, 0, 0.5);
+    border-radius: 8px;
 }
 
 .lesson:hover .lesson-content {
@@ -279,7 +279,6 @@
     overflow: visible;
     min-height: initial;
     height: 200px;
-    border-radius: 8px;
 }
 
 .lesson-time {

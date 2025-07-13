@@ -85,7 +85,8 @@
                     [style.top.px]="getSlotTop(slot)" [style.left.%]="getSlotLeft(slot)" (click)="editSlot(slot)">
 
                     <div class="slot-content">
-                        <span class="slot-time">{{slot.startTime}} - {{slot.endTime}}</span>
+                        <span class="slot-time">{{slot.startTime}} - {{slot.hasRealEndTime? slot.realEndTime :
+                            slot.endTime}}</span>
                     </div>
                 </div>
             </ng-container>

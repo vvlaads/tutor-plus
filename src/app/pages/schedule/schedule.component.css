@@ -243,6 +243,7 @@
     flex-direction: column;
     cursor: pointer;
     text-overflow: ellipsis;
+    border-radius: 8px;
 }
 
 .lesson:hover {
@@ -350,9 +351,10 @@
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    border: 10px solid #126850;
-    background-color: #a2e0ce;
+    border: 5px solid #279173;
+    background-color: #79f1cf;
     box-sizing: border-box;
+    border-radius: 8px;
 }
 
 .slot:hover {
@@ -376,7 +378,7 @@
     padding: 10px;
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
+    text-align: center;
 }
 
 .slot:hover .slot-content {
@@ -388,7 +390,7 @@
 
 .slot-time {
     font-weight: 600;
-    color: #ff0000;
+    color: #b62d2d;
     font-size: 14px;
 }
 

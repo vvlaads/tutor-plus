@@ -30,6 +30,13 @@
                     class="button-icon">
                 <span class="button-text">Расписание</span>
             </button>
+
+            <button class="nav-button" (click)="navigate.emit('wait-list')"
+                [class.isActive]="targetIsSelected('wait-list')">
+                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Clocks.png"
+                    class="button-icon">
+                <span class="button-text">Лист ожидания</span>
+            </button>
         </div>
         <hr>
     </div>

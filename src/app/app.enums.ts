@@ -6,7 +6,8 @@ export enum DialogMode {
 export enum Section {
     Home = 'HOME',
     Students = 'STUDENTS',
-    Schedule = "SCHEDULE"
+    Schedule = "SCHEDULE",
+    WaitList = 'WAIT_LIST'
 }
 
 export enum ScheduleObject {

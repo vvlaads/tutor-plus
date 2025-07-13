@@ -1,9 +1,10 @@
-import { inject, Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, updateDoc, deleteDoc, onSnapshot, getDocs } from '@angular/fire/firestore';
 import { BehaviorSubject } from 'rxjs';
 import { Student } from '../app.interfaces';
 import { LessonService } from './lesson.service';
 import { convertStringToDate } from '../functions/dates';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class StudentService implements OnDestroy {
@@ -21,7 +22,7 @@ export class StudentService implements OnDestroy {
   }
 
   private startListening(): void {
-    const studentsRef = collection(this.firestore, 'students');
+    const studentsRef = collection(this.firestore, environment.studentsBase);
 
     this.unsubscribe = onSnapshot(studentsRef, {
       next: (snapshot) => {
@@ -63,34 +64,34 @@ export class StudentService implements OnDestroy {
   }
 
   public loadStudents(): void {
-    getDocs(collection(this.firestore, 'students')).then(() => {
+    getDocs(collection(this.firestore, environment.studentsBase)).then(() => {
       console.log('Загрузка данных учеников');
     });
   }
 
   public async getStudents(): Promise<Student[]> {
-    const snapshot = await getDocs(collection(this.firestore, 'students'));
+    const snapshot = await getDocs(collection(this.firestore, environment.studentsBase));
     return snapshot.docs.map(this.createStudent);
   }
 
   public async getStudentById(id: string): Promise<Student | null> {
-    const docSnap = await getDoc(doc(this.firestore, 'students', id));
+    const docSnap = await getDoc(doc(this.firestore, environment.studentsBase, id));
     return docSnap.exists() ? this.createStudent(docSnap) : null;
   }
 
   public async addStudent(student: Omit<Student, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(this.firestore, 'students'), student);
+    const docRef = await addDoc(collection(this.firestore, environment.studentsBase), student);
     this.checkNextLessons(docRef.id);
     return docRef.id;
   }
 
   public async updateStudent(id: string, changes: Partial<Student>): Promise<void> {
-    await updateDoc(doc(this.firestore, 'students', id), changes);
+    await updateDoc(doc(this.firestore, environment.studentsBase, id), changes);
     this.checkNextLessons(id);
   }
 
   public async deleteStudent(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, 'students', id));
+    await deleteDoc(doc(this.firestore, environment.studentsBase, id));
     this.lessonService.deleteLessonsByStudentId(id);
   }
 

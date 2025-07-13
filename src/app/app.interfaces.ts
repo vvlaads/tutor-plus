@@ -53,6 +53,13 @@ export interface TimeBlock {
     endTime: string;
 }
 
+export interface WaitingBlock {
+    id: string;
+    studentId: string;
+    date: string;
+    note: string;
+}
+
 export interface SelectOptionWithIcon {
     value: string;
     text: string;

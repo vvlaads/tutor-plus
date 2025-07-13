@@ -1,0 +1,48 @@
+<div class="form-container">
+    <span class="form-title">{{title}}</span>
+    <div class="form-content">
+        <form [formGroup]="waitingBlockForm" class="waiting-block-form" (ngSubmit)="submit()">
+            <div class="input-column">
+                <div class="form-group">
+                    <div class="form-row">
+                        <label for="input-date" class="form-label">Дата:</label>
+                        <input formControlName="date" id="input-date" class="form-input" type="date">
+                    </div>
+                    <div *ngIf="formSubmitted && waitingBlockForm.get('date')?.errors" class="error-message">
+                        {{ getErrorMessage('date') }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row">
+                        <label class="form-label">Ученик:</label>
+                        <app-search-select formControlName="studentId" [options]="options"
+                            placeholder="Выберите ученика"></app-search-select>
+                    </div>
+                    <div *ngIf="formSubmitted && waitingBlockForm.get('studentId')?.errors" class="error-message">
+                        {{getErrorMessage('studentId')}}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-row">
+                        <label for="input-note" class="form-label">Примечание:</label>
+                        <textarea formControlName="note" id="input-note" class="form-textarea" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="button submit-button">
+                    {{submitMessage}}
+                </button>
+                <button type="button" (click)="close()" class="button cancel-button">
+                    Отмена
+                </button>
+                <button type="button" (click)="delete()" class="button delete-button" *ngIf="isEditMode()">
+                    Удалить
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

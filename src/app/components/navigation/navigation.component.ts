@@ -55,6 +55,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
       this.selectedSection = Section.Students;
     } else if (url.startsWith('/schedule') || url.includes('/schedule/')) {
       this.selectedSection = Section.Schedule;
+    } else if (url.startsWith('/wait-list') || url.includes('/wait-list/')) {
+      this.selectedSection = Section.WaitList;
     } else {
       this.selectedSection = Section.Home;
     }
@@ -70,6 +72,9 @@ export class NavigationComponent implements OnInit, OnDestroy {
         break;
       case 'schedule':
         this.selectedSection = Section.Schedule;
+        break;
+      case 'wait-list':
+        this.selectedSection = Section.WaitList;
         break;
     }
     this.router.navigate([target]);
@@ -87,6 +92,8 @@ export class NavigationComponent implements OnInit, OnDestroy {
         return this.selectedSection === Section.Students;
       case 'schedule':
         return this.selectedSection === Section.Schedule;
+      case 'wait-list':
+        return this.selectedSection === Section.WaitList;
     }
     return false;
   }

@@ -3,6 +3,7 @@ import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, onSnaps
 import { BehaviorSubject } from 'rxjs';
 import { Slot } from '../app.interfaces';
 import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -23,7 +24,7 @@ export class SlotService implements OnDestroy {
   }
 
   private startListening(): void {
-    const slotsRef = collection(this.firestore, 'slots');
+    const slotsRef = collection(this.firestore, environment.slotsBase);
 
     this.unsubscribe = onSnapshot(slotsRef, {
       next: (snapshot) => {
@@ -56,33 +57,33 @@ export class SlotService implements OnDestroy {
   }
 
   public loadSlots(): void {
-    getDocs(collection(this.firestore, 'slots')).then(() => {
+    getDocs(collection(this.firestore, environment.slotsBase)).then(() => {
       console.log('Загрузка данных окон в расписании');
     });
     this.cleanupOldSlots();
   }
 
   public async getSlots(): Promise<Slot[]> {
-    const snapshot = await getDocs(collection(this.firestore, 'slots'));
+    const snapshot = await getDocs(collection(this.firestore, environment.slotsBase));
     return snapshot.docs.map(this.createSlot);
   }
 
   public async getSlotById(id: string): Promise<Slot | null> {
-    const docSnap = await getDoc(doc(this.firestore, 'slots', id));
+    const docSnap = await getDoc(doc(this.firestore, environment.slotsBase, id));
     return docSnap.exists() ? this.createSlot(docSnap) : null;
   }
 
   public async addSlot(slot: Omit<Slot, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(this.firestore, 'slots'), slot);
+    const docRef = await addDoc(collection(this.firestore, environment.slotsBase), slot);
     return docRef.id;
   }
 
   public async updateSlot(id: string, changes: Partial<Slot>): Promise<void> {
-    await updateDoc(doc(this.firestore, 'slots', id), changes);
+    await updateDoc(doc(this.firestore, environment.slotsBase, id), changes);
   }
 
   public async deleteSlot(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, 'slots', id));
+    await deleteDoc(doc(this.firestore, environment.slotsBase, id));
   }
 
   public async getSlotsByBaseId(baseId: string): Promise<Slot[]> {

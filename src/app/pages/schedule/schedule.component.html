@@ -32,6 +32,7 @@
                 <span id="week-info" *ngIf="showWeekMessage()">Текущая неделя</span>
                 <label>Скрыть окна:</label>
                 <input type="checkbox" [(ngModel)]="slotsIsHidden">
+                <button class="copy-button" (click)="copySlots()">Копировать окна</button>
             </div>
 
             <div class="calendar-header" *ngIf="!isOneDayFormat">

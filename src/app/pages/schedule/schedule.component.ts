@@ -511,4 +511,22 @@ export class ScheduleComponent implements OnInit {
     }
     return null;
   }
+
+  public copySlots(): void {
+    let result = ``;
+    for (let i = 0; i < this.currentWeekDates.length; i++) {
+      for (let slot of this.currentWeekSlots) {
+        if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i])) {
+          result += `${this.weekDayNames[i]}, ${this.currentWeekDates[i].getDate()} ${this.monthNames[this.currentWeekDates[i].getMonth()]}:\n\n`
+          break;
+        }
+      }
+
+      for (let slot of this.currentWeekSlots) {
+        if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i]))
+          result += `с ${slot.startTime} до ${slot.endTime} мск\n`
+      }
+    }
+    navigator.clipboard.writeText(result);
+  }
 }

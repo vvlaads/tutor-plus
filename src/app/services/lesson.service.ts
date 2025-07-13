@@ -3,6 +3,7 @@ import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, update
 import { BehaviorSubject } from 'rxjs';
 import { Lesson } from '../app.interfaces';
 import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +27,7 @@ export class LessonService implements OnDestroy {
   }
 
   private startListening(): void {
-    const lessonsRef = collection(this.firestore, 'lessons');
+    const lessonsRef = collection(this.firestore, environment.lessonsBase);
 
     this.unsubscribe = onSnapshot(lessonsRef, {
       next: (snapshot) => {
@@ -124,32 +125,32 @@ export class LessonService implements OnDestroy {
   }
 
   public loadLessons(): void {
-    getDocs(collection(this.firestore, 'lessons')).then(() => {
+    getDocs(collection(this.firestore, environment.lessonsBase)).then(() => {
       console.log('Загрузка данных занятий');
     });
   }
 
   public async getLessons(): Promise<Lesson[]> {
-    const snapshot = await getDocs(collection(this.firestore, 'lessons'));
+    const snapshot = await getDocs(collection(this.firestore, environment.lessonsBase));
     return snapshot.docs.map(this.createLesson);
   }
 
   public async getLessonById(id: string): Promise<Lesson | null> {
-    const docSnap = await getDoc(doc(this.firestore, 'lessons', id));
+    const docSnap = await getDoc(doc(this.firestore, environment.lessonsBase, id));
     return docSnap.exists() ? this.createLesson(docSnap) : null;
   }
 
   public async addLesson(lesson: Omit<Lesson, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(this.firestore, 'lessons'), lesson);
+    const docRef = await addDoc(collection(this.firestore, environment.lessonsBase), lesson);
     return docRef.id;
   }
 
   public async updateLesson(id: string, changes: Partial<Lesson>): Promise<void> {
-    await updateDoc(doc(this.firestore, 'lessons', id), changes);
+    await updateDoc(doc(this.firestore, environment.lessonsBase, id), changes);
   }
 
   public async deleteLesson(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, 'lessons', id));
+    await deleteDoc(doc(this.firestore, environment.lessonsBase, id));
   }
 
   public async deleteLessonsByStudentId(studentId: string): Promise<void> {

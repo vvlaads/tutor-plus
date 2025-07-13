@@ -75,7 +75,8 @@
                     <span class="lesson-paid-badge" [class.paid]="lesson.isPaid">
                         {{lesson.isPaid ? '✓' : '₽'}}
                     </span>
-                    <span class="lesson-from-badge"><img class="from-icon" [src]="getFromIcon(lesson)"></span>
+                    <span class="lesson-from-badge" *ngIf="fromIsOwl(lesson)"><img class="from-icon"
+                            [src]="getFromIcon(lesson)"></span>
                     <span class="student-name">{{getStudentByLesson(lesson)?.name}}</span>
                 </div>
             </div>

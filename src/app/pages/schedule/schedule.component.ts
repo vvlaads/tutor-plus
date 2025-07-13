@@ -514,6 +514,15 @@ export class ScheduleComponent implements OnInit {
     return null;
   }
 
+  public fromIsOwl(lesson: Lesson): boolean {
+    const options = FROM_OPTIONS;
+    const student = this.getStudentByLesson(lesson);
+    if (student) {
+      return student.from === 'Сова';
+    }
+    return false;
+  }
+
   private sortSlotsByStartTime(slots: Slot[]): Slot[] {
     return slots.sort((a, b) => convertTimeToMinutes(a.startTime) - convertTimeToMinutes(b.startTime))
   }

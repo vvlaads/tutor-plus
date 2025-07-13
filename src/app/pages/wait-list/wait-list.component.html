@@ -1,20 +1,21 @@
 <main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
-    <table class="wait-list-table" *ngIf="waitingBlocks.length > 0">
+    <table class="wait-list-table">
         <tr>
             <th *ngFor="let dayName of weekDayNames; let i = index">{{dayName}} {{getFormatDate(currentWeekDates[i])}}
             </th>
         </tr>
-        <tr *ngFor="let k of getMaxLengthIndexes()">
+        <!-- <tr *ngFor="let k of getMaxLengthIndexes()">
             <td *ngFor="let dayName of weekDayNames; let i = index">{{getNextByDayIndex(i)?.date}}</td>
-        </tr>
+        </tr> -->
     </table>
 
-    <div class=" button-container" [class.desktop]="(deviceType$ | async) === 'desktop'"
+    <!-- <div class=" button-container" [class.desktop]="(deviceType$ | async) === 'desktop'"
         [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
         <button (click)="addWaitingBlock()" class="add-waiting-block-button">
             <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
                 class="add-icon">
             <span class="button-text">Добавить</span>
         </button>
-    </div>
+    </div> -->
+    <h1>Скоро</h1>
 </main>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutService } from '../../services/layout.service';
 import { DialogMode, ScheduleObject } from '../../app.enums';
@@ -11,11 +11,12 @@ import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
 import { convertDateToString, convertMinutesToTime, convertStringToDate, convertTimeToMinutes, isDatesEquals } from '../../functions/dates';
 import { FormsModule } from '@angular/forms';
+import { NotificationComponent } from "../../components/notification/notification.component";
 
 @Component({
   standalone: true,
   selector: 'app-schedule',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NotificationComponent],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.css'
 })
@@ -24,6 +25,7 @@ export class ScheduleComponent implements OnInit {
   private lessons: Lesson[] = [];
   private slots: Slot[] = []
   private students: Student[] = [];
+  @ViewChild('notification') notification!: NotificationComponent;
 
   public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
   public blockHeightPixels: number = BLOCK_HEIGHT_PIXELS;
@@ -33,7 +35,7 @@ export class ScheduleComponent implements OnInit {
   public monthNames: string[] = MONTH_NAMES;
   public weekDayNames: string[] = WEEKDAY_NAMES;
   public currentDate: Date = new Date();
-  public today: Date = new Date();
+  public readonly today: Date = new Date();
   public isOneDayFormat: boolean = false;
   public currentWeekDates: Date[] = [];
   public slotsIsHidden = false;
@@ -512,21 +514,43 @@ export class ScheduleComponent implements OnInit {
     return null;
   }
 
+  private sortSlotsByStartTime(slots: Slot[]): Slot[] {
+    return slots.sort((a, b) => convertTimeToMinutes(a.startTime) - convertTimeToMinutes(b.startTime))
+  }
+
   public copySlots(): void {
     let result = ``;
+
+    const monday = new Date(this.currentWeekDates[0]);
+    const sunday = new Date(this.currentWeekDates[6]);
+    let nextWeekToday = new Date(this.today);
+    nextWeekToday.setDate(this.today.getDate() + 7);
+
+    if (monday.getTime() <= this.today.getTime() && this.today.getTime() <= sunday.getTime()) {
+      result += 'На этой неделе есть время:\n';
+    } else if (monday.getTime() <= nextWeekToday.getTime() && nextWeekToday.getTime() <= sunday.getTime()) {
+      result += 'На следующей неделе есть время:\n';
+    } else {
+      result += `На неделе с ${convertDateToString(monday)} по ${convertDateToString(sunday)} есть время:\n`;
+    }
+
+
+    const slots = this.sortSlotsByStartTime(this.currentWeekSlots);
     for (let i = 0; i < this.currentWeekDates.length; i++) {
       for (let slot of this.currentWeekSlots) {
         if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i])) {
-          result += `${this.weekDayNames[i]}, ${this.currentWeekDates[i].getDate()} ${this.monthNames[this.currentWeekDates[i].getMonth()]}:\n\n`
+          result += `\n${this.weekDayNames[i]}, ${this.currentWeekDates[i].getDate()} ${this.monthNames[this.currentWeekDates[i].getMonth()]},\n`
           break;
         }
       }
-
-      for (let slot of this.currentWeekSlots) {
+      for (let slot of slots) {
         if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i]))
-          result += `с ${slot.startTime} до ${slot.endTime} мск\n`
+          result += `С ${slot.startTime} до ${slot.endTime} мск\n`
       }
     }
-    navigator.clipboard.writeText(result);
+    navigator.clipboard.writeText(result).then(() => {
+      this.notification.show('Скопировано!', 2000);
+
+    });
   }
 }

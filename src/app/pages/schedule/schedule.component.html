@@ -30,8 +30,10 @@
             <div *ngIf="!isOneDayFormat" class="info">
                 <span id="year-info" *ngIf="!isOneDayFormat">{{currentDate.getFullYear()}} </span>
                 <span id="week-info" *ngIf="showWeekMessage()">Текущая неделя</span>
-                <label>Скрыть окна:</label>
-                <input type="checkbox" [(ngModel)]="slotsIsHidden">
+                <div class="hide-block">
+                    <label>Скрыть окна:</label>
+                    <input type="checkbox" [(ngModel)]="slotsIsHidden">
+                </div>
                 <button class="copy-button" (click)="copySlots()">Копировать окна</button>
             </div>
 
@@ -144,4 +146,6 @@
             <span>Добавить</span>
         </button>
     </div>
+
+    <app-notification #notification></app-notification>
 </main>

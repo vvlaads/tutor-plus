@@ -102,6 +102,7 @@
     font-size: 20px;
     display: flex;
     flex-direction: row;
+    justify-content: space-between;
     width: 100%;
     vertical-align: middle;
     margin-top: 5px;
@@ -112,7 +113,9 @@
     font-weight: 600;
 }
 
-.print-button {
+.print-button,
+.export-button,
+.copy-button {
     background: #4299e1;
     color: white;
     border: none;
@@ -126,24 +129,9 @@
     font-size: 16px;
 }
 
-.print-button:hover {
-    background: #3182ce;
-}
-
-.export-button {
-    background: #4299e1;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-    font-size: 16px;
-}
-
-.export-button:hover {
+.print-button:hover,
+.export-button:hover,
+.copy-button:hover {
     background: #3182ce;
 }
 

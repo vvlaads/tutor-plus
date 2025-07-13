@@ -544,8 +544,13 @@ export class ScheduleComponent implements OnInit {
         }
       }
       for (let slot of slots) {
-        if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i]))
-          result += `С ${slot.startTime} до ${slot.endTime} мск\n`
+        if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i])) {
+          if (slot.hasRealEndTime) {
+            result += `С ${slot.startTime} до ${slot.realEndTime} мск\n`
+          } else {
+            result += `С ${slot.startTime} до ${slot.endTime} мск\n`
+          }
+        }
       }
     }
     navigator.clipboard.writeText(result).then(() => {

@@ -5,7 +5,7 @@ import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student } from '../../app.interfaces';
 import { StudentService } from '../../services/student.service';
-import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
+import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
@@ -539,7 +539,7 @@ export class ScheduleComponent implements OnInit {
     for (let i = 0; i < this.currentWeekDates.length; i++) {
       for (let slot of this.currentWeekSlots) {
         if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i])) {
-          result += `\n${this.weekDayNames[i]}, ${this.currentWeekDates[i].getDate()} ${this.monthNames[this.currentWeekDates[i].getMonth()]},\n`
+          result += `\n${WEEKDAY_FULL_NAMES[i]}, ${this.currentWeekDates[i].getDate()} ${LOWER_MONTH_NAMES[this.currentWeekDates[i].getMonth()]},\n`
           break;
         }
       }
@@ -550,7 +550,6 @@ export class ScheduleComponent implements OnInit {
     }
     navigator.clipboard.writeText(result).then(() => {
       this.notification.show('Скопировано!', 2000);
-
     });
   }
 }

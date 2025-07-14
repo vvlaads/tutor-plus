@@ -83,6 +83,7 @@ export class StudentProfileComponent implements OnInit, OnDestroy {
 
   public goBack(): void {
     if (this.stateService.saved) {
+      this.stateService.saved = false;
       this.router.navigate(['/schedule'])
       this.dialogService.openLessonDialog(this.stateService.mode, this.stateService.lesson, this.stateService.checkCollisions);
     } else {

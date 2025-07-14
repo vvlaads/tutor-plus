@@ -81,6 +81,7 @@
                             <app-search-select formControlName="studentId" [options]="options"
                                 placeholder="Выберите ученика" (selected)="updateCosts()"></app-search-select>
                         </div>
+                        <button (click)="goToStudent()">Перейти</button>
                         <div *ngIf="formSubmitted && lessonForm.get('studentId')?.errors" class="error-message">
                             {{getErrorMessage('studentId')}}
                         </div>

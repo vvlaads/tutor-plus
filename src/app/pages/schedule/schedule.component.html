@@ -50,9 +50,9 @@
 
 
 
-        <div class="calendar-body" *ngIf="!isOneDayFormat">
+        <div #scrollContainer class="calendar-body" *ngIf="!isOneDayFormat">
             <div *ngFor="let time of times" class="calendar-row" [style.height.px]="blockHeightPixels">
-                <div class="time-value">
+                <div class="time-value" [attr.data-hour]="time">
                     {{time}}
                     <div class="time-block" [style.height.px]="blockHeightPixels"></div>
                 </div>

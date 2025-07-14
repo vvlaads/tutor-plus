@@ -229,7 +229,6 @@ export class SlotDialogComponent {
     for (let l of lessons) {
       const start = convertTimeToMinutes(l.startTime);
       const end = convertTimeToMinutes(l.endTime);
-      if (id && id === l.id) { continue; }
       if (l.date === slot.date && ((startSlot >= start && startSlot < end) || (endSlot > start && endSlot <= end))) {
         return { date: l.date, startTime: l.startTime, endTime: l.endTime };
       }
@@ -239,6 +238,7 @@ export class SlotDialogComponent {
     for (let s of slots) {
       const start = convertTimeToMinutes(s.startTime);
       const end = convertTimeToMinutes(s.endTime);
+      if (id && id === s.id) { continue; }
       if (s.date === slot.date && ((startSlot >= start && startSlot < end) || (endSlot > start && endSlot <= end))) {
         return { date: s.date, startTime: s.startTime, endTime: s.endTime };
       }

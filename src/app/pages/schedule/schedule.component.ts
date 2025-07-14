@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutService } from '../../services/layout.service';
 import { DialogMode, ScheduleObject } from '../../app.enums';
@@ -20,12 +20,13 @@ import { NotificationComponent } from "../../components/notification/notificatio
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.css'
 })
-export class ScheduleComponent implements OnInit {
+export class ScheduleComponent implements OnInit, AfterViewInit {
   private dialogService = inject(DialogService);
   private lessons: Lesson[] = [];
   private slots: Slot[] = []
   private students: Student[] = [];
   @ViewChild('notification') notification!: NotificationComponent;
+  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
   public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
   public blockHeightPixels: number = BLOCK_HEIGHT_PIXELS;
@@ -565,5 +566,18 @@ export class ScheduleComponent implements OnInit {
     navigator.clipboard.writeText(result).then(() => {
       this.notification.show('Скопировано!', 2000);
     });
+  }
+
+  public ngAfterViewInit(): void {
+    this.scrollToHour('12:00');
+  }
+
+  public scrollToHour(time: string): void {
+    const container = this.scrollContainer.nativeElement;
+    const hourElement = container.querySelector(`[data-hour="${time}"]`);
+
+    if (hourElement) {
+      hourElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 }

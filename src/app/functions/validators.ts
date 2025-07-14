@@ -1,6 +1,7 @@
 import { AbstractControl, ValidationErrors, ValidatorFn } from "@angular/forms";
 import { COMMUNICATION_OPTIONS, HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, PAID_OPTIONS } from "../app.constants";
 import { changeDateFormatMinusToDot, convertStringToDate, convertTimeToMinutes } from "./dates";
+import { clearPhoneNumber } from "../app.functions";
 
 export function timeRangeValidator(): ValidatorFn {
     return (control: AbstractControl): ValidationErrors | null => {
@@ -158,6 +159,18 @@ export function stopDateValidator(): ValidatorFn {
             if (!date) {
                 return { invalidStopDate: true };
             }
+        }
+        return null;
+    }
+}
+
+export function phoneNumberValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const value = control.value;
+        if (value) {
+            const cleanedPhone = clearPhoneNumber(value);
+            const pattern = (/^\+7\d{10}$/);
+            return pattern.test(cleanedPhone) ? null : { invalidPhoneNumber: true };
         }
         return null;
     }

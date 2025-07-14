@@ -6,8 +6,8 @@ import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PAID_OPTIONS, PLATFORM_OPTIONS, STATUS_OPTIONS } from '../../app.constants';
-import { generateColor } from '../../app.functions';
-import { allowedValuesValidator, parentValidator, stopDateValidator } from '../../functions/validators';
+import { clearPhoneNumber, generateColor, getErrorMessage } from '../../app.functions';
+import { allowedValuesValidator, parentValidator, phoneNumberValidator, stopDateValidator } from '../../functions/validators';
 import { CustomSelectComponent } from '../../components/custom-select/custom-select.component';
 import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../functions/dates';
 
@@ -58,7 +58,7 @@ export class StudentDialogComponent {
 
     this.studentForm = this.fb.group({
       name: [data.student?.name, [Validators.required]],
-      phone: [data.student?.phone, [Validators.required, Validators.pattern(/^\+79\d{9}$/)]],
+      phone: [data.student?.phone, [Validators.required, phoneNumberValidator()]],
       subject: [data.student?.subject, Validators.required],
       communication: [data.student?.communication, [Validators.required, allowedValuesValidator(this.communicationOptions, 'value')]],
       platform: [data.student?.platform, [Validators.required, allowedValuesValidator(this.platformOptions, 'value')]],
@@ -68,7 +68,7 @@ export class StudentDialogComponent {
       color: [data.student == null ? generateColor() : data.student.color, [Validators.required]],
       hasParent: [data.student == null ? false : data.student.hasParent],
       parentName: [data.student?.parentName],
-      parentPhone: [data.student?.parentPhone, [Validators.pattern(/^\+79\d{9}$/)]],
+      parentPhone: [data.student?.parentPhone, [phoneNumberValidator()]],
       parentCommunication: [data.student?.parentCommunication],
       paidByStudent: [data.student == null ? true : data.student.paidByStudent],
       isStopped: [data.student == null ? false : data.student.isStopped],
@@ -84,7 +84,9 @@ export class StudentDialogComponent {
     const studentValue = this.studentForm.value;
     const student = {
       ...studentValue,
-      stopDate: studentValue.stopDate ? changeDateFormatMinusToDot(studentValue.stopDate) : null
+      stopDate: studentValue.stopDate ? changeDateFormatMinusToDot(studentValue.stopDate) : null,
+      phone: clearPhoneNumber(studentValue.phone),
+      parentPhone: studentValue.hasParent ? clearPhoneNumber(studentValue.phone) : null
     }
     return student;
   }
@@ -150,15 +152,7 @@ export class StudentDialogComponent {
   }
 
   public getError(field: string): string | null {
-    const control = this.studentForm.get(field);
-    if (!control || !control.errors) return null;
-
-    if (control.errors['required']) return '*Поле обязательно';
-    if (control.errors['pattern']) return '*Неверный формат';
-    if (control.errors['min']) return '*Слишком маленькое значение';
-    if (control.errors['allowedValues']) return '*Недопустимое значение';
-
-    return null;
+    return getErrorMessage(this.studentForm, field);
   }
 
   public getFormErrorMessage(): string | null {

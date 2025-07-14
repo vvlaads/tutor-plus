@@ -6,7 +6,7 @@ import { LayoutService } from '../../services/layout.service';
 import { DialogMode } from '../../app.enums';
 import { SelectOptionWithIcon, Student } from '../../app.interfaces';
 import { LessonSliderComponent } from '../../components/lesson-slider/lesson-slider.component';
-import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, PLATFORM_OPTIONS } from '../../app.constants';
+import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS } from '../../app.constants';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
@@ -19,9 +19,8 @@ import { DialogService } from '../../services/dialog.service';
 })
 export class StudentProfileComponent implements OnInit {
   private dialogService = inject(DialogService);
-
   public student: Student | null = null;
-  public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
+  public pageMarginLeftPercentage: number = 0;
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
   public communicationOptions: SelectOptionWithIcon[] = COMMUNICATION_OPTIONS;
   public fromOptions: SelectOptionWithIcon[] = FROM_OPTIONS;

@@ -19,6 +19,7 @@ import {
 } from '../../functions/dates';
 import { SlotService } from '../../services/slot.service';
 import { SearchSelectComponent } from "../../components/search-select/search-select.component";
+import { Router } from '@angular/router';
 
 
 @Component({
@@ -48,6 +49,7 @@ export class LessonDialogComponent implements OnInit {
     private studentService: StudentService,
     private slotService: SlotService,
     private dialogService: DialogService,
+    private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Partial<Lesson> | null, checkCollisions: boolean }
   ) {
     this.mode = data.mode;
@@ -361,5 +363,12 @@ export class LessonDialogComponent implements OnInit {
       return 'Укажите настоящее время окончания';
     }
     return null;
+  }
+
+  public goToStudent(): void {
+    const id = this.lessonForm.value.studentId;
+    if (id) {
+      this.router.navigate(['/student', id]);
+    }
   }
 }

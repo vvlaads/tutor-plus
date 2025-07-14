@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, Output, EventEmitter } from '@angular/core';
+import { Component, forwardRef, Input, Output, EventEmitter, ElementRef, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SelectOption } from '../../app.interfaces';
@@ -30,6 +30,7 @@ export class SearchSelectComponent implements ControlValueAccessor {
   public searchQuery: string = '';
   public isOpen: boolean = false;
   public filteredOptions: SelectOption[] = [];
+  private elementRef: ElementRef = inject(ElementRef);
 
   private onChange = (value: string | null) => { };
   private onTouched = () => { };
@@ -81,14 +82,17 @@ export class SearchSelectComponent implements ControlValueAccessor {
 
   public onBlur(): void {
     setTimeout(() => {
-      this.isOpen = false;
-      if (
-        this.selectedOption &&
-        !this.options.some((opt) => opt.text === this.searchQuery)
-      ) {
-        this.searchQuery = '';
-        this.onChange(null);
+      const activeElement = document.activeElement;
+      if (!this.elementRef.nativeElement.contains(activeElement)) {
+        this.isOpen = false;
+        if (
+          this.selectedOption &&
+          !this.options.some((opt) => opt.text === this.searchQuery)
+        ) {
+          this.searchQuery = '';
+          this.onChange(null);
+        }
       }
-    }, 200);
+    }, 500);
   }
 }

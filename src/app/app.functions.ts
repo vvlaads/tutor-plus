@@ -9,6 +9,7 @@ export function getErrorMessage(formGroup: FormGroup, field: string): string | n
     if (control.errors['pattern']) return '*Неверный формат';
     if (control.errors['min']) return '*Слишком маленькое значение';
     if (control.errors['allowedValues']) return '*Недопустимое значение';
+    if (control.errors['invalidPhoneNumber']) return '*Неверный номер телефона';
     return null;
 }
 
@@ -31,4 +32,9 @@ export function formatPhoneNumber(phone: string): string {
         throw new Error(`Неверный формат номера. Ожидается: +7XXXXXXXXXX (${PHONE_NUMBER_LENGTH} цифр)`);
     }
     return `+7 (${digitsOnly.substring(1, 4)}) ${digitsOnly.substring(4, 7)}-${digitsOnly.substring(7, 9)}-${digitsOnly.substring(9)}`;
+}
+
+export function clearPhoneNumber(phone: string) {
+    const cleanedPhone = phone.replace(/[^\d+]/g, '');
+    return cleanedPhone;
 }

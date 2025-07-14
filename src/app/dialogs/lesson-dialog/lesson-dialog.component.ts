@@ -20,6 +20,7 @@ import {
 import { SlotService } from '../../services/slot.service';
 import { SearchSelectComponent } from "../../components/search-select/search-select.component";
 import { Router } from '@angular/router';
+import { StateService } from '../../services/state.service';
 
 
 @Component({
@@ -30,8 +31,7 @@ import { Router } from '@angular/router';
 })
 export class LessonDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<LessonDialogComponent>);
-  private mode: DialogMode;
-  private checkCollisions = false;
+  private stateService = inject(StateService);
   private students: Student[] = []
   private touchedLessons: Lesson[] = [];
 
@@ -52,9 +52,7 @@ export class LessonDialogComponent implements OnInit {
     private router: Router,
     @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Partial<Lesson> | null, checkCollisions: boolean }
   ) {
-    this.mode = data.mode;
-    this.checkCollisions = data.checkCollisions;
-    switch (this.mode) {
+    switch (this.data.mode) {
       case DialogMode.Add:
         this.title = 'Новое занятие'
         this.submitMessage = 'Добавить'
@@ -108,7 +106,7 @@ export class LessonDialogComponent implements OnInit {
     const lessonValue = this.lessonForm.value;
     const lesson = {
       ...lessonValue,
-      date: changeDateFormatMinusToDot(lessonValue.date),
+      date: lessonValue.date ? changeDateFormatMinusToDot(lessonValue.date) : null,
       repeatEndDate: lessonValue.repeatEndDate ? changeDateFormatMinusToDot(lessonValue.repeatEndDate) : null
     }
     return lesson;
@@ -124,7 +122,7 @@ export class LessonDialogComponent implements OnInit {
       return;
     }
 
-    switch (this.mode) {
+    switch (this.data.mode) {
       case DialogMode.Add:
         this.add();
         break;
@@ -280,13 +278,13 @@ export class LessonDialogComponent implements OnInit {
       }
     }
 
-    if (this.checkCollisions) {
+    if (this.data.checkCollisions) {
       const slots = await this.slotService.getSlots();
       for (let s of slots) {
         const start = convertTimeToMinutes(s.startTime);
         const end = convertTimeToMinutes(s.endTime);
         if (s.date === lesson.date && ((startLesson >= start && startLesson < end) || (endLesson > start && endLesson <= end))) {
-          return { date: s.date, startTime: s.startTime, endTime: s.endTime };
+          this.slotService.deleteSlot(s.id);
         }
       }
     }
@@ -295,7 +293,7 @@ export class LessonDialogComponent implements OnInit {
   }
 
   public isEditMode(): boolean {
-    return this.mode == DialogMode.Edit;
+    return this.data.mode == DialogMode.Edit;
   }
 
   public async getCostByStudentId(): Promise<void> {
@@ -368,6 +366,8 @@ export class LessonDialogComponent implements OnInit {
   public goToStudent(): void {
     const id = this.lessonForm.value.studentId;
     if (id) {
+      this.stateService.saveLessonForm(this.data.mode, { ...this.convertFormToLesson(), id: this.data.lesson?.id }, this.data.checkCollisions);
+      this.close(null);
       this.router.navigate(['/student', id]);
     }
   }

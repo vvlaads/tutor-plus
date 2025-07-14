@@ -4,9 +4,11 @@ export const PAGE_MARGIN_LEFT_PERCENTAGE = 25;
 export const PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN = 7;
 
 export const MINUTES_IN_HOUR = 60;
+export const SECONDS_IN_MINUTE = 60;
 export const HOURS_IN_DAY = 24;
 export const DAYS_IN_WEEK = 7;
 export const MAX_LESSON_DURATION = 5;
+export const MILLISECONDS_IN_SECOND = 1000;
 
 export const PHONE_NUMBER_LENGTH = 11;
 export const VISIBLE_LESSONS_COUNT = 3;

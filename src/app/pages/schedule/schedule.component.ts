@@ -5,7 +5,7 @@ import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student } from '../../app.interfaces';
 import { StudentService } from '../../services/student.service';
-import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES } from '../../app.constants';
+import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MILLISECONDS_IN_SECOND, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, SECONDS_IN_MINUTE, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES } from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
@@ -327,29 +327,43 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
 
   public isCellDisabled(time: string, dayName: string): boolean {
     const originalDate = this.getDateByDayName(dayName);
-    if (!originalDate) {
-      return false;
-    }
-    const cellStartDate = new Date(originalDate);
-    cellStartDate.setHours(0, 0, 0, 0);
+    if (!originalDate) return false;
 
-    const cellStart = new Date(cellStartDate);
-    cellStart.setMinutes(convertTimeToMinutes(time));
-    const cellEnd = new Date(cellStart.getTime());
-    cellEnd.setMinutes(cellStart.getMinutes() + 59);
+    const cellStart = this.createDateTime(convertDateToString(originalDate), time);
+    const cellEnd = new Date(cellStart.getTime() + (MINUTES_IN_HOUR - 1) * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND);
 
-    return this.lessons.some(lesson => {
-      const lessonDate = new Date(convertStringToDate(lesson.date));
-      const lessonStart = new Date(lessonDate);
-      lessonStart.setMinutes(convertTimeToMinutes(lesson.startTime));
-      const lessonEnd = new Date(lessonDate);
-      lessonEnd.setMinutes(convertTimeToMinutes(lesson.endTime));
-
-      const result = (lessonStart >= cellStart && lessonStart <= cellEnd) ||
-        (lessonEnd > cellStart && lessonEnd <= cellEnd) ||
-        (lessonStart <= cellStart && lessonEnd >= cellEnd);
-      return result;
+    const hasLessonConflict = this.lessons.some(lesson => {
+      const lessonStart = this.createDateTime(lesson.date, lesson.startTime);
+      const lessonEnd = this.createDateTime(lesson.date, lesson.endTime);
+      return this.checkTimeConflict(cellStart, cellEnd, lessonStart, lessonEnd);
     });
+
+    const hasSlotConflict = this.slots.some(slot => {
+      const slotStart = this.createDateTime(slot.date, slot.startTime);
+      const slotEnd = this.createDateTime(slot.date, slot.endTime);
+      return this.checkTimeConflict(cellStart, cellEnd, slotStart, slotEnd);
+    });
+
+    return hasLessonConflict || hasSlotConflict;
+  }
+
+  private createDateTime(dateStr: string, timeStr: string): Date {
+    const date = new Date(convertStringToDate(dateStr));
+    date.setMinutes(convertTimeToMinutes(timeStr));
+    return date;
+  }
+
+  private checkTimeConflict(
+    rangeStart: Date,
+    rangeEnd: Date,
+    eventStart: Date,
+    eventEnd: Date
+  ): boolean {
+    return (
+      (eventStart >= rangeStart && eventStart <= rangeEnd) ||
+      (eventEnd > rangeStart && eventEnd <= rangeEnd) ||
+      (eventStart <= rangeStart && eventEnd >= rangeEnd)
+    );
   }
 
   public showTodayMessage(): boolean {

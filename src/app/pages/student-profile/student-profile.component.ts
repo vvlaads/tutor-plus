@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component, inject, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { LayoutService } from '../../services/layout.service';
 import { DialogMode } from '../../app.enums';
@@ -10,6 +10,8 @@ import { COMMUNICATION_OPTIONS, FROM_OPTIONS, PLATFORM_OPTIONS } from '../../app
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
+import { StateService } from '../../services/state.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
   selector: 'app-student-profile',
@@ -17,8 +19,9 @@ import { DialogService } from '../../services/dialog.service';
   templateUrl: './student-profile.component.html',
   styleUrl: './student-profile.component.css'
 })
-export class StudentProfileComponent implements OnInit {
+export class StudentProfileComponent implements OnInit, OnDestroy {
   private dialogService = inject(DialogService);
+  private stateService = inject(StateService);
   public student: Student | null = null;
   public pageMarginLeftPercentage: number = 0;
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
@@ -28,9 +31,11 @@ export class StudentProfileComponent implements OnInit {
   public unpaidLessonsCount: number = 0;
   public prepaidLessonsCount: number = 0;
   public formatPhoneNumber = formatPhoneNumber;
+  private destroy$ = new Subject<void>();
 
   public constructor(private route: ActivatedRoute,
     private studentService: StudentService,
+    private router: Router,
     private layoutService: LayoutService,
     private lessonService: LessonService) {
     this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
@@ -38,9 +43,20 @@ export class StudentProfileComponent implements OnInit {
     })
   }
 
-  public async ngOnInit(): Promise<void> {
-    this.subscribeToLessons();
-    this.subscribeToStudents();
+  public ngOnInit(): void {
+    this.lessonService.lessons$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadStudent());
+
+    this.studentService.students$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.loadStudent());
+    this.loadStudent();
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private subscribeToLessons(): void {
@@ -66,7 +82,12 @@ export class StudentProfileComponent implements OnInit {
   }
 
   public goBack(): void {
-    window.history.back();
+    if (this.stateService.saved) {
+      this.router.navigate(['/schedule'])
+      this.dialogService.openLessonDialog(this.stateService.mode, this.stateService.lesson, this.stateService.checkCollisions);
+    } else {
+      this.router.navigate(['/students'])
+    }
   }
 
   public updateStudent(): void {

@@ -6,6 +6,11 @@
     transition: all 0.3s ease;
 }
 
+.content-wrapper.mobile {
+    font-size: 12px;
+    padding-bottom: 60px;
+}
+
 .calendar {
     width: 100%;
     padding-bottom: 100px;
@@ -19,9 +24,35 @@
     width: 100%;
 }
 
-.change-schedule-status-buttons {
+.change-schedule-status-buttons-desktop {
     display: flex;
     flex-direction: row;
+}
+
+.change-schedule-status-buttons-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.switch-format-container-mobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+
+.change-date-container-mobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+
+.small-buttons {
+    width: 45%;
+    display: flex;
+    justify-content: space-between;
 }
 
 .change-schedule-status-button {
@@ -43,29 +74,47 @@
     border: 1px solid #e0e0e0;
 }
 
-.change-schedule-status-button:hover {
+.change-schedule-status-button-mobile {
+    width: 45%;
+    height: 30px;
+    justify-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    border: 1px solid #e0e0e0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.change-schedule-status-button:hover,
+.change-schedule-status-button-mobile:hover {
     transform: scale(1.01);
     background-color: #4299e1;
     color: white;
 }
 
-.change-schedule-status-button:active {
+.change-schedule-status-button:active,
+.change-schedule-status-button-mobile:active {
     transform: scale(0.98);
     background-color: #4299e1;
 }
 
-.change-schedule-status-button.isActive {
+.change-schedule-status-button.isActive,
+.change-schedule-status-button-mobile.isActive {
     background-color: #4299e1;
     color: white;
 }
 
-.change-schedule-status-button.isActive:hover {
+.change-schedule-status-button.isActive:hover,
+.change-schedule-status-button-mobile.isActive:hover {
     transform: scale(1.01);
     background-color: #3182ce;
     color: white;
 }
 
-.change-schedule-status-button.isActive:active {
+.change-schedule-status-button.isActive:active,
+.change-schedule-status-button-mobile.isActive:active {
     transform: scale(0.98);
     background-color: #3182ce;
     color: white;
@@ -81,6 +130,14 @@
     border: none;
     margin-right: 20px;
     cursor: pointer;
+}
+
+.date-button-mobile {
+    width: 30px;
+    height: 30px;
+    background: #4299e1;
+    border: none;
+    border-radius: 5px;
 }
 
 .date-button:hover {
@@ -109,7 +166,36 @@
     gap: 16px;
 }
 
+.info-mobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+}
+
+.week-time-info,
+.windows-manager {
+    width: 45%;
+}
+
+.copy-button-mobile {
+    width: 100%;
+    height: 30px;
+    justify-items: center;
+    justify-content: center;
+    background-color: #f9f9f9;
+    font-size: 16px;
+    border-radius: 8px;
+    border: none;
+    border: 1px solid #e0e0e0;
+    font-family: 'Roboto', sans-serif;
+}
+
 #today-info {
+    font-weight: 600;
+}
+
+#week-info {
     font-weight: 600;
 }
 
@@ -135,10 +221,6 @@
     background: #3182ce;
 }
 
-#week-info {
-    font-weight: 600;
-}
-
 .calendar-header {
     width: 100%;
     display: flex;
@@ -146,6 +228,10 @@
     border: 1px solid #2c3e50;
     box-sizing: content-box;
     height: 20px;
+}
+
+.calendar-header.mobile {
+    height: 40px;
 }
 
 .time-label {
@@ -242,7 +328,6 @@
     display: flex;
     flex-direction: column;
     cursor: pointer;
-    text-overflow: ellipsis;
     border-radius: 8px;
 }
 
@@ -274,6 +359,11 @@
     border-radius: 8px;
 }
 
+.lesson.mobile .lesson-content {
+    padding: 2px;
+    text-align: center;
+}
+
 .lesson:hover .lesson-content {
     white-space: normal;
     overflow: visible;
@@ -287,6 +377,11 @@
     font-size: 14px;
 }
 
+.lesson.mobile .lesson-time {
+    font-size: 12px;
+    font-weight: 600;
+}
+
 .student-name {
     font-weight: 500;
     color: #2c3e50;
@@ -294,7 +389,6 @@
     display: block;
     white-space: normal;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .lesson:hover .student-name {
@@ -359,6 +453,10 @@
     border-radius: 8px;
 }
 
+.slot.mobile {
+    border-width: 2px;
+}
+
 .slot:hover {
     z-index: 200;
     overflow: visible;
@@ -383,6 +481,10 @@
     text-align: center;
 }
 
+.slot-content.mobile {
+    padding: 2px;
+}
+
 .slot:hover .slot-content {
     white-space: normal;
     overflow: visible;
@@ -394,6 +496,10 @@
     font-weight: 600;
     color: #b62d2d;
     font-size: 14px;
+}
+
+.slot-content.mobile .slot-time {
+    font-size: 12px;
 }
 
 .one-day-calendar {
@@ -493,11 +599,21 @@
     background: transparent;
 }
 
+.fixed-block.mobile {
+    bottom: 60px;
+    justify-content: center;
+    margin: 20px 0;
+    left: 0;
+    right: 0;
+    display: flex;
+}
+
 .add-lesson-button {
     width: 280px;
     height: 60px;
     border-radius: 30px;
     border: none;
+    font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, #3498db, #2c3e50);
     color: white;
     font-size: 16px;

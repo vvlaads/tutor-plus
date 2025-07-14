@@ -17,6 +17,13 @@
                 src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Calendar%20Icon.png">
         </button>
 
+
+        <button class="mobile-button" (click)="navigate.emit('wait-list')"
+            [class.isActive]="targetIsSelected('wait-list')">
+            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Clocks.png"
+                class="button-icon">
+        </button>
+
         <button class="mobile-button exit" (click)="logout.emit()">
             <img class="button-icon"
                 src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Cross%20Icon.png">

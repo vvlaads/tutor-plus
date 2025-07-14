@@ -1,4 +1,6 @@
-<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
+<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage"
+    [class.desktop]="(deviceType$ | async) === 'desktop'" [class.tablet]="(deviceType$ | async) === 'tablet'"
+    [class.mobile]="(deviceType$ | async) === 'mobile'">
     <div class="work-panel">
         <div class="change-student-status-buttons" [class.desktop]="(deviceType$ | async) === 'desktop'"
             [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
@@ -18,8 +20,9 @@
     <div class="student-list">
         <div *ngFor="let student of filteredStudents" class="student-block" [style.background-color]="student.color"
             (click)="openStudentProfile(student.id)">
-            <div class="student-block-header">
-                <h2 class="student-name">{{ student.name }}</h2>
+            <div class="student-block-header" [class.desktop]="(deviceType$ | async) === 'desktop'"
+                [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
+                <span class="student-name">{{ student.name }}</span>
                 <span class="lesson-paid-badge" [class.paid]="unpaidLessonsCount.get(student.id)===0">
                     {{unpaidLessonsCount.get(student.id)===0 ? '✓' : '₽'}}
                 </span>
@@ -30,10 +33,12 @@
 
             <div class="divider"></div>
 
-            <div class="student-block-content">
+            <div class="student-block-content" [class.desktop]="(deviceType$ | async) === 'desktop'"
+                [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
                 <div class="student-block-info">
                     <p>Предмет: <span class="student-value">{{ student.subject }}</span></p>
-                    <p>Телефон: <span class="student-value">{{ formatPhoneNumber(student.phone) }}</span></p>
+                    <p>Телефон: <span class="student-value">{{ formatPhoneNumber(student.phone) }}</span>
+                    </p>
                 </div>
                 <div class="student-block-lessons">
                     <p>

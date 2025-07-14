@@ -1,12 +1,16 @@
-<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
+<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage"
+    [class.desktop]="(deviceType$ | async) === 'desktop'" [class.tablet]="(deviceType$ | async) === 'tablet'"
+    [class.mobile]="(deviceType$ | async) === 'mobile'">
     <div class=calendar>
         <div class="calendar-sticky-header">
-            <div class="change-schedule-status-buttons">
+            <div class="change-schedule-status-buttons-desktop" *ngIf="(deviceType$ | async) === 'desktop'">
                 <button class="change-schedule-status-button" (click)="resetCurrentDate()"> Вернуться к сегодня</button>
+
                 <button class="change-schedule-status-button" (click)="setOneDayFormat(true)"
                     [class.isActive]="isOneDayFormat">Один день</button>
                 <button class="change-schedule-status-button" (click)="setOneDayFormat(false)"
                     [class.isActive]="!isOneDayFormat">На неделю</button>
+
                 <button class="date-button" id="prev-date-button" (click)="goToPrev()">
                     <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon%20Swap.png"
                         class="button-icon">
@@ -21,13 +25,55 @@
                 </button>
             </div>
 
-            <div *ngIf="isOneDayFormat" class="info">
+            <div class="change-schedule-status-buttons-mobile" *ngIf="(deviceType$ | async) === 'mobile'">
+                <div class="switch-format-container-mobile">
+                    <button class="change-schedule-status-button-mobile" (click)="setOneDayFormat(true)"
+                        [class.isActive]="isOneDayFormat">Один день</button>
+                    <button class="change-schedule-status-button-mobile" (click)="setOneDayFormat(false)"
+                        [class.isActive]="!isOneDayFormat">На неделю</button>
+                </div>
+
+                <div class="change-date-container-mobile">
+                    <button class="change-schedule-status-button-mobile" (click)="resetCurrentDate()"> К
+                        сегодня</button>
+                    <div class="small-buttons">
+                        <button class="date-button-mobile" id="prev-date-button-mobile" (click)="goToPrev()">
+                            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon%20Swap.png"
+                                class="button-icon">
+                        </button>
+                        <button class="date-button-mobile" id="find-date-button-mobile" (click)="findDate()">
+                            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Magnifier%20Icon.png"
+                                class="button-icon">
+                        </button>
+                        <button class="date-button-mobile" id="next-date-button-mobile" (click)="goToNext()">
+                            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Arrow%20Icon.png"
+                                class="button-icon">
+                        </button>
+                    </div>
+                </div>
+                <div *ngIf="!isOneDayFormat" class="info-mobile">
+                    <div class="week-time-info">
+                        <span id="year-info" *ngIf="!isOneDayFormat">{{currentDate.getFullYear()}} </span>
+                        <span id="week-info" *ngIf="showWeekMessage()">Текущая неделя</span>
+                        <div class="hide-block">
+                            <label>Скрыть окна:</label>
+                            <input type="checkbox" [(ngModel)]="slotsIsHidden">
+                        </div>
+                    </div>
+                    <div class="windows-manager">
+                        <button class="copy-button-mobile" (click)="copySlots()">Копировать окна</button>
+
+                    </div>
+                </div>
+            </div>
+
+            <div *ngIf="isOneDayFormat && (deviceType$ | async) === 'desktop'" class="info">
                 <span *ngIf="isOneDayFormat">{{getCurrentDateInString()}}</span>
                 <span id="today-info" *ngIf="showTodayMessage()"> Сегодня</span>
                 <button class="print-button" (click)="printTable()">Печать</button>
                 <button class="export-button" (click)="exportTables()">Экспорт</button>
             </div>
-            <div *ngIf="!isOneDayFormat" class="info">
+            <div *ngIf="!isOneDayFormat && (deviceType$ | async) === 'desktop'" class="info">
                 <span id="year-info" *ngIf="!isOneDayFormat">{{currentDate.getFullYear()}} </span>
                 <span id="week-info" *ngIf="showWeekMessage()">Текущая неделя</span>
                 <div class="hide-block">
@@ -37,7 +83,11 @@
                 <button class="copy-button" (click)="copySlots()">Копировать окна</button>
             </div>
 
-            <div class="calendar-header" *ngIf="!isOneDayFormat">
+
+
+
+            <div class="calendar-header" *ngIf="!isOneDayFormat" [class.desktop]="(deviceType$ | async) === 'desktop'"
+                [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
                 <div class="time-label"></div>
                 <div *ngFor="let date of currentWeekDates; let i = index" class="day-header"
                     [class.today]="dateIsToday(date)">
@@ -68,25 +118,31 @@
             <div *ngFor="let lesson of currentWeekLessons" class="lesson" [style.min-height]="getLessonHeight(lesson)"
                 [style.height]="getLessonHeight(lesson)" [style.width.%]=" blockWidthPercentage"
                 [style.top.px]="getLessonTop(lesson)" [style.left.%]="getLessonLeft(lesson)"
-                (click)="editLesson(lesson)">
+                (click)="editLesson(lesson)" [class.mobile]="(deviceType$ | async) === 'mobile'">
 
                 <div class="lesson-content" [style.background-color]="getStudentByLesson(lesson)?.color">
-                    <span class="lesson-time">{{lesson.startTime}} - {{lesson.endTime}}</span>
-                    <span class="lesson-paid-badge" [class.paid]="lesson.isPaid">
+                    <span class="lesson-time">{{lesson.startTime}}<br *ngIf="(deviceType$ | async) === 'mobile'"> - <br
+                            *ngIf="(deviceType$ | async) === 'mobile'">{{lesson.endTime}}</span>
+                    <span class="lesson-paid-badge" [class.paid]="lesson.isPaid"
+                        *ngIf="(deviceType$ | async) === 'desktop'">
                         {{lesson.isPaid ? '✓' : '₽'}}
                     </span>
-                    <span class="lesson-from-badge" *ngIf="fromIsOwl(lesson)"><img class="from-icon"
+                    <span class="lesson-from-badge"
+                        *ngIf="fromIsOwl(lesson) && (deviceType$ | async) === 'desktop'"><img class="from-icon"
                             [src]="getFromIcon(lesson)"></span>
-                    <span class="student-name">{{getStudentByLesson(lesson)?.name}}</span>
+                    <span class="student-name"
+                        *ngIf="(deviceType$ | async) === 'desktop'">{{getStudentByLesson(lesson)?.name}}</span>
                 </div>
             </div>
             <ng-container *ngIf="!slotsIsHidden">
                 <div *ngFor="let slot of currentWeekSlots" class="slot" [style.min-height]="getSlotHeight(slot)"
                     [style.height]="getSlotHeight(slot)" [style.width.%]=" blockWidthPercentage"
-                    [style.top.px]="getSlotTop(slot)" [style.left.%]="getSlotLeft(slot)" (click)="editSlot(slot)">
+                    [style.top.px]="getSlotTop(slot)" [style.left.%]="getSlotLeft(slot)" (click)="editSlot(slot)"
+                    [class.mobile]="(deviceType$ | async) === 'mobile'">
 
-                    <div class="slot-content">
-                        <span class="slot-time">{{slot.startTime}} - {{slot.hasRealEndTime? slot.realEndTime :
+                    <div class="slot-content" [class.mobile]="(deviceType$ | async) === 'mobile'">
+                        <span class="slot-time">{{slot.startTime}}<br *ngIf="(deviceType$ | async) === 'mobile'"> - <br
+                                *ngIf="(deviceType$ | async) === 'mobile'">{{slot.hasRealEndTime? slot.realEndTime :
                             slot.endTime}}</span>
                     </div>
                 </div>
@@ -141,7 +197,8 @@
     </div>
 
 
-    <div class="fixed-block">
+    <div class="fixed-block" [class.desktop]="(deviceType$ | async) === 'desktop'"
+        [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
         <button (click)="addScheduleObject()" class="add-lesson-button">
             <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
                 class="add-lesson-icon">

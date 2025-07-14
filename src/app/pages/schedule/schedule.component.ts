@@ -12,6 +12,7 @@ import { DialogService } from '../../services/dialog.service';
 import { convertDateToString, convertMinutesToTime, convertStringToDate, convertTimeToMinutes, isDatesEquals } from '../../functions/dates';
 import { FormsModule } from '@angular/forms';
 import { NotificationComponent } from "../../components/notification/notification.component";
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   standalone: true,
@@ -40,7 +41,8 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
   public isOneDayFormat: boolean = false;
   public currentWeekDates: Date[] = [];
   public slotsIsHidden = false;
-
+  private deviceService = inject(DeviceService);
+  public deviceType$ = this.deviceService.deviceType$;
   public currentWeekLessons: Lesson[] = [];
   public oneDayLessons: Lesson[] = [];
   public currentWeekSlots: Slot[] = [];

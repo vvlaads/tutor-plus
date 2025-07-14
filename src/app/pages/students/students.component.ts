@@ -55,6 +55,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
   public prevLessons$ = this.lessonService.prevLessons$;
   public nextLessons$ = this.lessonService.nextLessons$;
   public unpaidLessonsCount: Map<string, number> = new Map();
+  public unpaidOwlLessonsCount: Map<string, number> = new Map();
 
   public ngOnInit(): void {
     this.subscribeToLayoutChanges();
@@ -133,6 +134,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
     this.applySearchFilter();
     this.students.forEach(async student => {
       this.unpaidLessonsCount.set(student.id, await this.getUnpaidLessonsCount(student))
+      this.unpaidOwlLessonsCount.set(student.id, await this.getUnpaidOwlLessonsCount(student))
     })
   }
 
@@ -171,6 +173,11 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
   public async getUnpaidLessonsCount(student: Student): Promise<number> {
     const lessons = await this.lessonService.getUnpaidLessonsByStudentId(student.id);
+    return lessons.length;
+  }
+
+  public async getUnpaidOwlLessonsCount(student: Student): Promise<number> {
+    const lessons = await this.lessonService.getUnpaidOwlLessonsByStudentId(student.id);
     return lessons.length;
   }
 }

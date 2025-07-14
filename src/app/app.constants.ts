@@ -23,7 +23,7 @@ export const COMMUNICATION_OPTIONS = [
     { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' },
     { value: 'WhatsApp', text: 'WhatsApp', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Whatsapp%20Icon.png' },
     { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
-    { value: 'Profi', text: 'Profi', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Profi%20Icon.png' },
+    { value: 'Profi', text: 'Profi', icon: 'https://github.com/vvlaads/tutor-plus-resources/blob/main/Profi%20Icon.png' },
     { value: 'Телефон', text: 'Телефон', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' }
 ];
 

@@ -121,6 +121,7 @@ export class LessonService implements OnDestroy {
       hasRealEndTime: data.hasRealEndTime || false,
       realEndTime: data.realEndTime || null,
       note: data.note || null,
+      paidByOwl: data.paidByOwl || null
     };
   }
 
@@ -253,6 +254,14 @@ export class LessonService implements OnDestroy {
   public async getUnpaidLessonsByStudentId(studentId: string): Promise<Lesson[]> {
     const studentLessons = await this.getPrevLessonsByStudentId(studentId);
     const unpaidLessons = studentLessons.filter(lesson => !lesson.isPaid);
+    unpaidLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
+
+    return unpaidLessons;
+  }
+
+  public async getUnpaidOwlLessonsByStudentId(studentId: string): Promise<Lesson[]> {
+    const studentLessons = await this.getPrevLessonsByStudentId(studentId);
+    const unpaidLessons = studentLessons.filter(lesson => lesson.paidByOwl === false);
     unpaidLessons.sort((a, b) => this.getLessonTimestamp(b) - this.getLessonTimestamp(a));
 
     return unpaidLessons;

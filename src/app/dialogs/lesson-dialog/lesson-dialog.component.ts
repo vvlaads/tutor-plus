@@ -75,6 +75,7 @@ export class LessonDialogComponent implements OnInit {
       hasRealEndTime: [data.lesson == null ? false : data.lesson.hasRealEndTime],
       realEndTime: [data.lesson?.realEndTime],
       note: [data.lesson?.note],
+      paidByOwl: [data.lesson == null ? false : data.lesson.paidByOwl],
     }, {
       validators: [
         timeRangeValidator(),
@@ -89,7 +90,7 @@ export class LessonDialogComponent implements OnInit {
   public ngOnInit(): void {
     this.subscribeToStudents();
     if (this.data.lesson?.studentId) {
-      this.updateCosts();
+      this.updateStudentInfo();
     }
   }
 
@@ -107,7 +108,8 @@ export class LessonDialogComponent implements OnInit {
     const lesson = {
       ...lessonValue,
       date: lessonValue.date ? changeDateFormatMinusToDot(lessonValue.date) : null,
-      repeatEndDate: lessonValue.repeatEndDate ? changeDateFormatMinusToDot(lessonValue.repeatEndDate) : null
+      repeatEndDate: lessonValue.repeatEndDate ? changeDateFormatMinusToDot(lessonValue.repeatEndDate) : null,
+      paidByOwl: this.isOwlStudent ? lessonValue.paidByOwl : null
     }
     return lesson;
   }
@@ -339,9 +341,17 @@ export class LessonDialogComponent implements OnInit {
     }
   }
 
-  public async updateCosts(): Promise<void> {
+  public isOwlStudent = false;
+
+  public async updateStudentInfo(): Promise<void> {
     await this.getCostByStudentId();
     this.getPreferredCost();
+    let lessonValue = this.lessonForm.value;
+    if (!lessonValue.studentId) {
+      lessonValue.studentId = this.data.lesson?.studentId;
+    }
+    const student = await this.studentService.getStudentById(lessonValue.studentId);
+    student?.from === 'Сова' ? this.isOwlStudent = true : this.isOwlStudent = false;
   }
 
   public getErrorMessage(field: string): string | null {

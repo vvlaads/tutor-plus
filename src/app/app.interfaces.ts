@@ -12,6 +12,7 @@ export interface Lesson {
     hasRealEndTime: boolean;
     realEndTime: string | null;
     note: string | null;
+    paidByOwl: boolean | null;
 }
 
 export interface Student {

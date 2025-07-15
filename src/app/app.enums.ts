@@ -14,3 +14,7 @@ export enum ScheduleObject {
     Slot = 'SLOT',
     Lesson = 'LESSON'
 }
+
+export enum AppNames {
+    OWL = 'Сова'
+}

@@ -1,4 +1,5 @@
 import { DAYS_IN_WEEK, HOURS_IN_DAY, MINUTES_IN_HOUR } from "../app.constants";
+import { TimeBlock } from "../app.interfaces";
 
 export function changeDateFormatMinusToDot(minusFormat: string): string {
     const parts = minusFormat.split('-');
@@ -111,4 +112,43 @@ export function getWeeklyRecurringDates(start: Date, end: Date): Date[] {
     }
 
     return dates;
+}
+
+export function hasOverlay(first: TimeBlock, second: TimeBlock): boolean {
+    const startFirst = convertTimeToMinutes(first.startTime);
+    const endFirst = convertTimeToMinutes(first.endTime);
+    const dateFirst = convertStringToDate(first.date);
+
+    const startSecond = convertTimeToMinutes(second.startTime);
+    const endSecond = convertTimeToMinutes(second.endTime);
+    const dateSecond = convertStringToDate(second.date);
+
+    if (!isDatesEquals(dateFirst, dateSecond)) {
+        return false;
+    }
+    if (endFirst <= startSecond || endSecond <= startFirst) {
+        return false;
+    }
+    return true;
+}
+
+export function getHoursFromTime(formattedTime: string): number {
+    const parts = formattedTime.split(':');
+
+    if (parts.length !== 2) {
+        throw new Error('Неверный формат времени. Ожидалось: hh:mm');
+    }
+
+    const hours = parseInt(parts[0]);
+    const minutes = parseInt(parts[1]);
+
+    if (isNaN(hours) || isNaN(minutes)) {
+        throw new Error('Неверные значения времени');
+    }
+
+    if (hours >= HOURS_IN_DAY || minutes >= MINUTES_IN_HOUR || hours < 0 || minutes < 0) {
+        throw new Error('Неверные данные времени');
+    }
+
+    return hours;
 }

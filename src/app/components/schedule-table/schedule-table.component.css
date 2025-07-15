@@ -1,0 +1,163 @@
+.table-container {
+    height: 100vh;
+    overflow-y: auto;
+    position: relative;
+    width: 100%;
+}
+
+.grid-header {
+    font-size: 16px;
+    display: grid;
+    grid-template-columns: 9% 13% 13% 13% 13% 13% 13% 13%;
+    position: sticky;
+    top: 0;
+    background: white;
+    z-index: 100;
+    box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.grid-header .time-label,
+.grid-header .dayName {
+    padding: 8px;
+    text-align: center;
+    border: 1px solid #ddd;
+    background-color: #f2f2f2;
+}
+
+.grid-body {
+    display: grid;
+    grid-template-columns: 9% 13% 13% 13% 13% 13% 13% 13%;
+    width: 100%;
+}
+
+.time-value,
+.cell {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+    box-sizing: border-box;
+    position: relative;
+    height: calc(var(--block-height) - 1px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.cell:not(.disabled):hover {
+    background-color: #ddd;
+    cursor: pointer;
+}
+
+.cell-content {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    color: white;
+    width: 24px;
+    height: 24px;
+}
+
+.cell:hover .cell-content {
+    opacity: 1;
+}
+
+.cell.disabled:hover .cell-content {
+    opacity: 0;
+}
+
+.time-value {
+    background-color: #f9f9f9;
+}
+
+.lesson {
+    font-size: 16px;
+    position: absolute;
+    border-radius: 4px;
+    color: #2c3e50;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    border: 2px solid rgba(0, 0, 0, 0.4);
+    z-index: 1;
+}
+
+.lesson:hover {
+    overflow: visible;
+    z-index: 10;
+    min-height: 120px;
+}
+
+.lesson-content {
+    width: 85%;
+    padding: 8px;
+}
+
+.lesson-time,
+.slot-time {
+    font-weight: 600;
+}
+
+.lesson-student-name {
+    font-weight: 500;
+    font-size: small;
+    display: block;
+    white-space: normal;
+}
+
+.lesson-badges {
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 4px;
+    padding-right: 4px;
+}
+
+.paid-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background-color: #e74c3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: bold;
+    color: white;
+}
+
+.paid-badge.paid {
+    background-color: #2ecc71;
+}
+
+.owl-badge {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slot {
+    font-size: 16px;
+    position: absolute;
+    border-radius: 4px;
+    color: #d53636;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    cursor: pointer;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+    border: 4px solid #279173;
+    background-color: #79f1cf;
+}
+
+.dayName.current {
+    background-color: #ddd;
+}

@@ -2,10 +2,11 @@ import { Component, inject } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
 import { DeviceService } from '../../services/device.service';
 import { CommonModule } from '@angular/common';
+import { ScheduleTableComponent } from "../../components/schedule-table/schedule-table.component";
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule],
+  imports: [CommonModule, ScheduleTableComponent],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })

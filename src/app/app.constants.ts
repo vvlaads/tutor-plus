@@ -1,7 +1,7 @@
 import { ScheduleObject } from "./app.enums";
 
-export const PAGE_MARGIN_LEFT_PERCENTAGE = 25;
-export const PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN = 7;
+export const PAGE_MARGIN_LEFT_PERCENTAGE = 20;
+export const PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN = 5;
 
 export const MINUTES_IN_HOUR = 60;
 export const SECONDS_IN_MINUTE = 60;
@@ -12,7 +12,8 @@ export const MILLISECONDS_IN_SECOND = 1000;
 
 export const PHONE_NUMBER_LENGTH = 11;
 export const VISIBLE_LESSONS_COUNT = 3;
-export const BLOCK_HEIGHT_PIXELS = 50;
+export const BLOCK_HEIGHT_IN_PIXELS = 60;
+export const HEADER_HEIGHT_IN_PIXELS = 30;
 export const BLOCK_WIDTH_PERCENTAGE = 13;
 export const TIME_COLUMN_WIDTH_PERCENTAGE = 9;
 
@@ -30,7 +31,8 @@ export const COMMUNICATION_OPTIONS = [
 export const PLATFORM_OPTIONS = [
     { value: 'Zoom', text: 'Zoom', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Zoom%20Icon.png' },
     { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
-    { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' }
+    { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' },
+    { value: 'Дома', text: 'Дома', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Home%20Icon%20Black.png' }
 ];
 
 export const FROM_OPTIONS = [

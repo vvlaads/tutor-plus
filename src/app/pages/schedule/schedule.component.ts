@@ -5,7 +5,10 @@ import { DialogMode, ScheduleObject } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student } from '../../app.interfaces';
 import { StudentService } from '../../services/student.service';
-import { BLOCK_HEIGHT_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MILLISECONDS_IN_SECOND, MINUTES_IN_HOUR, MONTH_NAMES, PAGE_MARGIN_LEFT_PERCENTAGE, PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN, SCHEDULE_OBJECT_OPTIONS, SECONDS_IN_MINUTE, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES } from '../../app.constants';
+import {
+  BLOCK_HEIGHT_IN_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MILLISECONDS_IN_SECOND,
+  MINUTES_IN_HOUR, MONTH_NAMES, SCHEDULE_OBJECT_OPTIONS, SECONDS_IN_MINUTE, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES
+} from '../../app.constants';
 import { SlotService } from '../../services/slot.service';
 import * as XLSX from 'xlsx';
 import { DialogService } from '../../services/dialog.service';
@@ -29,8 +32,8 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
   @ViewChild('notification') notification!: NotificationComponent;
   @ViewChild('scrollContainer') scrollContainer!: ElementRef;
 
-  public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
-  public blockHeightPixels: number = BLOCK_HEIGHT_PIXELS;
+  public pageMarginLeftPercentage: number = 0;
+  public blockHeightPixels: number = BLOCK_HEIGHT_IN_PIXELS;
   public blockWidthPercentage: number = BLOCK_WIDTH_PERCENTAGE;
   public timeColumnWidthPercetage: number = TIME_COLUMN_WIDTH_PERCENTAGE;
   public times: string[] = TIMES;
@@ -107,7 +110,6 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
         return false;
       }
     });
-    console.log('cur les:', this.currentWeekLessons);
   }
 
   private subscribeToStudents(): void {
@@ -451,6 +453,8 @@ export class ScheduleComponent implements OnInit, AfterViewInit {
         case 'Zoom':
           return 'rgb(24, 143, 154)';
         case 'Profi':
+          return 'rgb(255, 165, 171)';
+        case 'Дома':
           return 'rgb(255, 165, 171)';
         case 'Teams':
           return 'rgb(207, 144, 255)';

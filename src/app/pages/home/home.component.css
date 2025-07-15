@@ -1,7 +1,8 @@
 .content-wrapper {
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
-    padding: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
     transition: all 0.3s ease;
 }
 

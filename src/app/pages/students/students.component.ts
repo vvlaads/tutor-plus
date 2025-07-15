@@ -9,7 +9,6 @@ import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SearchComponent } from '../../components/search/search.component';
 import { Lesson, Student } from '../../app.interfaces';
-import { PAGE_MARGIN_LEFT_PERCENTAGE } from '../../app.constants';
 import { take, Subscription } from 'rxjs';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
@@ -45,7 +44,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
   public students: Student[] = [];
   public filteredStudents: Student[] = [];
-  public pageMarginLeftPercentage: number = PAGE_MARGIN_LEFT_PERCENTAGE;
+  public pageMarginLeftPercentage: number = 0;
   public isActiveFormat = true;
   public isLoading = false;
   public searchQuery = '';

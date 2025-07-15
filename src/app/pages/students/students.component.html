@@ -23,11 +23,11 @@
             <div class="student-block-header" [class.desktop]="(deviceType$ | async) === 'desktop'"
                 [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
                 <span class="student-name">{{ student.name }}</span>
-                <span class="lesson-paid-badge" [class.paid]="unpaidLessonsCount.get(student.id)===0">
-                    {{unpaidLessonsCount.get(student.id)===0 ? '✓' : '₽'}}
-                </span>
                 <span class="lesson-owl-paid-badge" *ngIf="student.from === 'Сова'">
                     {{unpaidOwlLessonsCount.get(student.id)===0 ? '✓' : '₽'}}
+                </span>
+                <span class="lesson-paid-badge" [class.paid]="unpaidLessonsCount.get(student.id)===0">
+                    {{unpaidLessonsCount.get(student.id)===0 ? '✓' : '₽'}}
                 </span>
             </div>
 

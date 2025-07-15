@@ -34,7 +34,7 @@ export class LessonDialogComponent implements OnInit {
   private stateService = inject(StateService);
   private students: Student[] = []
   private touchedLessons: Lesson[] = [];
-
+  public isOwlStudent = false;
   public lessonForm: FormGroup;
   public title: string;
   public submitMessage: string;
@@ -341,7 +341,7 @@ export class LessonDialogComponent implements OnInit {
     }
   }
 
-  public isOwlStudent = false;
+
 
   public async updateStudentInfo(): Promise<void> {
     await this.getCostByStudentId();

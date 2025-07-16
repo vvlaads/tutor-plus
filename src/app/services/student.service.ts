@@ -44,7 +44,7 @@ export class StudentService implements OnDestroy {
     return {
       id: doc.id,
       name: data.name || 'Без имени',
-      phone: data.phone || '',
+      phone: data.phone || null,
       subject: data.subject || '',
       communication: data.communication || '',
       platform: data.platform || '',

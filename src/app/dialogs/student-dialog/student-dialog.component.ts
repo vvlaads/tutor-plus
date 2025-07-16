@@ -85,7 +85,7 @@ export class StudentDialogComponent {
     const student = {
       ...studentValue,
       stopDate: studentValue.stopDate ? changeDateFormatMinusToDot(studentValue.stopDate) : null,
-      phone: clearPhoneNumber(studentValue.phone),
+      phone: studentValue.phone ? clearPhoneNumber(studentValue.phone) : null,
       parentPhone: studentValue.hasParent ? clearPhoneNumber(studentValue.phone) : null
     }
     return student;

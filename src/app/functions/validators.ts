@@ -169,8 +169,13 @@ export function phoneNumberValidator(): ValidatorFn {
         const value = control.value;
         if (value) {
             const cleanedPhone = clearPhoneNumber(value);
-            const pattern = (/^\+7\d{10}$/);
-            return pattern.test(cleanedPhone) ? null : { invalidPhoneNumber: true };
+            if (cleanedPhone.startsWith('+7')) {
+                const pattern = (/^\+7\d{10}$/);
+                return pattern.test(cleanedPhone) ? null : { invalidPhoneNumber: true };
+            } else {
+                const pattern = (/^\+\d{10,15}$/);
+                return pattern.test(cleanedPhone) ? null : { invalidPhoneNumber: true };
+            }
         }
         return null;
     }

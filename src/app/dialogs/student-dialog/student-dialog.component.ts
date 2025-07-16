@@ -10,6 +10,7 @@ import { clearPhoneNumber, generateColor, getErrorMessage } from '../../app.func
 import { allowedValuesValidator, parentValidator, phoneNumberValidator, stopDateValidator } from '../../functions/validators';
 import { CustomSelectComponent } from '../../components/custom-select/custom-select.component';
 import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../functions/dates';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-student-dialog',
@@ -19,6 +20,7 @@ import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../fu
 })
 export class StudentDialogComponent {
   private dialogRef = inject(MatDialogRef<StudentDialogComponent>);
+  private router = inject(Router);
   private mode: DialogMode;
 
   public studentForm: FormGroup;
@@ -116,9 +118,13 @@ export class StudentDialogComponent {
   public addStudent(): void {
     const student = this.convertFormToStudent();
 
-    this.studentService.addStudent(student).catch(error => {
-      console.error('Ошибка при добавлении:', error);
-    });
+    this.studentService.addStudent(student)
+      .then(id => {
+        this.router.navigate([`/student/${id}`]);
+      })
+      .catch(error => {
+        console.error('Ошибка при добавлении:', error);
+      });
   }
 
   public updateStudent(): void {

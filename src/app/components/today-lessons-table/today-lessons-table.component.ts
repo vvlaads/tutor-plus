@@ -102,7 +102,7 @@ export class TodayLessonsTableComponent implements OnInit, OnChanges {
   }
 
   public notDefaultTime(lesson: Lesson): boolean {
-    let time = this.getTimeDifference(lesson.startTime, lesson.endTime);
+    let time = this.getRealTimeDifference(lesson);
     if (time !== 60) {
       return true;
     }

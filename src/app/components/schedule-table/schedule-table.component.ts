@@ -36,8 +36,8 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
   public currentWeekLessons: Lesson[] = [];
   public currentWeekSlots: Slot[] = [];
   public studentsByLessonId: Map<string, Student> = new Map();
-  public slotsIsVisible = true;
-  public changeVisibilityTitle = 'Скрыть окна';
+  public slotsIsVisible = false;
+  public changeVisibilityTitle = 'Показать окна';
 
   @Input()
   public currentDate: Date = new Date();

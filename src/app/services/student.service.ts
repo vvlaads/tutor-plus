@@ -1,42 +1,52 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, updateDoc, deleteDoc, onSnapshot, getDocs } from '@angular/fire/firestore';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Student } from '../app.interfaces';
 import { LessonService } from './lesson.service';
 import { convertStringToDate } from '../functions/dates';
-import { environment } from '../../environments/environment';
+import { DatabaseService } from './database.service';
 
 @Injectable({ providedIn: 'root' })
 export class StudentService implements OnDestroy {
-  private unsubscribe!: () => void;
+  private destroy$ = new Subject<void>();
   private studentsSubject = new BehaviorSubject<Student[]>([]);
+  private databaseService = inject(DatabaseService);
 
-  public students$ = this.studentsSubject.asObservable();
+  public students$ = this.databaseService
+    .getDatabaseStream('students')
+    .pipe(
+      switchMap(dbName => {
+        this.studentsSubject.next([]);
+        if (!dbName) return of([]);
+        return this.createCollectionListener(dbName);
+      }),
+      takeUntil(this.destroy$)
+    );
 
   public constructor(private firestore: Firestore, private lessonService: LessonService) {
-    this.startListening();
   }
 
   public ngOnDestroy(): void {
-    this.stopListening();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  private startListening(): void {
-    const studentsRef = collection(this.firestore, environment.studentsBase);
+  private createCollectionListener(dbName: string): Observable<Student[]> {
+    return new Observable<Student[]>(subscriber => {
+      const unsubscribe = onSnapshot(
+        collection(this.firestore, dbName),
+        snapshot => {
+          const students = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as Student));
+          subscriber.next(students);
+        },
+        error => console.error('Ошибка загрузки студентов:', error)
+      );
 
-    this.unsubscribe = onSnapshot(studentsRef, {
-      next: (snapshot) => {
-        const students = snapshot.docs.map(this.createStudent);
-        this.studentsSubject.next(students);
-      },
-      error: (err) => console.error('Ошибка загрузки:', err)
+      return () => unsubscribe();
     });
-  }
-
-  private stopListening(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
   }
 
   private createStudent(doc: any): Student {
@@ -63,36 +73,48 @@ export class StudentService implements OnDestroy {
     };
   }
 
-  public loadStudents(): void {
-    getDocs(collection(this.firestore, environment.studentsBase)).then(() => {
-      console.log('Загрузка данных учеников');
-    });
-  }
-
   public async getStudents(): Promise<Student[]> {
-    const snapshot = await getDocs(collection(this.firestore, environment.studentsBase));
-    return snapshot.docs.map(this.createStudent);
+    const db = this.databaseService.getDatabaseName('students')
+    if (db) {
+      const snapshot = await getDocs(collection(this.firestore, db));
+      return snapshot.docs.map(this.createStudent);
+    }
+    return [];
   }
 
   public async getStudentById(id: string): Promise<Student | null> {
-    const docSnap = await getDoc(doc(this.firestore, environment.studentsBase, id));
-    return docSnap.exists() ? this.createStudent(docSnap) : null;
+    const db = this.databaseService.getDatabaseName('students')
+    if (db) {
+      const docSnap = await getDoc(doc(this.firestore, db, id));
+      return docSnap.exists() ? this.createStudent(docSnap) : null;
+    }
+    return null;
   }
 
   public async addStudent(student: Omit<Student, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(this.firestore, environment.studentsBase), student);
-    this.checkNextLessons(docRef.id);
-    return docRef.id;
+    const db = this.databaseService.getDatabaseName('students')
+    if (db) {
+      const docRef = await addDoc(collection(this.firestore, db), student);
+      this.checkNextLessons(docRef.id);
+      return docRef.id;
+    }
+    return '';
   }
 
   public async updateStudent(id: string, changes: Partial<Student>): Promise<void> {
-    await updateDoc(doc(this.firestore, environment.studentsBase, id), changes);
-    this.checkNextLessons(id);
+    const db = this.databaseService.getDatabaseName('students')
+    if (db) {
+      await updateDoc(doc(this.firestore, db, id), changes);
+      this.checkNextLessons(id);
+    }
   }
 
   public async deleteStudent(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, environment.studentsBase, id));
-    this.lessonService.deleteLessonsByStudentId(id);
+    const db = this.databaseService.getDatabaseName('students')
+    if (db) {
+      await deleteDoc(doc(this.firestore, db, id));
+      this.lessonService.deleteLessonsByStudentId(id);
+    }
   }
 
   private async checkNextLessons(id: string): Promise<void> {

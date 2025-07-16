@@ -48,8 +48,8 @@
                             <span class="loading-text">Загрузка...</span>
                         </ng-container>
                         <ng-template #prevLessonLoaded>
-                            <span class="student-value" [class.no-data]="!(prevLessons$ | async)?.get(student.id)">
-                                {{ getPrevLessonDate((prevLessons$ | async)?.get(student.id)) }}
+                            <span class="student-value" [class.no-data]="!prevLessons.get(student.id)">
+                                {{ getPrevLessonDate(prevLessons.get(student.id)) }}
                             </span>
                         </ng-template>
                     </p>
@@ -59,8 +59,8 @@
                             <span class="loading-text">Загрузка...</span>
                         </ng-container>
                         <ng-template #nextLessonLoaded>
-                            <span class="student-value" [class.no-data]="!(nextLessons$ | async)?.get(student.id)">
-                                {{ getNextLessonDate((nextLessons$ | async)?.get(student.id)) }}
+                            <span class="student-value" [class.no-data]="!nextLessons.get(student.id)">
+                                {{ getNextLessonDate(nextLessons.get(student.id)) }}
                             </span>
                         </ng-template>
                     </p>

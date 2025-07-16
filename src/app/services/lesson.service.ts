@@ -1,15 +1,17 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc } from '@angular/fire/firestore';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Lesson } from '../app.interfaces';
 import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
-import { environment } from '../../environments/environment';
+import { DatabaseService } from './database.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LessonService implements OnDestroy {
-  private unsubscribe!: () => void;
+  private destroy$ = new Subject<void>();
+  private databaseService = inject(DatabaseService);
+  private firestore = inject(Firestore);
   private lessonsSubject = new BehaviorSubject<Lesson[]>([]);
   private prevLessonsSubject = new BehaviorSubject<Map<string, Lesson>>(new Map());
   private nextLessonsSubject = new BehaviorSubject<Map<string, Lesson>>(new Map());
@@ -18,24 +20,37 @@ export class LessonService implements OnDestroy {
   public prevLessons$ = this.prevLessonsSubject.asObservable();
   public nextLessons$ = this.nextLessonsSubject.asObservable();
 
-  public constructor(private firestore: Firestore) {
-    this.startListening();
+  constructor() {
+    this.initLessonsListener();
   }
 
-  public ngOnDestroy(): void {
-    this.stopListening();
-  }
-
-  private startListening(): void {
-    const lessonsRef = collection(this.firestore, environment.lessonsBase);
-
-    this.unsubscribe = onSnapshot(lessonsRef, {
-      next: (snapshot) => {
-        const lessons = snapshot.docs.map(this.createLesson);
+  private initLessonsListener(): void {
+    this.databaseService.getDatabaseStream('lessons')
+      .pipe(
+        switchMap(dbName => {
+          this.lessonsSubject.next([]);
+          if (!dbName) return of([]);
+          return this.createCollectionListener(dbName);
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(lessons => {
         this.lessonsSubject.next(lessons);
         this.updatePrevAndNextLessons(lessons);
-      },
-      error: (err) => console.error('Ошибка загрузки:', err)
+      });
+  }
+
+  private createCollectionListener(dbName: string): Observable<Lesson[]> {
+    return new Observable<Lesson[]>(subscriber => {
+      const unsubscribe = onSnapshot(
+        collection(this.firestore, dbName),
+        snapshot => {
+          const lessons = snapshot.docs.map(doc => this.createLesson(doc));
+          subscriber.next(lessons);
+        },
+        error => console.error('Ошибка загрузки уроков:', error)
+      );
+      return () => unsubscribe();
     });
   }
 
@@ -44,11 +59,15 @@ export class LessonService implements OnDestroy {
     const prevLessonsMap = new Map<string, Lesson>();
     const nextLessonsMap = new Map<string, Lesson>();
 
-    const studentIds = [...new Set(lessons.map(lesson => lesson.studentId))];
+    const lessonsByStudent = lessons.reduce((acc, lesson) => {
+      if (!acc.has(lesson.studentId)) {
+        acc.set(lesson.studentId, []);
+      }
+      acc.get(lesson.studentId)?.push(lesson);
+      return acc;
+    }, new Map<string, Lesson[]>());
 
-    studentIds.forEach(studentId => {
-      const studentLessons = lessons.filter(lesson => lesson.studentId === studentId);
-
+    lessonsByStudent.forEach((studentLessons, studentId) => {
       const prevLesson = this.findPrevLesson(studentLessons, now);
       if (prevLesson) {
         prevLessonsMap.set(studentId, prevLesson);
@@ -62,6 +81,11 @@ export class LessonService implements OnDestroy {
 
     this.prevLessonsSubject.next(prevLessonsMap);
     this.nextLessonsSubject.next(nextLessonsMap);
+  }
+
+  public ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private findClosestLesson(lessons: Lesson[], now: Date, direction: 'prev' | 'next'): Lesson | null {
@@ -99,12 +123,6 @@ export class LessonService implements OnDestroy {
     return this.findClosestLesson(lessons, now, 'next');
   }
 
-  private stopListening(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
-  }
-
   private createLesson(doc: any): Lesson {
     const data = doc.data();
     return {
@@ -126,32 +144,53 @@ export class LessonService implements OnDestroy {
   }
 
   public loadLessons(): void {
-    getDocs(collection(this.firestore, environment.lessonsBase)).then(() => {
-      console.log('Загрузка данных занятий');
-    });
+    const db = this.databaseService.getDatabaseName('lessons')
+    if (db) {
+      getDocs(collection(this.firestore, db)).then(() => {
+        console.log('Загрузка данных занятий');
+      });
+    }
   }
 
   public async getLessons(): Promise<Lesson[]> {
-    const snapshot = await getDocs(collection(this.firestore, environment.lessonsBase));
-    return snapshot.docs.map(this.createLesson);
+    const db = this.databaseService.getDatabaseName('lessons')
+    if (db) {
+      const snapshot = await getDocs(collection(this.firestore, db));
+      return snapshot.docs.map(this.createLesson);
+    }
+    return [];
   }
 
   public async getLessonById(id: string): Promise<Lesson | null> {
-    const docSnap = await getDoc(doc(this.firestore, environment.lessonsBase, id));
-    return docSnap.exists() ? this.createLesson(docSnap) : null;
+    const db = this.databaseService.getDatabaseName('lessons')
+    if (db) {
+      const docSnap = await getDoc(doc(this.firestore, db, id));
+      return docSnap.exists() ? this.createLesson(docSnap) : null;
+    }
+    return null;
   }
 
   public async addLesson(lesson: Omit<Lesson, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(this.firestore, environment.lessonsBase), lesson);
-    return docRef.id;
+    const db = this.databaseService.getDatabaseName('lessons')
+    if (db) {
+      const docRef = await addDoc(collection(this.firestore, db), lesson);
+      return docRef.id;
+    }
+    return '';
   }
 
   public async updateLesson(id: string, changes: Partial<Lesson>): Promise<void> {
-    await updateDoc(doc(this.firestore, environment.lessonsBase, id), changes);
+    const db = this.databaseService.getDatabaseName('lessons')
+    if (db) {
+      await updateDoc(doc(this.firestore, db, id), changes);
+    }
   }
 
   public async deleteLesson(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, environment.lessonsBase, id));
+    const db = this.databaseService.getDatabaseName('lessons')
+    if (db) {
+      await deleteDoc(doc(this.firestore, db, id));
+    }
   }
 
   public async deleteLessonsByStudentId(studentId: string): Promise<void> {

@@ -82,7 +82,6 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   private subscribeToStudents(): void {
-    this.studentService.loadStudents();
     this.studentService.students$.subscribe(students => {
       this.students = students;
     })

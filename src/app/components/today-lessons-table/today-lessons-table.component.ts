@@ -44,7 +44,6 @@ export class TodayLessonsTableComponent implements OnInit, OnChanges {
   }
 
   private async subscribeToStudents(): Promise<void> {
-    this.studentService.loadStudents();
     this.studentService.students$.subscribe(students => {
       this.students = students;
     });

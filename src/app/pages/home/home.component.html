@@ -1,51 +1,20 @@
-<main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
-    <div class="welcome-message">
-        <h1>Добро пожаловать</h1>
-        <h3>Версия от 16.07.25</h3>
-        <p>Это тестовый сервис для репетиторства и удобного менеджмента.</p>
-        <p>Поскольку сервис находится в разработке здесь временно будут анектоды</p>
-    </div>
+<main class="collections-container" [style.margin-left.%]="pageMarginLeftPercentage">
+    <h1 class="collections-title">Текущие коллекции</h1>
 
-    <div class="joke">
-        <h3>Анекдот:</h3>
-        <p>
-            На экзамене по истории студент спрашивает соседа:
-            <br>
-            - Слышь, а когда отменили крепостное право?
-            <br>
-            - В шестьдесят первом.
-            <br>
-            - Тогда ж Гагарин в космос полетел.
-            <br>
-            - Ну, видимо, в честь этого и отменили.
-        </p>
+    <div class="collections-grid">
+        <div *ngFor="let col of collections" class="collection-card" (click)="openCollection(col)"
+            [class.current]="isCurrent(col)">
+            <span class="collection-name">{{col.name}}</span>
+        </div>
+
+        <div class="add-collection-card" (click)="addCollection()">
+            <div class="add-collection-content">
+                <img class="add-icon"
+                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
+                    alt="Добавить коллекцию">
+                <span class="add-collection-label">Добавить коллекцию</span>
+            </div>
+        </div>
     </div>
-    <div class="joke">
-        <h3>Анекдот:</h3>
-        <p>
-            — Столица Британии?
-            <br>
-            — Рим.
-            <br>
-            — Столица Галлии?
-            <br>
-            — Рим.
-            <br>
-            — Столица Египта?
-            <br>
-            — Рим.
-            <br>
-            — Я ставлю вам двойку, Гай!
-            <br>
-            — Посмотрим…
-        </p>
-    </div>
-    <div class="joke">
-        <h3>Анекдот:</h3>
-        <p>
-            — Товарищ Сталин, а правда, что вы читаете по 500 страниц в день?
-            <br>
-            — Правда. И 300 из них — ночные доносы.
-        </p>
-    </div>
+    <button (click)="copyCollection()">Костыль</button>
 </main>

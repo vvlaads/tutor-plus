@@ -9,7 +9,7 @@ import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
 import { SearchComponent } from '../../components/search/search.component';
 import { Lesson, Student } from '../../app.interfaces';
-import { take, Subscription } from 'rxjs';
+import { take } from 'rxjs';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
@@ -28,17 +28,13 @@ import { DeviceService } from '../../services/device.service';
   templateUrl: './students.component.html',
   styleUrls: ['./students.component.css']
 })
-export class StudentsComponent implements OnInit, OnDestroy {
+export class StudentsComponent implements OnInit {
   private studentService = inject(StudentService);
   private lessonService = inject(LessonService);
   private layoutService = inject(LayoutService);
   private router = inject(Router);
   private dialogService = inject(DialogService);
   private deviceService = inject(DeviceService);
-  private studentsSubscription!: Subscription;
-  private layoutSubscription!: Subscription;
-  private prevLessonsSubscription!: Subscription;
-  private nextLessonsSubscription!: Subscription;
 
   public deviceType$ = this.deviceService.deviceType$;
 
@@ -51,8 +47,8 @@ export class StudentsComponent implements OnInit, OnDestroy {
   public formatPhoneNumber = formatPhoneNumber;
   public isPrevLessonsLoading = true;
   public isNextLessonsLoading = true;
-  public prevLessons$ = this.lessonService.prevLessons$;
-  public nextLessons$ = this.lessonService.nextLessons$;
+  public prevLessons = new Map<string, Lesson>();
+  public nextLessons = new Map<string, Lesson>();
   public unpaidLessonsCount: Map<string, number> = new Map();
   public unpaidOwlLessonsCount: Map<string, number> = new Map();
 
@@ -62,24 +58,13 @@ export class StudentsComponent implements OnInit, OnDestroy {
     this.subscribeToLessons();
   }
 
-  public ngOnDestroy(): void {
-    this.studentsSubscription?.unsubscribe();
-    this.layoutSubscription?.unsubscribe();
-    this.prevLessonsSubscription?.unsubscribe();
-    this.nextLessonsSubscription?.unsubscribe();
-
-  }
-
   private subscribeToLessons(): void {
-    this.prevLessonsSubscription = this.prevLessons$.subscribe({
-      next: () => this.isPrevLessonsLoading = false,
-      error: () => this.isPrevLessonsLoading = false
-    });
-
-    this.nextLessonsSubscription = this.nextLessons$.subscribe({
-      next: () => this.isNextLessonsLoading = false,
-      error: () => this.isNextLessonsLoading = false
-    });
+    this.lessonService.prevLessons$.subscribe(prevLessons => {
+      this.prevLessons = prevLessons;
+    })
+    this.lessonService.nextLessons$.subscribe(nextLessons => {
+      this.nextLessons = nextLessons;
+    })
   }
 
   public getPrevLessonDate(lesson: Lesson | null | undefined): string {
@@ -107,21 +92,11 @@ export class StudentsComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToStudents(): void {
-    this.isLoading = true;
-
-    this.studentService.loadStudents();
-
-    this.studentsSubscription = this.studentService.students$.subscribe({
-      next: (students) => {
-        this.updateStudents(students);
-        this.applySearchFilter();
-        this.isLoading = false;
-      },
-      error: (err) => {
-        console.error('Error loading students', err);
-        this.isLoading = false;
-      }
-    });
+    this.studentService.students$.subscribe(students => {
+      this.students = students;
+      this.updateStudents(students);
+      this.applySearchFilter();
+    })
   }
 
   private async updateStudents(students: Student[]): Promise<void> {

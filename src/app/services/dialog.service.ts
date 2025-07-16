@@ -2,12 +2,14 @@ import { inject, Injectable } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { StudentDialogComponent } from '../dialogs/student-dialog/student-dialog.component';
 import { DialogMode } from '../app.enums';
-import { Lesson, SelectOption, Slot, Student, WaitingBlock } from '../app.interfaces';
+import { Collection, Lesson, SelectOption, Slot, Student, WaitingBlock } from '../app.interfaces';
 import { LessonDialogComponent } from '../dialogs/lesson-dialog/lesson-dialog.component';
 import { SlotDialogComponent } from '../dialogs/slot-dialog/slot-dialog.component';
 import { ChoiceDialogComponent } from '../dialogs/choice-dialog/choice-dialog.component';
 import { FindDateDialogComponent } from '../dialogs/find-date-dialog/find-date-dialog.component';
 import { WaitingBlockDialogComponent } from '../dialogs/waiting-block-dialog/waiting-block-dialog.component';
+import { CollectionDialogComponent } from '../dialogs/collection-dialog/collection-dialog.component';
+import { collection } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -90,6 +92,20 @@ export class DialogService {
       data: {
         mode: mode,
         waitingBlock: waitingBlock
+      }
+    });
+    return dialogRef;
+  }
+
+  public openCollectionDialog(mode: DialogMode, col: Partial<Collection> | null): MatDialogRef<CollectionDialogComponent, any> {
+    const dialogRef = this.dialog.open(CollectionDialogComponent, {
+      width: '1200px',
+      maxWidth: '95vw',
+      panelClass: 'wide-dialog',
+      disableClose: true,
+      data: {
+        mode: mode,
+        collection: col
       }
     });
     return dialogRef;

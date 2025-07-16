@@ -1,44 +1,55 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc } from '@angular/fire/firestore';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Slot } from '../app.interfaces';
 import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
 import { environment } from '../../environments/environment';
+import { DatabaseService } from './database.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SlotService implements OnDestroy {
-  private unsubscribe!: () => void;
+  private destroy$ = new Subject<void>();
   private slotsSubject = new BehaviorSubject<Slot[]>([]);
+  private databaseService = inject(DatabaseService);
 
-  public slots$ = this.slotsSubject.asObservable();
+  public slots$ = this.databaseService
+    .getDatabaseStream('slots')
+    .pipe(
+      switchMap(dbName => {
+        this.slotsSubject.next([]);
+        if (!dbName) return of([]);
+        return this.createCollectionListener(dbName);
+      }),
+      takeUntil(this.destroy$)
+    );
 
   public constructor(private firestore: Firestore) {
-    this.startListening();
     this.cleanupOldSlots();
   }
 
   public ngOnDestroy(): void {
-    this.stopListening();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  private startListening(): void {
-    const slotsRef = collection(this.firestore, environment.slotsBase);
+  private createCollectionListener(dbName: string): Observable<Slot[]> {
+    return new Observable<Slot[]>(subscriber => {
+      const unsubscribe = onSnapshot(
+        collection(this.firestore, dbName),
+        snapshot => {
+          const slots = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          } as Slot));
+          subscriber.next(slots);
+        },
+        error => console.error('Ошибка загрузки окон:', error)
+      );
 
-    this.unsubscribe = onSnapshot(slotsRef, {
-      next: (snapshot) => {
-        const slots = snapshot.docs.map(this.createSlot);
-        this.slotsSubject.next(slots);
-      },
-      error: (err) => console.error('Ошибка загрузки:', err)
+      return () => unsubscribe();
     });
-  }
-
-  private stopListening(): void {
-    if (this.unsubscribe) {
-      this.unsubscribe();
-    }
   }
 
   private createSlot(doc: any): Slot {
@@ -57,33 +68,54 @@ export class SlotService implements OnDestroy {
   }
 
   public loadSlots(): void {
-    getDocs(collection(this.firestore, environment.slotsBase)).then(() => {
-      console.log('Загрузка данных окон в расписании');
-    });
+    const db = this.databaseService.getDatabaseName('slots')
+    if (db) {
+      getDocs(collection(this.firestore, db)).then(() => {
+        console.log('Загрузка данных окон в расписании');
+      });
+    }
     this.cleanupOldSlots();
   }
 
   public async getSlots(): Promise<Slot[]> {
-    const snapshot = await getDocs(collection(this.firestore, environment.slotsBase));
-    return snapshot.docs.map(this.createSlot);
+    const db = this.databaseService.getDatabaseName('slots')
+    if (db) {
+      const snapshot = await getDocs(collection(this.firestore, db));
+      return snapshot.docs.map(this.createSlot);
+    }
+    return [];
   }
 
   public async getSlotById(id: string): Promise<Slot | null> {
-    const docSnap = await getDoc(doc(this.firestore, environment.slotsBase, id));
-    return docSnap.exists() ? this.createSlot(docSnap) : null;
+    const db = this.databaseService.getDatabaseName('slots')
+    if (db) {
+      const docSnap = await getDoc(doc(this.firestore, db, id));
+      return docSnap.exists() ? this.createSlot(docSnap) : null;
+    }
+    return null;
   }
 
   public async addSlot(slot: Omit<Slot, 'id'>): Promise<string> {
-    const docRef = await addDoc(collection(this.firestore, environment.slotsBase), slot);
-    return docRef.id;
+    const db = this.databaseService.getDatabaseName('slots')
+    if (db) {
+      const docRef = await addDoc(collection(this.firestore, db), slot);
+      return docRef.id;
+    }
+    return '';
   }
 
   public async updateSlot(id: string, changes: Partial<Slot>): Promise<void> {
-    await updateDoc(doc(this.firestore, environment.slotsBase, id), changes);
+    const db = this.databaseService.getDatabaseName('slots')
+    if (db) {
+      await updateDoc(doc(this.firestore, db, id), changes);
+    }
   }
 
   public async deleteSlot(id: string): Promise<void> {
-    await deleteDoc(doc(this.firestore, environment.slotsBase, id));
+    const db = this.databaseService.getDatabaseName('slots')
+    if (db) {
+      await deleteDoc(doc(this.firestore, db, id));
+    }
   }
 
   public async getSlotsByBaseId(baseId: string): Promise<Slot[]> {

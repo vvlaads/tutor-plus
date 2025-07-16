@@ -1,47 +1,66 @@
-<div class="table-container">
-    <div class="grid-header" [style.height.px]="headerHeight">
-        <div class="time-label">Время:</div>
-        <div *ngFor="let dayName of weekDayNames; let i = index" class="dayName" [class.current]="isCurrent(i)">
-            {{dayName}}, {{weekDates[i].getDate()}} {{monthNames[weekDates[i].getMonth()]}}
+<div class="schedule-table-container">
+    <div class="before-table">
+        <div class="date-info">
+            <span class="year">{{currentDate.getFullYear()}} </span>
+            <span class="current-week" *ngIf="isCurrentWeek()">Текущая неделя</span>
+        </div>
+
+        <div class="windows-manager">
+            <button class="window-button" (click)="changeVisibilityOfSlots()">{{changeVisibilityTitle}}</button>
+            <button class="window-button" (click)="copySlots()">Копировать окна</button>
         </div>
     </div>
 
-    <div class="grid-body">
-        <div *ngFor="let time of times; let rowIndex = index" class="time-value" [style.grid-row]="rowIndex + 1">
-            {{time}}
-        </div>
-
-        <ng-container *ngFor="let time of times; let rowIndex = index">
-            <div *ngFor="let dayName of weekDayNames; let colIndex = index" class="cell" [style.grid-row]="rowIndex + 1"
-                [style.grid-column]="colIndex + 2" (click)="cellIsClicked(dayName, time)"
-                [class.disabled]="cellIsDisabled(dayName, time)">
-                <img class="cell-content"
-                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png">
-            </div>
-        </ng-container>
-
-        <div *ngFor="let lesson of currentWeekLessons" class="lesson"
-            [style.background-color]="getStudentByLesson(lesson)?.color"
-            [style.left]="getTimeBlockLeftPosition(lesson) + '%'" [style.top.px]="getTimeBlockTopPosition(lesson)"
-            [style.width]="blockWidthPercentage + '%'" [style.height.px]="getTimeBlockHeight(lesson)"
-            (click)="openLesson(lesson)">
-            <div class="lesson-content">
-                <div class="lesson-time">{{lesson.startTime}} - {{lesson.endTime}}</div>
-                <div class="lesson-student-name">{{getStudentByLesson(lesson)?.name}}</div>
-            </div>
-            <div class="lesson-badges">
-                <span class="paid-badge" [class.paid]="lesson.isPaid">
-                    {{lesson.isPaid ? '✓' : '₽'}}
-                </span>
-                <img class="owl-badge" *ngIf="getStudentByLesson(lesson)?.from === 'Сова'"
-                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png">
+    <div class="table-container">
+        <div class="grid-header" [style.height.px]="headerHeight">
+            <div class="time-label">Время:</div>
+            <div *ngFor="let dayName of weekDayNames; let i = index" class="dayName" [class.today]="isToday(i)">
+                {{dayName}}, {{weekDates[i].getDate()}} {{monthNames[weekDates[i].getMonth()]}}
             </div>
         </div>
 
-        <div *ngFor="let slot of currentWeekSlots" class="slot" [style.left]="getTimeBlockLeftPosition(slot) + '%'"
-            [style.top.px]="getTimeBlockTopPosition(slot)" [style.width]="blockWidthPercentage + '%'"
-            [style.height.px]="getTimeBlockHeight(slot)" (click)="openSlot(slot)">
-            <div class="slot-time">{{slot.startTime}} - {{slot.endTime}}</div>
+        <div class="grid-body">
+            <div *ngFor="let time of times; let rowIndex = index" class="time-value" [style.grid-row]="rowIndex + 1">
+                {{time}}
+            </div>
+
+            <ng-container *ngFor="let time of times; let rowIndex = index">
+                <div *ngFor="let dayName of weekDayNames; let colIndex = index" class="cell"
+                    [style.grid-row]="rowIndex + 1" [style.grid-column]="colIndex + 2"
+                    (click)="cellIsClicked(dayName, time)" [class.disabled]="cellIsDisabled(dayName, time)">
+                    <img class="cell-content"
+                        src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png">
+                </div>
+            </ng-container>
+
+            <div *ngFor="let lesson of currentWeekLessons" class="lesson"
+                [style.background-color]="getStudentByLesson(lesson)?.color"
+                [style.left]="getTimeBlockLeftPosition(lesson) + '%'" [style.top.px]="getTimeBlockTopPosition(lesson)"
+                [style.width]="blockWidthPercentage + '%'" [style.height.px]="getTimeBlockHeight(lesson)"
+                (click)="openLesson(lesson)">
+                <div class="lesson-content">
+                    <div class="lesson-time">{{lesson.startTime}} - {{lesson.hasRealEndTime? lesson.realEndTime:
+                        lesson.endTime}}</div>
+                    <div class="lesson-student-name">{{getStudentByLesson(lesson)?.name}}</div>
+                </div>
+                <div class="lesson-badges">
+                    <span class="paid-badge" [class.paid]="lesson.isPaid">
+                        {{lesson.isPaid ? '✓' : '₽'}}
+                    </span>
+                    <img class="owl-badge" *ngIf="getStudentByLesson(lesson)?.from === 'Сова'"
+                        src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png">
+                </div>
+            </div>
+            <ng-container *ngIf="slotsIsVisible">
+                <div *ngFor="let slot of currentWeekSlots" class="slot"
+                    [style.left]="getTimeBlockLeftPosition(slot) + '%'" [style.top.px]="getTimeBlockTopPosition(slot)"
+                    [style.width]="blockWidthPercentage + '%'" [style.height.px]="getTimeBlockHeight(slot)"
+                    (click)="openSlot(slot)">
+                    <div class="slot-time">{{slot.startTime}} - {{slot.hasRealEndTime? slot.realEndTime: slot.endTime}}
+                    </div>
+                </div>
+            </ng-container>
         </div>
     </div>
+    <app-notification #notification></app-notification>
 </div>

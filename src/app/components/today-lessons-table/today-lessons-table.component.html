@@ -1,0 +1,56 @@
+<div class="today-lessons-table-container">
+    <div class="before-table">
+        <div class="date-info">
+            <span class="date">{{getFormattedDate(currentDate)}} </span>
+            <span class="current-day" *ngIf="isToday()">Сегодня</span>
+        </div>
+
+        <div class="function-manager">
+            <button class="function-button" (click)="print()">Печать</button>
+            <button class="function-button" (click)="export()">Экспорт</button>
+        </div>
+    </div>
+
+    <table class="today-lessons-table" id="schedule-table">
+        <thead>
+            <tr class="table-header">
+                <th class="time-start-column">Начало</th>
+                <th class="time-end-column">Конец</th>
+                <th class="time-distance-column">Время</th>
+                <th class="student-column">Ученик</th>
+                <th class="communication-column">Где общаемся</th>
+                <th class="platform-column">Где занимаемся</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let lesson of oneDayLessons; let i = index">
+                <tr class="lesson-info-row">
+                    <td class="time-start-cell">{{lesson.startTime}}</td>
+                    <td class="time-end-cell">{{lesson.hasRealEndTime ? lesson.realEndTime: lesson.endTime}}
+                    </td>
+                    <td class="time-distance-cell" [class.not-default]="notDefaultTime(lesson)">
+                        {{ lesson.hasRealEndTime? getRealTimeDifference(lesson)
+                        :getTimeDifference(lesson.startTime, lesson.endTime)}}
+                        мин
+                    </td>
+                    <td class="student-cell">
+                        <span class="student-name-in-cell">{{getStudentByLesson(lesson)?.name}}</span>
+                        <br />
+                        <span class="note">{{lesson.note}}</span>
+                    </td>
+                    <td class="communication-cell"
+                        [style.background-color]="getAppColor(getStudentByLesson(lesson)?.communication)">
+                        {{getStudentByLesson(lesson)?.communication}}</td>
+                    <td class="platform-cell"
+                        [style.background-color]="getAppColor(getStudentByLesson(lesson)?.platform)">
+                        {{getStudentByLesson(lesson)?.platform}}</td>
+                </tr>
+                <tr class="break-row" *ngIf="i < oneDayLessons.length - 1">
+                    <td colspan="6" class="break-cell">
+                        Перерыв {{getBreakTime(i)}} минут
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+</div>

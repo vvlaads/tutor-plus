@@ -1,603 +1,79 @@
-import { AfterViewInit, Component, ElementRef, inject, OnInit, ViewChild } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutService } from '../../services/layout.service';
 import { DialogMode, ScheduleObject } from '../../app.enums';
-import { LessonService } from '../../services/lesson.service';
-import { Lesson, Slot, Student } from '../../app.interfaces';
-import { StudentService } from '../../services/student.service';
-import {
-  BLOCK_HEIGHT_IN_PIXELS, BLOCK_WIDTH_PERCENTAGE, FROM_OPTIONS, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MILLISECONDS_IN_SECOND,
-  MINUTES_IN_HOUR, MONTH_NAMES, SCHEDULE_OBJECT_OPTIONS, SECONDS_IN_MINUTE, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES
-} from '../../app.constants';
-import { SlotService } from '../../services/slot.service';
-import * as XLSX from 'xlsx';
+import { SCHEDULE_OBJECT_OPTIONS } from '../../app.constants';
+import { TodayLessonsTableComponent } from "../../components/today-lessons-table/today-lessons-table.component";
 import { DialogService } from '../../services/dialog.service';
-import { convertDateToString, convertMinutesToTime, convertStringToDate, convertTimeToMinutes, isDatesEquals } from '../../functions/dates';
-import { FormsModule } from '@angular/forms';
-import { NotificationComponent } from "../../components/notification/notification.component";
-import { DeviceService } from '../../services/device.service';
+import { convertStringToDate } from '../../functions/dates';
+import { ScheduleTableComponent } from "../../components/schedule-table/schedule-table.component";
 
 @Component({
   standalone: true,
   selector: 'app-schedule',
-  imports: [CommonModule, FormsModule, NotificationComponent],
+  imports: [CommonModule, TodayLessonsTableComponent, ScheduleTableComponent],
   templateUrl: './schedule.component.html',
   styleUrl: './schedule.component.css'
 })
-export class ScheduleComponent implements OnInit, AfterViewInit {
-  private dialogService = inject(DialogService);
-  private lessons: Lesson[] = [];
-  private slots: Slot[] = []
-  private students: Student[] = [];
-  @ViewChild('notification') notification!: NotificationComponent;
-  @ViewChild('scrollContainer') scrollContainer!: ElementRef;
-
+export class ScheduleComponent {
   public pageMarginLeftPercentage: number = 0;
-  public blockHeightPixels: number = BLOCK_HEIGHT_IN_PIXELS;
-  public blockWidthPercentage: number = BLOCK_WIDTH_PERCENTAGE;
-  public timeColumnWidthPercetage: number = TIME_COLUMN_WIDTH_PERCENTAGE;
-  public times: string[] = TIMES;
-  public monthNames: string[] = MONTH_NAMES;
-  public weekDayNames: string[] = WEEKDAY_NAMES;
-  public currentDate: Date = new Date();
-  public readonly today: Date = new Date();
-  public isOneDayFormat: boolean = false;
-  public currentWeekDates: Date[] = [];
-  public slotsIsHidden = false;
-  private deviceService = inject(DeviceService);
-  public deviceType$ = this.deviceService.deviceType$;
-  public currentWeekLessons: Lesson[] = [];
-  public oneDayLessons: Lesson[] = [];
-  public currentWeekSlots: Slot[] = [];
+  public oneDayFormat = false;
+  public currentDate = new Date();
 
-  public constructor(
-    private layoutService: LayoutService,
-    private lessonService: LessonService,
-    private studentService: StudentService,
-    private slotService: SlotService) {
+  public constructor(private layoutService: LayoutService, private dialogService: DialogService) {
     this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
       this.pageMarginLeftPercentage = pageMarginLeftPercentage;
     })
   }
 
-  public ngOnInit(): void {
-    this.updateCurrentWeek();
-    this.subscribeToLessons();
-    this.subscribeToStudents();
-    this.subscribeToSlots();
-  }
-
-  private updateCurrentWeek(): void {
-    const monday = new Date(this.currentDate);
-    const dayOfWeek = this.currentDate.getDay();
-    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    monday.setDate(this.currentDate.getDate() - diff);
-
-    this.currentWeekDates = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + i);
-      return date;
-    });
-  }
-
-  private async subscribeToLessons() {
-    this.lessonService.loadLessons();
-    this.lessonService.lessons$.subscribe(lessons => {
-      this.lessons = lessons;
-      this.updateLessons();
-    });
-  }
-
-  private updateLessons(): void {
-    this.oneDayLessons = this.lessons.filter(lesson => {
-      try {
-        const lessonDate = convertStringToDate(lesson.date);
-        return isDatesEquals(this.currentDate, lessonDate);
-      } catch (e) {
-        console.error('Ошибка преобразования:', e);
-        return false;
-      }
-    });
-
-    this.sortLessonsByStartTime();
-
-    this.currentWeekLessons = this.lessons.filter(lesson => {
-      try {
-        const lessonDate = convertStringToDate(lesson.date);
-        return this.currentWeekDates.some(date => isDatesEquals(date, lessonDate));
-      } catch (e) {
-        console.error('Ошибка преобразования:', e);
-        return false;
-      }
-    });
-  }
-
-  private subscribeToStudents(): void {
-    this.studentService.loadStudents();
-    this.studentService.students$.subscribe(students => {
-      this.students = students;
-    })
-  }
-
-  private subscribeToSlots(): void {
-    this.slotService.loadSlots();
-    this.slotService.slots$.subscribe(slots => {
-      this.slots = slots;
-      this.updateSlots();
-    });
-  }
-
-  private updateSlots(): void {
-    this.currentWeekSlots = this.slots.filter(slot => {
-      try {
-        const slotDate = convertStringToDate(slot.date);
-        return this.currentWeekDates.some(date => isDatesEquals(date, slotDate));
-      } catch (e) {
-        console.error('Ошибка преобразования:', e);
-        return false;
-      }
-    });
-  }
-
-  private updateCurrentDate(newDate: Date): void {
-    this.currentDate = new Date(newDate);
-    this.updateCurrentWeek();
-    this.updateLessons();
-    this.updateSlots();
-  }
-
-  private getDateByDayName(dayName: string): Date | null {
-    if (this.weekDayNames.includes(dayName)) {
-      for (var i = 0; i < this.weekDayNames.length; i++) {
-        if (this.weekDayNames[i] === dayName) {
-          return this.currentWeekDates[i];
-        }
-      }
-    }
-    return null
-  }
-
-  public getStudentByLesson(lesson: Lesson): Student | null {
-    for (let student of this.students) {
-      if (student.id === lesson.studentId) {
-        return student;
-      }
-    }
-
-    return null;
-  }
-
   public setOneDayFormat(isOneDayFormat: boolean): void {
-    this.isOneDayFormat = isOneDayFormat;
+    this.oneDayFormat = isOneDayFormat;
   }
 
-  public goToPrev(): void {
+  public resetCurrentDate(): void {
+    this.currentDate = new Date();
+  }
+
+  public goPrev(): void {
     const newDate = new Date(this.currentDate);
-    if (this.isOneDayFormat) {
+    if (this.oneDayFormat) {
       newDate.setDate(newDate.getDate() - 1);
     } else {
       newDate.setDate(newDate.getDate() - 7);
     }
-    this.updateCurrentDate(newDate);
-  }
-
-  public goToNext(): void {
-    const newDate = new Date(this.currentDate);
-    if (this.isOneDayFormat) {
-      newDate.setDate(newDate.getDate() + 1);
-    } else {
-      newDate.setDate(newDate.getDate() + 7);
-    }
-    this.updateCurrentDate(newDate);
+    this.currentDate = newDate;
   }
 
   public findDate(): void {
     const dialogRef = this.dialogService.openFindDateDialog();
     dialogRef.afterClosed().subscribe(result => {
-      console.log(`Переход к дате ${result}`)
-      if (result !== undefined) {
-        this.updateCurrentDate(convertStringToDate(result));
-      } else {
-        console.log("Дата для перехода не найдена")
+      if (result) {
+        this.currentDate = new Date(convertStringToDate(result));
       }
     });
   }
 
-  public resetCurrentDate(): void {
-    this.updateCurrentDate(this.today);
-  }
-
-  private getNextTime(time: string): string {
-    let timeInMinutes = convertTimeToMinutes(time)
-    timeInMinutes += 60;
-    let nextTime = ''
-    try {
-      nextTime = convertMinutesToTime(timeInMinutes)
-    } catch (error) {
-      timeInMinutes -= 5;
-      nextTime = convertMinutesToTime(timeInMinutes)
+  public goNext(): void {
+    const newDate = new Date(this.currentDate);
+    if (this.oneDayFormat) {
+      newDate.setDate(newDate.getDate() + 1);
+    } else {
+      newDate.setDate(newDate.getDate() + 7);
     }
-    return nextTime;
-  }
-
-  private getConstantToFixOffset(hours: number): number {
-    // let c = 0;
-    // let counter = 0
-    // for (let i = 0; i <= hours; i++) {
-    //   counter += 1;
-    //   if (Number.isInteger(c)) {
-    //     if (counter == 2) {
-    //       counter = 0
-    //       c += 0.5
-    //     }
-    //   } else {
-    //     if (counter == 3) {
-    //       counter = 0
-    //       c += 0.5
-    //     }
-    //   }
-    // }
-    // return hours - c;
-    return hours;
-  }
-
-  public getLessonHeight(lesson: Lesson): string {
-    let startTime = convertTimeToMinutes(lesson.startTime);
-    let endTime = convertTimeToMinutes(lesson.endTime);
-    let hours = Math.floor(endTime / 60) - Math.floor(startTime / 60)
-
-    return `${(endTime - startTime) * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours)}px`
-  }
-
-  public getLessonTop(lesson: Lesson): number {
-    const totalMinutes = convertTimeToMinutes(lesson.startTime)
-    const hours = Math.floor(totalMinutes / 60);
-    return totalMinutes * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours);
-  }
-
-  public getLessonLeft(lesson: Lesson): number {
-    const lessonDate = convertStringToDate(lesson.date);
-    for (let i = 0; i < this.currentWeekDates.length; i++) {
-      if (isDatesEquals(lessonDate, this.currentWeekDates[i])) {
-        return this.timeColumnWidthPercetage + i * this.blockWidthPercentage;
-      }
-    }
-    return 0;
-  }
-
-  public getSlotHeight(slot: Slot): string {
-    let startTime = convertTimeToMinutes(slot.startTime);
-    let endTime = convertTimeToMinutes(slot.endTime);
-    let hours = Math.floor(endTime / 60) - Math.floor(startTime / 60)
-
-    return `${(endTime - startTime) * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours)}px`
-  }
-
-  public getSlotTop(slot: Slot): number {
-    const totalMinutes = convertTimeToMinutes(slot.startTime)
-    const hours = Math.floor(totalMinutes / 60);
-    return totalMinutes * this.blockHeightPixels / 60 + this.getConstantToFixOffset(hours);
-  }
-
-  public getSlotLeft(slot: Slot): number {
-    const lessonDate = convertStringToDate(slot.date);
-    for (let i = 0; i < this.currentWeekDates.length; i++) {
-      if (isDatesEquals(lessonDate, this.currentWeekDates[i])) {
-        return this.timeColumnWidthPercetage + i * this.blockWidthPercentage;
-      }
-    }
-    return 0;
-  }
-
-  public addLesson() {
-    this.dialogService.openLessonDialog(DialogMode.Add, null);
-  }
-
-  public editLesson(lesson: Lesson) {
-    this.dialogService.openLessonDialog(DialogMode.Edit, lesson);
-  }
-
-  public editSlot(slot: Slot) {
-    this.dialogService.openSlotDialog(DialogMode.Edit, slot);
-  }
-
-  public cellIsClicked(time: string, dayName: string) {
-    if (this.isCellDisabled(time, dayName)) {
-      return;
-    }
-
-    const date = this.getDateByDayName(dayName)
-    if (!date) {
-      return;
-    }
-    let options = SCHEDULE_OBJECT_OPTIONS
-    const dialogRef = this.dialogService.openChoiceDialog(options);
-    var endTime = this.getNextTime(time);
-
-    dialogRef.afterClosed().subscribe((option) => {
-      switch (option) {
-        case ScheduleObject.Slot:
-          const slot = { date: convertDateToString(date), startTime: time, endTime: endTime }
-          this.dialogService.openSlotDialog(DialogMode.Add, slot);
-          break;
-        case ScheduleObject.Lesson:
-          const lesson = { date: convertDateToString(date), startTime: time, endTime: endTime }
-          this.dialogService.openLessonDialog(DialogMode.Add, lesson, true)
-          break;
-      }
-    });
-
-  }
-
-  public isCellDisabled(time: string, dayName: string): boolean {
-    const originalDate = this.getDateByDayName(dayName);
-    if (!originalDate) return false;
-
-    const cellStart = this.createDateTime(convertDateToString(originalDate), time);
-    const cellEnd = new Date(cellStart.getTime() + (MINUTES_IN_HOUR - 1) * SECONDS_IN_MINUTE * MILLISECONDS_IN_SECOND);
-
-    const hasLessonConflict = this.lessons.some(lesson => {
-      const lessonStart = this.createDateTime(lesson.date, lesson.startTime);
-      const lessonEnd = this.createDateTime(lesson.date, lesson.endTime);
-      return this.checkTimeConflict(cellStart, cellEnd, lessonStart, lessonEnd);
-    });
-
-    const hasSlotConflict = this.slots.some(slot => {
-      const slotStart = this.createDateTime(slot.date, slot.startTime);
-      const slotEnd = this.createDateTime(slot.date, slot.endTime);
-      return this.checkTimeConflict(cellStart, cellEnd, slotStart, slotEnd);
-    });
-
-    return hasLessonConflict || hasSlotConflict;
-  }
-
-  private createDateTime(dateStr: string, timeStr: string): Date {
-    const date = new Date(convertStringToDate(dateStr));
-    date.setMinutes(convertTimeToMinutes(timeStr));
-    return date;
-  }
-
-  private checkTimeConflict(
-    rangeStart: Date,
-    rangeEnd: Date,
-    eventStart: Date,
-    eventEnd: Date
-  ): boolean {
-    return (
-      (eventStart >= rangeStart && eventStart <= rangeEnd) ||
-      (eventEnd > rangeStart && eventEnd <= rangeEnd) ||
-      (eventStart <= rangeStart && eventEnd >= rangeEnd)
-    );
-  }
-
-  public showTodayMessage(): boolean {
-    if (this.isOneDayFormat && this.dateIsToday(this.currentDate)) {
-      return true;
-    }
-    return false;
-  }
-
-  public showWeekMessage(): boolean {
-    if (!this.isOneDayFormat && this.dateIsToday(this.currentDate)) {
-      return true;
-    }
-    return false;
-  }
-
-  public dateIsToday(date: Date): boolean {
-    return isDatesEquals(date, this.today);
-  }
-
-  public getTimeDifference(time1: string, time2: string): number {
-    let minutes1 = convertTimeToMinutes(time1);
-    let minutes2 = convertTimeToMinutes(time2);
-    let difference = minutes1 - minutes2
-    if (difference < 0) {
-      return -difference;
-    }
-    return difference;
-  }
-
-  public getRealTimeDifference(lesson: Lesson): number {
-    if (lesson.hasRealEndTime && lesson.realEndTime) {
-      const start = convertTimeToMinutes(lesson.startTime);
-      const end = convertTimeToMinutes(lesson.realEndTime);
-      if (start > end && end + HOURS_IN_DAY * MINUTES_IN_HOUR <= start + MAX_LESSON_DURATION * MINUTES_IN_HOUR) {
-        return end + HOURS_IN_DAY * MINUTES_IN_HOUR - start;
-      }
-    }
-    return this.getTimeDifference(lesson.startTime, lesson.endTime);
-  }
-
-  public sortLessonsByStartTime(ascending: boolean = true): void {
-    this.oneDayLessons.sort((a, b) => {
-      const timeA = convertTimeToMinutes(a.startTime);
-      const timeB = convertTimeToMinutes(b.startTime);
-
-      return ascending ? timeA - timeB : timeB - timeA;
-    });
-  }
-
-  public getBreakTime(index: number) {
-    let prevTime = this.oneDayLessons[index].endTime
-    let nextTime = this.oneDayLessons[index + 1].startTime
-    return this.getTimeDifference(prevTime, nextTime);
-  }
-
-  public notDefaultTime(lesson: Lesson): boolean {
-    let time = this.getTimeDifference(lesson.startTime, lesson.endTime);
-    if (time !== 60) {
-      return true;
-    }
-    return false;
-  }
-
-  public printTable(): void {
-    const printContent = document.getElementById('schedule-table')?.outerHTML;
-    const originalContent = document.body.innerHTML;
-
-    document.body.innerHTML = printContent || '';
-    window.print();
-    document.body.innerHTML = originalContent;
-
-    window.location.reload();
-  }
-
-  public getAppColor(appName: string | undefined): string {
-    if (appName) {
-      switch (appName) {
-        case 'WhatsApp':
-          return 'rgb(141, 255, 147)';
-        case 'Telegram':
-          return 'rgb(141, 238, 255)';
-        case 'Zoom':
-          return 'rgb(24, 143, 154)';
-        case 'Profi':
-          return 'rgb(255, 165, 171)';
-        case 'Дома':
-          return 'rgb(255, 165, 171)';
-        case 'Teams':
-          return 'rgb(207, 144, 255)';
-      }
-    }
-    return 'rgb(255,255,255)'
-  }
-
-  public getCurrentDateInString(): string {
-    return convertDateToString(this.currentDate);
+    this.currentDate = newDate;
   }
 
   public addScheduleObject(): void {
-    let options = SCHEDULE_OBJECT_OPTIONS;
-    const dialogRef = this.dialogService.openChoiceDialog(options);
-
-    dialogRef.afterClosed().subscribe((option) => {
-      switch (option) {
-        case ScheduleObject.Slot:
-          this.dialogService.openSlotDialog(DialogMode.Add, null);
-          break;
+    const dialogRef = this.dialogService.openChoiceDialog(SCHEDULE_OBJECT_OPTIONS);
+    dialogRef.afterClosed().subscribe(result => {
+      switch (result) {
         case ScheduleObject.Lesson:
           this.dialogService.openLessonDialog(DialogMode.Add, null);
           break;
+        case ScheduleObject.Slot:
+          this.dialogService.openSlotDialog(DialogMode.Add, null);
       }
-    });
-  }
-
-  public async exportTables(): Promise<void> {
-    const rangeWeeks = 2;
-    this.resetCurrentDate();
-    this.updateCurrentDate(this.currentWeekDates[0]);
-    const dayInWeek = 7;
-    for (let i = 0; i < dayInWeek * rangeWeeks; i++) {
-      this.goToPrev();
-    }
-    const dayCount = (rangeWeeks * 2 + 1) * dayInWeek;
-    const workbook = XLSX.utils.book_new();
-
-    try {
-      console.log(`Начинаем экспорт`);
-
-      for (let i = 0; i < dayCount; i++) {
-        const tableElement = document.getElementById('schedule-table');
-        if (!tableElement) {
-          console.error('Таблица не найдена');
-          continue;
-        }
-
-        const worksheet = XLSX.utils.table_to_sheet(tableElement);
-        const sheetName = `${convertDateToString(this.currentDate)}`;
-        XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
-        this.goToNext();
-        await new Promise(resolve => setTimeout(resolve, 300));
-      }
-
-      this.resetCurrentDate();
-      const fileName = `Расписание ${convertDateToString(this.currentDate)}.xlsx`;
-      XLSX.writeFile(workbook, fileName);
-      console.log('Экспорт завершен успешно!');
-
-    } catch (error) {
-      console.error('Ошибка при экспорте:', error);
-      this.resetCurrentDate();
-    }
-  }
-
-  public getFromIcon(lesson: Lesson): string | null {
-    const options = FROM_OPTIONS;
-    const student = this.getStudentByLesson(lesson);
-    if (student) {
-      for (let option of options) {
-        if (student.from == option.value) {
-          return option.icon;
-        }
-      }
-    }
-    return null;
-  }
-
-  public fromIsOwl(lesson: Lesson): boolean {
-    const options = FROM_OPTIONS;
-    const student = this.getStudentByLesson(lesson);
-    if (student) {
-      return student.from === 'Сова';
-    }
-    return false;
-  }
-
-  private sortSlotsByStartTime(slots: Slot[]): Slot[] {
-    return slots.sort((a, b) => convertTimeToMinutes(a.startTime) - convertTimeToMinutes(b.startTime))
-  }
-
-  public copySlots(): void {
-    let result = ``;
-
-    const monday = new Date(this.currentWeekDates[0]);
-    const sunday = new Date(this.currentWeekDates[6]);
-    let nextWeekToday = new Date(this.today);
-    nextWeekToday.setDate(this.today.getDate() + 7);
-
-    if (monday.getTime() <= this.today.getTime() && this.today.getTime() <= sunday.getTime()) {
-      result += 'На этой неделе есть время:\n';
-    } else if (monday.getTime() <= nextWeekToday.getTime() && nextWeekToday.getTime() <= sunday.getTime()) {
-      result += 'На следующей неделе есть время:\n';
-    } else {
-      result += `На неделе с ${convertDateToString(monday)} по ${convertDateToString(sunday)} есть время:\n`;
-    }
-
-
-    const slots = this.sortSlotsByStartTime(this.currentWeekSlots);
-    for (let i = 0; i < this.currentWeekDates.length; i++) {
-      for (let slot of this.currentWeekSlots) {
-        if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i])) {
-          result += `\n${WEEKDAY_FULL_NAMES[i]}, ${this.currentWeekDates[i].getDate()} ${LOWER_MONTH_NAMES[this.currentWeekDates[i].getMonth()]},\n`
-          break;
-        }
-      }
-      for (let slot of slots) {
-        if (isDatesEquals(convertStringToDate(slot.date), this.currentWeekDates[i])) {
-          if (slot.hasRealEndTime) {
-            result += `С ${slot.startTime} до ${slot.realEndTime} мск\n`
-          } else {
-            result += `С ${slot.startTime} до ${slot.endTime} мск\n`
-          }
-        }
-      }
-    }
-    navigator.clipboard.writeText(result).then(() => {
-      this.notification.show('Скопировано!', 2000);
-    });
-  }
-
-  public ngAfterViewInit(): void {
-    this.scrollToHour('12:00');
-  }
-
-  public scrollToHour(time: string): void {
-    const container = this.scrollContainer.nativeElement;
-    const hourElement = container.querySelector(`[data-hour="${time}"]`);
-
-    if (hourElement) {
-      hourElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
+    })
   }
 }
+

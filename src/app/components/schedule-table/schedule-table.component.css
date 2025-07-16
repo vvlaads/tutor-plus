@@ -1,5 +1,52 @@
+.schedule-table-container {
+    height: 95vh;
+    width: 100%;
+}
+
+.before-table {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.year {
+    font-weight: 600;
+}
+
+.windows-manager {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+}
+
+.window-button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.5);
+    background-color: #f9f9f9;
+    border: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    height: 30px;
+    width: 140px;
+    cursor: pointer;
+}
+
+.window-button:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.window-button:active {
+    color: white;
+    background-color: #1878b8;
+    transform: scale(0.98);
+}
+
 .table-container {
-    height: 100vh;
+    height: 95%;
     overflow-y: auto;
     position: relative;
     width: 100%;
@@ -158,6 +205,6 @@
     background-color: #79f1cf;
 }
 
-.dayName.current {
+.grid-header .dayName.today {
     background-color: #ddd;
 }

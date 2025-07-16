@@ -1,5 +1,5 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { BLOCK_HEIGHT_IN_PIXELS, BLOCK_WIDTH_PERCENTAGE, HEADER_HEIGHT_IN_PIXELS, MINUTES_IN_HOUR, MONTH_NAMES, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_NAMES } from '../../app.constants';
+import { Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { BLOCK_HEIGHT_IN_PIXELS, BLOCK_WIDTH_PERCENTAGE, HEADER_HEIGHT_IN_PIXELS, LOWER_MONTH_NAMES, MINUTES_IN_HOUR, MONTH_NAMES, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES } from '../../app.constants';
 import { CommonModule } from '@angular/common';
 import { LessonService } from '../../services/lesson.service';
 import { Lesson, Slot, Student, TimeBlock } from '../../app.interfaces';
@@ -8,14 +8,23 @@ import { StudentService } from '../../services/student.service';
 import { DialogService } from '../../services/dialog.service';
 import { DialogMode, ScheduleObject } from '../../app.enums';
 import { SlotService } from '../../services/slot.service';
+import { NotificationComponent } from "../notification/notification.component";
 
 @Component({
   selector: 'app-schedule-table',
-  imports: [CommonModule],
+  imports: [CommonModule, NotificationComponent],
   templateUrl: './schedule-table.component.html',
   styleUrl: './schedule-table.component.css'
 })
-export class ScheduleTableComponent implements OnInit {
+export class ScheduleTableComponent implements OnInit, OnChanges {
+  private students: Student[] = [];
+  private lessons: Lesson[] = [];
+  private slots: Slot[] = []
+  private dialogService = inject(DialogService);
+  private lessonService = inject(LessonService);
+  private studentService = inject(StudentService);
+  private slotService = inject(SlotService);
+
   public weekDayNames = WEEKDAY_NAMES;
   public monthNames = MONTH_NAMES;
   public times = TIMES;
@@ -23,23 +32,17 @@ export class ScheduleTableComponent implements OnInit {
   public headerHeight = HEADER_HEIGHT_IN_PIXELS;
   public blockWidthPercentage = BLOCK_WIDTH_PERCENTAGE;
   public timeWidthPercentage = TIME_COLUMN_WIDTH_PERCENTAGE;
-
   public weekDates: Date[] = []
-  public currentDate: Date = new Date();
-
-  private students: Student[] = [];
-
-  private lessons: Lesson[] = [];
   public currentWeekLessons: Lesson[] = [];
-
-  private slots: Slot[] = []
   public currentWeekSlots: Slot[] = [];
-
   public studentsByLessonId: Map<string, Student> = new Map();
-  private dialogService = inject(DialogService);
+  public slotsIsVisible = true;
+  public changeVisibilityTitle = 'Скрыть окна';
 
-  constructor(private lessonService: LessonService, private studentService: StudentService, private slotService: SlotService) {
-  }
+  @Input()
+  public currentDate: Date = new Date();
+  @ViewChild('notification')
+  public notification!: NotificationComponent;
 
   public ngOnInit(): void {
     this.updateCurrentWeek();
@@ -48,7 +51,15 @@ export class ScheduleTableComponent implements OnInit {
     this.subscribeToStudents();
   }
 
-  private async subscribeToLessons() {
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes['currentDate']) {
+      this.updateCurrentWeek();
+      this.updateLessons();
+      this.updateSlots();
+    }
+  }
+
+  private async subscribeToLessons(): Promise<void> {
     this.lessonService.loadLessons();
     this.lessonService.lessons$.subscribe(lessons => {
       this.lessons = lessons;
@@ -56,7 +67,7 @@ export class ScheduleTableComponent implements OnInit {
     });
   }
 
-  private async subscribeToSlots() {
+  private async subscribeToSlots(): Promise<void> {
     this.slotService.loadSlots();
     this.slotService.slots$.subscribe(slots => {
       this.slots = slots;
@@ -83,7 +94,6 @@ export class ScheduleTableComponent implements OnInit {
     });
   }
 
-
   private updateSlots(): void {
     this.currentWeekSlots = this.slots.filter(slot => {
       try {
@@ -104,6 +114,7 @@ export class ScheduleTableComponent implements OnInit {
     }
     return null;
   }
+
   private getDateByDayName(dayName: string): Date | null {
     for (let i = 0; i < this.weekDayNames.length; i++) {
       if (this.weekDayNames[i] === dayName) {
@@ -147,7 +158,6 @@ export class ScheduleTableComponent implements OnInit {
     if (dayIndex === -1) return 0;
     return TIME_COLUMN_WIDTH_PERCENTAGE + (dayIndex * BLOCK_WIDTH_PERCENTAGE);
   }
-
 
   private getNextTime(time: string): string {
     let timeInMinutes = convertTimeToMinutes(time)
@@ -200,10 +210,19 @@ export class ScheduleTableComponent implements OnInit {
     }
   }
 
-  public isCurrent(index: number): boolean {
+  public isToday(index: number): boolean {
     const today = new Date();
     const date = this.weekDates[index];
     return isDatesEquals(today, date);
+  }
+
+  public isCurrentWeek(): boolean {
+    for (let i = 0; i < this.weekDates.length; i++) {
+      if (this.isToday(i)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public openLesson(lesson: Lesson): void {
@@ -212,5 +231,57 @@ export class ScheduleTableComponent implements OnInit {
 
   public openSlot(slot: Slot): void {
     this.dialogService.openSlotDialog(DialogMode.Edit, slot);
+  }
+
+  public copySlots(): void {
+    let result = ``;
+    const monday = new Date(this.weekDates[0]);
+    const sunday = new Date(this.weekDates[6]);
+    const today = new Date();
+    let nextWeekToday = new Date(today);
+    nextWeekToday.setDate(today.getDate() + 7);
+
+    if (monday.getTime() <= today.getTime() && today.getTime() <= sunday.getTime()) {
+      result += 'На этой неделе есть время:\n';
+    } else if (monday.getTime() <= nextWeekToday.getTime() && nextWeekToday.getTime() <= sunday.getTime()) {
+      result += 'На следующей неделе есть время:\n';
+    } else {
+      result += `На неделе с ${convertDateToString(monday)} по ${convertDateToString(sunday)} есть время:\n`;
+    }
+
+    const slots = this.sortSlotsByStartTime(this.currentWeekSlots);
+    for (let i = 0; i < this.weekDates.length; i++) {
+      for (let slot of this.currentWeekSlots) {
+        if (isDatesEquals(convertStringToDate(slot.date), this.weekDates[i])) {
+          result += `\n${WEEKDAY_FULL_NAMES[i]}, ${this.weekDates[i].getDate()} ${LOWER_MONTH_NAMES[this.weekDates[i].getMonth()]},\n`
+          break;
+        }
+      }
+      for (let slot of slots) {
+        if (isDatesEquals(convertStringToDate(slot.date), this.weekDates[i])) {
+          if (slot.hasRealEndTime) {
+            result += `С ${slot.startTime} до ${slot.realEndTime} мск\n`
+          } else {
+            result += `С ${slot.startTime} до ${slot.endTime} мск\n`
+          }
+        }
+      }
+    }
+    navigator.clipboard.writeText(result).then(() => {
+      this.notification.show('Скопировано!', 2000);
+    });
+  }
+
+  private sortSlotsByStartTime(slots: Slot[]): Slot[] {
+    return slots.sort((a, b) => convertTimeToMinutes(a.startTime) - convertTimeToMinutes(b.startTime))
+  }
+
+  public changeVisibilityOfSlots(): void {
+    this.slotsIsVisible = !this.slotsIsVisible;
+    if (this.slotsIsVisible) {
+      this.changeVisibilityTitle = 'Скрыть окна';
+    } else {
+      this.changeVisibilityTitle = 'Показать окна';
+    }
   }
 }

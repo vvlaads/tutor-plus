@@ -1,0 +1,180 @@
+.before-table {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.date {
+    font-weight: 600;
+}
+
+.function-manager {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+}
+
+.function-button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.5);
+    background-color: #f9f9f9;
+    border: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    height: 30px;
+    width: 140px;
+    cursor: pointer;
+}
+
+.function-button:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.function-button:active {
+    color: white;
+    background-color: #1878b8;
+    transform: scale(0.98);
+}
+
+
+.today-lessons-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 16px;
+}
+
+.today-lessons-table th {
+    background-color: #4299e1;
+    font-weight: 500;
+    color: #e2e8f0;
+    padding: 12px;
+}
+
+.lesson-info-row {
+    height: 80px;
+}
+
+.today-lessons-table td {
+    border: 1px solid #e2e8f0;
+    padding: 12px;
+}
+
+.time-start-cell {
+    font-size: 24px;
+    font-weight: bolder;
+}
+
+.time-end-cell {
+    font-size: 24px;
+    font-weight: bolder;
+}
+
+.time-distance-cell {
+    font-weight: 600;
+}
+
+.time-distance-cell.not-default {
+    font-weight: 600;
+}
+
+.not-default {
+    border: 1px solid #ff9c9c;
+    background-color: #ffbdbd;
+}
+
+.student-cell {
+    font-weight: 600;
+    text-align: center;
+}
+
+.student-name-in-cell {
+    font-weight: 600;
+    font-size: 20px;
+    text-align: left;
+    display: block;
+}
+
+.note {
+    font-size: 16px;
+    font-weight: 500;
+    font-style: italic;
+    color: red;
+}
+
+.communication-cell {
+    font-weight: 600;
+}
+
+.platform-cell {
+    font-weight: 600;
+}
+
+.break-row {
+    height: 40px;
+}
+
+.break-cell {
+    text-align: center;
+    vertical-align: middle;
+    padding: 8px;
+    background-color: #cecece;
+    color: #232323;
+}
+
+@media print {
+
+    @page {
+        margin: 0;
+        size: auto;
+    }
+
+    body::after {
+        display: none;
+    }
+
+    @page :footer {
+        display: none;
+    }
+
+    @page :header {
+        display: none;
+    }
+
+    body * {
+        visibility: hidden;
+    }
+
+    #schedule-table,
+    #schedule-table * {
+        visibility: visible;
+    }
+
+    #schedule-table {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .print-button {
+        display: none;
+    }
+
+    .break-cell {
+        page-break-after: avoid;
+    }
+
+    .one-day-table {
+        font-size: 12pt;
+    }
+
+    .lesson-info-row {
+        page-break-inside: avoid;
+    }
+}

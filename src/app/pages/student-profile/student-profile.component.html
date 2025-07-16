@@ -49,7 +49,8 @@
             <div class="info-column">
                 <div class="info-item">
                     <span class="info-label">Телефон:</span>
-                    <span class="info-value phone">{{ formatPhoneNumber(student.phone) }}</span>
+                    <span class="info-value phone">{{ student.phone ? formatPhoneNumber(student.phone):
+                        'Отсутствует'}}</span>
                 </div>
 
                 <div class="info-item">

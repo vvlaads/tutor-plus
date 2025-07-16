@@ -18,7 +18,7 @@ export interface Lesson {
 export interface Student {
     id: string;
     name: string;
-    phone: string;
+    phone: string | null;
     subject: string;
     communication: string;
     platform: string;

@@ -165,7 +165,7 @@ export class StudentsComponent implements OnInit, OnDestroy {
 
     this.filteredStudents = this.students.filter(s =>
     (s.name.toLowerCase().includes(this.searchQuery) ||
-      (s.phone.includes(this.searchQuery))
+      (s.phone && s.phone.includes(this.searchQuery))
       && (s.isActive === this.isActiveFormat)));
   }
 

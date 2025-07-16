@@ -37,7 +37,8 @@
                 [class.tablet]="(deviceType$ | async) === 'tablet'" [class.mobile]="(deviceType$ | async) === 'mobile'">
                 <div class="student-block-info">
                     <p>Предмет: <span class="student-value">{{ student.subject }}</span></p>
-                    <p>Телефон: <span class="student-value">{{ formatPhoneNumber(student.phone) }}</span>
+                    <p>Телефон: <span class="student-value">{{ student.phone ?
+                            formatPhoneNumber(student.phone):'Отсутствует'}}</span>
                     </p>
                 </div>
                 <div class="student-block-lessons">

@@ -58,7 +58,7 @@ export class StudentDialogComponent {
 
     this.studentForm = this.fb.group({
       name: [data.student?.name, [Validators.required]],
-      phone: [data.student?.phone, [Validators.required, phoneNumberValidator()]],
+      phone: [data.student?.phone, [phoneNumberValidator()]],
       subject: [data.student?.subject, Validators.required],
       communication: [data.student?.communication, [Validators.required, allowedValuesValidator(this.communicationOptions, 'value')]],
       platform: [data.student?.platform, [Validators.required, allowedValuesValidator(this.platformOptions, 'value')]],

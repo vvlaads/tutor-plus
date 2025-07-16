@@ -30,7 +30,7 @@ export function formatPhoneNumber(phone: string): string {
     const digitsOnly = phone.replace(/\D/g, '');
 
     if (!digitsOnly.startsWith('7') || digitsOnly.length !== PHONE_NUMBER_LENGTH) {
-        throw new Error(`Неверный формат номера. Ожидается: +7XXXXXXXXXX (${PHONE_NUMBER_LENGTH} цифр)`);
+        return phone;
     }
     return `+7 (${digitsOnly.substring(1, 4)}) ${digitsOnly.substring(4, 7)}-${digitsOnly.substring(7, 9)}-${digitsOnly.substring(9)}`;
 }

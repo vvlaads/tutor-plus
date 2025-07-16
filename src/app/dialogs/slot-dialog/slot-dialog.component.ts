@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { DialogService } from '../../services/dialog.service';
 import { changeDateFormatDotToMinus, changeDateFormatMinusToDot, convertDateToString, convertStringToDate, convertTimeToMinutes, getWeeklyRecurringDates } from '../../functions/dates';
 import { getErrorMessage } from '../../app.functions';
-import { realEndTimeRangeValidator, repeatDateRangeValidator, requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator } from '../../functions/validators';
+import { correctYearValidator, realEndTimeRangeValidator, repeatDateRangeValidator, requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator } from '../../functions/validators';
 import { REPEAT_SLOT_OPTIONS } from '../../app.constants';
 import { LessonService } from '../../services/lesson.service';
 
@@ -47,11 +47,11 @@ export class SlotDialogComponent {
     }
 
     this.slotForm = this.fb.group({
-      date: [data.slot?.date == null ? null : changeDateFormatDotToMinus(data.slot.date), [Validators.required]],
+      date: [data.slot?.date == null ? null : changeDateFormatDotToMinus(data.slot.date), [Validators.required, correctYearValidator()]],
       startTime: [data.slot?.startTime, [Validators.required]],
       endTime: [data.slot?.endTime, [Validators.required]],
       isRepeat: [data.slot == null ? false : data.slot.isRepeat],
-      repeatEndDate: [data.slot?.repeatEndDate ? changeDateFormatDotToMinus(data.slot.repeatEndDate) : null],
+      repeatEndDate: [data.slot?.repeatEndDate ? changeDateFormatDotToMinus(data.slot.repeatEndDate) : null, [correctYearValidator()]],
       hasRealEndTime: [data.slot == null ? false : data.slot.hasRealEndTime],
       realEndTime: [data.slot?.realEndTime]
     }, {

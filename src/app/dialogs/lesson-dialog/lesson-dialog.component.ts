@@ -10,6 +10,7 @@ import { getErrorMessage } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
 import { HOURS_IN_DAY, MAX_LESSON_DURATION, MINUTES_IN_HOUR, REPEAT_LESSON_OPTIONS } from '../../app.constants';
 import {
+  correctYearValidator,
   realEndTimeRangeValidator, repeatDateRangeValidator,
   requiredRealEndTimeValidator, requiredRepeatDateValidator, timeRangeValidator
 } from '../../functions/validators';
@@ -65,13 +66,13 @@ export class LessonDialogComponent implements OnInit {
 
     this.lessonForm = this.fb.group({
       studentId: [data.lesson?.studentId, [Validators.required]],
-      date: [data.lesson?.date == null ? null : changeDateFormatDotToMinus(data.lesson.date), [Validators.required]],
+      date: [data.lesson?.date == null ? null : changeDateFormatDotToMinus(data.lesson.date), [Validators.required, correctYearValidator()]],
       startTime: [data.lesson?.startTime, [Validators.required]],
       endTime: [data.lesson?.endTime, [Validators.required]],
       cost: [data.lesson?.cost, [Validators.required, Validators.min(0)]],
       isPaid: [data.lesson == null ? false : data.lesson.isPaid],
       isRepeat: [data.lesson == null ? false : data.lesson.isRepeat],
-      repeatEndDate: [data.lesson?.repeatEndDate ? changeDateFormatDotToMinus(data.lesson.repeatEndDate) : null],
+      repeatEndDate: [data.lesson?.repeatEndDate ? changeDateFormatDotToMinus(data.lesson.repeatEndDate) : null, [correctYearValidator()]],
       hasRealEndTime: [data.lesson == null ? false : data.lesson.hasRealEndTime],
       realEndTime: [data.lesson?.realEndTime],
       note: [data.lesson?.note],

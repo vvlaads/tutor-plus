@@ -10,6 +10,7 @@ export function getErrorMessage(formGroup: FormGroup, field: string): string | n
     if (control.errors['min']) return '*Слишком маленькое значение';
     if (control.errors['allowedValues']) return '*Недопустимое значение';
     if (control.errors['invalidPhoneNumber']) return '*Неверный номер телефона';
+    if (control.errors['invalidYear']) return '*Неверный год';
     return null;
 }
 

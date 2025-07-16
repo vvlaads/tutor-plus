@@ -175,3 +175,19 @@ export function phoneNumberValidator(): ValidatorFn {
         return null;
     }
 }
+
+export function correctYearValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+        const value = control.value;
+        if (value) {
+            const formattedDate = changeDateFormatMinusToDot(value);
+            const date = convertStringToDate(formattedDate);
+            const year = date.getFullYear();
+            const currentYear = new Date().getFullYear()
+            if (year < currentYear - 1 || year > currentYear + 1) {
+                return { invalidYear: true };
+            }
+        }
+        return null;
+    }
+}

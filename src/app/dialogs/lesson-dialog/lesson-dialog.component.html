@@ -71,6 +71,9 @@
                             <label for="repeat-end-date" class="form-label">Повторять до:</label>
                             <input type="date" id="repeat-end-date" formControlName="repeatEndDate" class="form-input">
                         </div>
+                        <div *ngIf="formSubmitted && lessonForm.get('repeatEndDate')?.errors" class="error-message">
+                            {{getErrorMessage('repeatEndDate')}}
+                        </div>
                     </div>
                 </div>
 

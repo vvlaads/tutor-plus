@@ -41,6 +41,7 @@ export class StudentService implements OnDestroy {
             ...doc.data()
           } as Student));
           subscriber.next(students);
+          console.log('Загрузка студентов')
         },
         error => console.error('Ошибка загрузки студентов:', error)
       );

@@ -44,10 +44,11 @@ export class DatabaseService {
 
   public getDatabaseStream(serviceType: ServiceType): Observable<string | null> {
     return this.currentDatabase$.pipe(
-      map(data => data
-        ? `${serviceType}-${data.user.uid}-${data.collection.id}`
-        : null
-      )
+      map(data => {
+        return data
+          ? `${serviceType}-${data.user.uid}-${data.collection.id}`
+          : null;
+      })
     );
   }
 }

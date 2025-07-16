@@ -71,8 +71,8 @@ export class HomeComponent implements OnInit {
 
   private firestore = inject(Firestore);
   async copyCollection() {
-    const source = 'slots-dev'; // Откуда копируем
-    const target = 'slots-0x7UpVmFZFQ4zwpPMdRgffIl3Ct1-SprRyR1kEWtFCYzO80Hy'; // Куда копируем
+    const source = 'students'; // Откуда копируем
+    const target = 'students-0x7UpVmFZFQ4zwpPMdRgffIl3Ct1-SprRyR1kEWtFCYzO80Hy'; // Куда копируем
 
     try {
       // 1. Получаем все документы из исходной коллекции

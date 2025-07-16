@@ -1,4 +1,4 @@
-import { Component, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { BLOCK_HEIGHT_IN_PIXELS, BLOCK_WIDTH_PERCENTAGE, HEADER_HEIGHT_IN_PIXELS, LOWER_MONTH_NAMES, MINUTES_IN_HOUR, MONTH_NAMES, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES } from '../../app.constants';
 import { CommonModule } from '@angular/common';
 import { LessonService } from '../../services/lesson.service';
@@ -16,7 +16,7 @@ import { NotificationComponent } from "../notification/notification.component";
   templateUrl: './schedule-table.component.html',
   styleUrl: './schedule-table.component.css'
 })
-export class ScheduleTableComponent implements OnInit, OnChanges {
+export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit {
   private students: Student[] = [];
   private lessons: Lesson[] = [];
   private slots: Slot[] = []
@@ -43,12 +43,18 @@ export class ScheduleTableComponent implements OnInit, OnChanges {
   public currentDate: Date = new Date();
   @ViewChild('notification')
   public notification!: NotificationComponent;
+  @ViewChild('tableContainer')
+  public tableContainer!: ElementRef<HTMLElement>;
 
   public ngOnInit(): void {
     this.updateCurrentWeek();
     this.subscribeToLessons();
     this.subscribeToSlots();
     this.subscribeToStudents();
+  }
+
+  public ngAfterViewInit(): void {
+    this.scrollToEight();
   }
 
   public ngOnChanges(changes: SimpleChanges): void {
@@ -283,5 +289,20 @@ export class ScheduleTableComponent implements OnInit, OnChanges {
     } else {
       this.changeVisibilityTitle = 'Показать окна';
     }
+  }
+
+  public scrollToEight(): void {
+    if (!this.tableContainer) return;
+    const targetTime = '08:00'
+
+    const rowIndex = this.times.indexOf(targetTime);
+    if (rowIndex === -1) return;
+
+    const scrollPosition = rowIndex * this.blockHeight - HEADER_HEIGHT_IN_PIXELS;
+
+    this.tableContainer.nativeElement.scrollTo({
+      top: scrollPosition,
+      behavior: 'smooth'
+    });
   }
 }

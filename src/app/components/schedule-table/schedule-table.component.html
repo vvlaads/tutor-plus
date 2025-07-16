@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <div class="table-container">
+    <div class="table-container" #tableContainer>
         <div class="grid-header" [style.height.px]="headerHeight">
             <div class="time-label">Время:</div>
             <div *ngFor="let dayName of weekDayNames; let i = index" class="dayName" [class.today]="isToday(i)">

@@ -132,6 +132,7 @@
 
 input {
     max-width: 300px;
+    font-family: 'Roboto', sans-serif;
 }
 
 .form-actions {

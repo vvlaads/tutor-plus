@@ -8,7 +8,6 @@ import { CommonModule } from '@angular/common';
 import { DialogService } from '../../services/dialog.service';
 import { CollectionOption, DialogMode } from '../../app.enums';
 import { COLLECTIONS_OPTIONS, MAX_COLLECTIONS_COUNT } from '../../app.constants';
-import { collection, doc, Firestore, getDocs, setDoc } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',
@@ -67,29 +66,5 @@ export class HomeComponent implements OnInit {
           break;
       }
     })
-  }
-
-  private firestore = inject(Firestore);
-  async copyCollection() {
-    const source = 'students'; // Откуда копируем
-    const target = 'students-0x7UpVmFZFQ4zwpPMdRgffIl3Ct1-SprRyR1kEWtFCYzO80Hy'; // Куда копируем
-
-    try {
-      // 1. Получаем все документы из исходной коллекции
-      const sourceSnapshot = await getDocs(collection(this.firestore, source));
-
-      // 2. Копируем каждый документ
-      sourceSnapshot.forEach(async (document) => {
-        await setDoc(
-          doc(this.firestore, target, document.id), // Сохраняем старый ID
-          document.data()
-        );
-      });
-
-      alert(`✅ Скопировано ${sourceSnapshot.size} документов!`);
-    } catch (error) {
-      console.error('Ошибка копирования:', error);
-      alert('❌ Ошибка при копировании! Смотри консоль.');
-    }
   }
 }

@@ -71,3 +71,11 @@ export interface SelectOption {
     value: string;
     text: string;
 }
+
+export interface Collection {
+    id: string;
+    name: string;
+    userId: string;
+    createAt: Date;
+    isSelected: boolean;
+}

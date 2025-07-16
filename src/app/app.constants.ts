@@ -1,4 +1,4 @@
-import { ScheduleObject } from "./app.enums";
+import { CollectionOption, ScheduleObject } from "./app.enums";
 
 export const PAGE_MARGIN_LEFT_PERCENTAGE = 20;
 export const PAGE_MARGIN_LEFT_PERCENTAGE_HIDDEN = 5;
@@ -60,4 +60,14 @@ export const WEEKDAY_NAMES = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', '�
 export const WEEKDAY_FULL_NAMES = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота', 'Воскресенье'];
 export const TIMES = ['00:00', '01:00', '02:00', '03:00', '04:00', '05:00', '06:00', '07:00', '08:00', '09:00', '10:00', '11:00', '12:00',
     '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00', '20:00', '21:00', '22:00', '23:00']
-export const SCHEDULE_OBJECT_OPTIONS = [{ value: ScheduleObject.Slot, text: "Добавить окно" }, { value: ScheduleObject.Lesson, text: "Добавить занятие" }]
+export const SCHEDULE_OBJECT_OPTIONS = [
+    { value: ScheduleObject.Slot, text: "Добавить окно" },
+    { value: ScheduleObject.Lesson, text: "Добавить занятие" }
+]
+
+export const COLLECTIONS_OPTIONS = [
+    { value: CollectionOption.SELECT, text: "Выбрать" },
+    { value: CollectionOption.EDIT, text: "Изменить" }
+]
+
+export const MAX_COLLECTIONS_COUNT = 6;

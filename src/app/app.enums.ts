@@ -18,3 +18,8 @@ export enum ScheduleObject {
 export enum AppNames {
     OWL = 'Сова'
 }
+
+export enum CollectionOption {
+    SELECT = 'SELECT',
+    EDIT = 'EDIT'
+}

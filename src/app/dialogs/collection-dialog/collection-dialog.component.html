@@ -1,0 +1,33 @@
+<div class="form-container">
+    <span class="form-title">{{title}}</span>
+    <div class="form-content">
+        <form [formGroup]="collectionForm" class="collection-form" (ngSubmit)="submit()">
+            <div class="input-columns">
+                <div class="input-column">
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label for="input-name" class="form-label">Название:</label>
+                            <input formControlName="name" id="input-name" class="form-input">
+                        </div>
+                        <div *ngIf="formSubmitted && collectionForm.get('name')?.errors" class="error-message">
+                            {{ getErrorMessage('name') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="button submit-button">
+                    {{submitMessage}}
+                </button>
+                <button type="button" (click)="close()" class="button cancel-button">
+                    Отмена
+                </button>
+                <button type="button" (click)="delete()" class="button delete-button" *ngIf="canDelete()">
+                    Удалить
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>

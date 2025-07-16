@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithPopup, User, signOut } from '@angular/fire/auth';
+import { doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 
@@ -11,7 +12,7 @@ export class AuthService {
 
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  public constructor(private auth: Auth, private router: Router) {
+  public constructor(private auth: Auth, private router: Router, private firestore: Firestore) {
     this.auth.onAuthStateChanged(user => {
       this.currentUserSubject.next(user);
     });
@@ -20,7 +21,19 @@ export class AuthService {
   public async googleSignIn(): Promise<void> {
     try {
       const provider = new GoogleAuthProvider();
-      await signInWithPopup(this.auth, provider);
+      const result = await signInWithPopup(this.auth, provider);
+      const user = result.user;
+      if (user) {
+        const userRef = doc(this.firestore, `users/${user.uid}`);
+        await setDoc(userRef, {
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          role: 'user',
+          createAt: new Date()
+        }, { merge: true })
+      }
       this.router.navigate(['']);
     } catch (error) {
       console.error('Ошибка входа:', error);

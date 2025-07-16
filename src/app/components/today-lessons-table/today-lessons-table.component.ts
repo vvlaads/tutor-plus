@@ -60,6 +60,8 @@ export class TodayLessonsTableComponent implements OnInit, OnChanges {
         return false;
       }
     });
+
+    this.oneDayLessons.sort((a, b) => convertTimeToMinutes(a.startTime) - convertTimeToMinutes(b.startTime));
   }
 
   public getStudentByLesson(lesson: Lesson): Student | null {

@@ -178,42 +178,25 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
     return nextTime;
   }
 
-  public cellIsDisabled(dayName: string, time: string): boolean {
-    const date = this.getDateByDayName(dayName)
-    const startTime = time;
-    const endTime = this.getNextTime(time);
-    if (date) {
-      const timeBlock = { date: convertDateToString(date), startTime: startTime, endTime: endTime };
-      for (let lesson of this.currentWeekLessons) {
-        if (hasOverlay(lesson, timeBlock)) {
-          return true;
-        }
-      }
-    }
-    return false;
-  }
-
   public cellIsClicked(dayName: string, time: string): void {
-    if (!this.cellIsDisabled(dayName, time)) {
-      const date = this.getDateByDayName(dayName)
-      let formattedDate = '';
-      if (date) {
-        formattedDate = convertDateToString(date);
-      }
-      let timeBlock = { startTime: time, endTime: this.getNextTime(time), date: formattedDate };
-
-      const dialogRef = this.dialogService.openChoiceDialog(SCHEDULE_OBJECT_OPTIONS);
-      dialogRef.afterClosed().subscribe(result => {
-        switch (result) {
-          case ScheduleObject.Slot:
-            this.dialogService.openSlotDialog(DialogMode.Add, timeBlock);
-            break;
-          case ScheduleObject.Lesson:
-            this.dialogService.openLessonDialog(DialogMode.Add, timeBlock);
-            break;
-        }
-      })
+    const date = this.getDateByDayName(dayName)
+    let formattedDate = '';
+    if (date) {
+      formattedDate = convertDateToString(date);
     }
+    let timeBlock = { startTime: time, endTime: this.getNextTime(time), date: formattedDate };
+
+    const dialogRef = this.dialogService.openChoiceDialog(SCHEDULE_OBJECT_OPTIONS);
+    dialogRef.afterClosed().subscribe(result => {
+      switch (result) {
+        case ScheduleObject.Slot:
+          this.dialogService.openSlotDialog(DialogMode.Add, timeBlock);
+          break;
+        case ScheduleObject.Lesson:
+          this.dialogService.openLessonDialog(DialogMode.Add, timeBlock);
+          break;
+      }
+    })
   }
 
   public isToday(index: number): boolean {

@@ -27,7 +27,7 @@
             <ng-container *ngFor="let time of times; let rowIndex = index">
                 <div *ngFor="let dayName of weekDayNames; let colIndex = index" class="cell"
                     [style.grid-row]="rowIndex + 1" [style.grid-column]="colIndex + 2"
-                    (click)="cellIsClicked(dayName, time)" [class.disabled]="cellIsDisabled(dayName, time)">
+                    (click)="cellIsClicked(dayName, time)">
                     <img class="cell-content"
                         src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png">
                 </div>

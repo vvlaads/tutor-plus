@@ -187,6 +187,12 @@ export class LessonService implements OnDestroy {
     return date.getTime();
   }
 
+  private getEndLessonTimestamp(lesson: Lesson): number {
+    const date = convertStringToDate(lesson.date);
+    date.setHours(0, convertTimeToMinutes(lesson.endTime), 0, 0)
+    return date.getTime();
+  }
+
   public async getPrevLessonsByStudentId(studentId: string): Promise<Lesson[]> {
     try {
       const now = new Date();
@@ -194,7 +200,7 @@ export class LessonService implements OnDestroy {
 
       const prevLessons = studentLessons.filter(lesson => {
         try {
-          return this.getLessonTimestamp(lesson) < now.getTime();
+          return this.getEndLessonTimestamp(lesson) < now.getTime();
         } catch {
           return false;
         }

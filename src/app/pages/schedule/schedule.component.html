@@ -25,7 +25,7 @@
     <app-today-lessons-table *ngIf="oneDayFormat" [currentDate]="currentDate"></app-today-lessons-table>
     <app-schedule-table *ngIf="!oneDayFormat" [currentDate]="currentDate"></app-schedule-table>
 
-    <div class="add-button-container">
+    <div class="add-button-container" *ngIf="!oneDayFormat">
         <button class="add-button" (click)="addScheduleObject()">
             <img class="button-icon"
                 src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png">

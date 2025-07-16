@@ -17,7 +17,7 @@ import { ScheduleTableComponent } from "../../components/schedule-table/schedule
 })
 export class ScheduleComponent {
   public pageMarginLeftPercentage: number = 0;
-  public oneDayFormat = false;
+  public oneDayFormat = true;
   public currentDate = new Date();
 
   public constructor(private layoutService: LayoutService, private dialogService: DialogService) {

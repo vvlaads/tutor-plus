@@ -44,7 +44,7 @@
                 <div class="student-block-lessons">
                     <p>
                         Последнее занятие:
-                        <span class="student-value" [class.no-data]="!prevLessons.get(student.id)">
+                        <span class="student-value">
                             {{ isPrevLessonsLoading ? 'Загрузка...' : getPrevLessonDate(prevLessons.get(student.id)) }}
                         </span>
                     </p>

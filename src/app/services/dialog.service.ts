@@ -85,7 +85,7 @@ export class DialogService {
 
   public openWaitingBlockDialog(mode: DialogMode, waitingBlock: Partial<WaitingBlock> | null): MatDialogRef<WaitingBlockDialogComponent, any> {
     const dialogRef = this.dialog.open(WaitingBlockDialogComponent, {
-      width: '600px',
+      width: '900px',
       maxWidth: '95vw',
       panelClass: 'wide-dialog',
       disableClose: true,

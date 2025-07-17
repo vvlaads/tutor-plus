@@ -1,13 +1,13 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { DeviceService } from '../../services/device.service';
+import { Component, inject, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { LayoutService } from '../../services/layout.service';
 import { CommonModule } from '@angular/common';
-import { MONTH_NAMES, WEEKDAY_NAMES } from '../../app.constants';
+import { HEADER_HEIGHT_IN_PIXELS, MONTH_NAMES, WEEKDAY_NAMES } from '../../app.constants';
 import { DialogService } from '../../services/dialog.service';
-import { DialogMode } from '../../app.enums';
-import { WaitingBlock } from '../../app.interfaces';
+import { Student, WaitingBlock } from '../../app.interfaces';
 import { WaitingBlockService } from '../../services/waiting-block.service';
-import { convertStringToDate, isDatesEquals } from '../../functions/dates';
+import { convertDateToString, convertStringToDate, convertTimeToMinutes, isDatesEquals } from '../../functions/dates';
+import { DialogMode } from '../../app.enums';
+import { StudentService } from '../../services/student.service';
 
 @Component({
   selector: 'app-wait-list',
@@ -16,28 +16,51 @@ import { convertStringToDate, isDatesEquals } from '../../functions/dates';
   styleUrl: './wait-list.component.css'
 })
 export class WaitListComponent implements OnInit {
-  public pageMarginLeftPercentage: number = 0;
-  private deviceService = inject(DeviceService);
-  public deviceType$ = this.deviceService.deviceType$;
+  private dialogService = inject(DialogService);
+  private waitingBlockService = inject(WaitingBlockService);
+  private studentService = inject(StudentService);
+  private waitingBlocks: WaitingBlock[] = []
+  private students: Student[] = [];
 
-  public monthNames: string[] = MONTH_NAMES;
-  public weekDayNames: string[] = WEEKDAY_NAMES;
+  public pageMarginLeftPercentage: number = 0;
+  public blockHeight = 150;
+  public weekDayNames = WEEKDAY_NAMES;
+  public headerHeight = HEADER_HEIGHT_IN_PIXELS;
+  public monthNames = MONTH_NAMES;
   public currentDate: Date = new Date();
   public today: Date = new Date();
-  public currentWeekDates: Date[] = [];
-  public waitingBlocks: WaitingBlock[] = []
-  public blocksInDay: WaitingBlock[][] = [];
-  public blocksPosition: number[] = [];
+  public weekDates: Date[] = [];
+  public blocksByDay: Map<number, WaitingBlock[]> = new Map();
 
-  public constructor(private layoutService: LayoutService, private dialogService: DialogService, private waitingBlockService: WaitingBlockService) {
+  public constructor(private layoutService: LayoutService) {
     this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
       this.pageMarginLeftPercentage = pageMarginLeftPercentage;
     })
-    this.subscribeToWaitingBlocks();
   }
 
   public ngOnInit(): void {
     this.updateCurrentWeek();
+    this.subscribeToWaitingBlocks();
+    this.subscribeToStudents();
+  }
+
+  private updateCurrentDate(newDate: Date) {
+    this.currentDate = new Date(newDate);
+    this.updateCurrentWeek();
+    this.updateWaitingBlocks();
+  }
+
+  private updateCurrentWeek(): void {
+    const monday = new Date(this.currentDate);
+    const dayOfWeek = this.currentDate.getDay();
+    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    monday.setDate(this.currentDate.getDate() - diff);
+
+    this.weekDates = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date(monday);
+      date.setDate(monday.getDate() + i);
+      return date;
+    });
   }
 
   private subscribeToWaitingBlocks(): void {
@@ -48,61 +71,88 @@ export class WaitListComponent implements OnInit {
     })
   }
 
-  private updateCurrentWeek(): void {
-    const monday = new Date(this.currentDate);
-    const dayOfWeek = this.currentDate.getDay();
-    const diff = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    monday.setDate(this.currentDate.getDate() - diff);
+  private updateWaitingBlocks() {
+    this.blocksByDay.clear();
 
-    this.currentWeekDates = Array.from({ length: 7 }, (_, i) => {
-      const date = new Date(monday);
-      date.setDate(monday.getDate() + i);
-      return date;
+    const blocks = this.waitingBlocks.filter(block =>
+      this.weekDates.some(date => isDatesEquals(convertStringToDate(block.date), date))
+    );
+
+    blocks.forEach(block => {
+      const blockDate = convertStringToDate(block.date);
+      for (let i = 0; i < this.weekDates.length; i++) {
+        if (isDatesEquals(blockDate, this.weekDates[i])) {
+          let arr = this.blocksByDay.get(i);
+          if (!arr) {
+            arr = [];
+          }
+          arr.push(block);
+          this.blocksByDay.set(i, arr);
+        }
+      }
     });
   }
 
-  private updateWaitingBlocks(): void {
-    this.waitingBlocks = this.waitingBlocks.filter(waitingBlock =>
-      this.currentWeekDates.some(date => isDatesEquals(convertStringToDate(waitingBlock.date), date))
-    );
-
-    this.blocksInDay = [];
-    for (let i = 0; i < this.weekDayNames.length; i++) {
-      this.blocksPosition[i] = 0;
-      this.blocksInDay[i] = this.waitingBlocks.filter(waitingBlock =>
-        isDatesEquals(convertStringToDate(waitingBlock.date), this.currentWeekDates[i])
-      );
-    }
+  private subscribeToStudents(): void {
+    this.studentService.students$.subscribe(students => {
+      this.students = students;
+    })
   }
 
-  public getMaxLengthIndexes(): number[] {
-    let max = 0;
-    for (let array of this.blocksInDay) {
-      if (array.length > max) {
-        max = array.length;
+  public isToday(index: number): boolean {
+    const today = new Date();
+    const date = this.weekDates[index];
+    return isDatesEquals(today, date);
+  }
+
+  public getBlocksForDay(dayIndex: number): WaitingBlock[] {
+    return this.blocksByDay.get(dayIndex) || [];
+  }
+
+  public getStudent(id: string): Student | null {
+    for (let student of this.students) {
+      if (student.id === id) {
+        return student;
       }
-    }
-
-    return Array.from({ length: max }, (_, i) => i);
-  }
-
-  public getNextByDayIndex(index: number): WaitingBlock | null {
-    if (this.blocksPosition[index] < this.blocksInDay[index].length) {
-      return this.blocksInDay[index][this.blocksPosition[index]++];
     }
     return null;
   }
 
-  private updateCurrentDate(newDate: Date): void {
-    this.currentDate = new Date(newDate);
-    this.updateCurrentWeek();
-  }
-
-  public getFormatDate(date: Date) {
-    return `${date.getDate()} ${this.monthNames[date.getMonth()]}`;
+  public openBlock(block: WaitingBlock): void {
+    this.dialogService.openWaitingBlockDialog(DialogMode.Edit, block);
   }
 
   public addWaitingBlock(): void {
     this.dialogService.openWaitingBlockDialog(DialogMode.Add, null);
+  }
+
+  public cellIsClicked(dayIndex: number) {
+    const block = { date: convertDateToString(this.weekDates[dayIndex]) };
+    this.dialogService.openWaitingBlockDialog(DialogMode.Add, block);
+  }
+
+  public resetCurrentDate(): void {
+    this.updateCurrentDate(new Date());
+  }
+
+  public goPrev(): void {
+    const newDate = new Date(this.currentDate);
+    newDate.setDate(newDate.getDate() - 7);
+    this.updateCurrentDate(newDate);
+  }
+
+  public findDate(): void {
+    const dialogRef = this.dialogService.openFindDateDialog();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.updateCurrentDate(new Date(convertStringToDate(result)))
+      }
+    });
+  }
+
+  public goNext(): void {
+    const newDate = new Date(this.currentDate);
+    newDate.setDate(newDate.getDate() + 7);
+    this.updateCurrentDate(newDate);
   }
 }

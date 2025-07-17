@@ -19,6 +19,7 @@
                         <app-search-select formControlName="studentId" [options]="options"
                             placeholder="Выберите ученика"></app-search-select>
                     </div>
+                    <button type="button" (click)="goToStudent()" class="navigate-button">Перейти</button>
                     <div *ngIf="formSubmitted && waitingBlockForm.get('studentId')?.errors" class="error-message">
                         {{getErrorMessage('studentId')}}
                     </div>

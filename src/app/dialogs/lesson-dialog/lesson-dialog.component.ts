@@ -98,9 +98,10 @@ export class LessonDialogComponent implements OnInit {
   private subscribeToStudents(): void {
     this.studentService.students$.subscribe(students => {
       this.students = students;
-      this.students.filter(student => student.isActive == true).forEach(student => {
-        this.options.push({ value: student.id, text: `${student.name} ${student.phone}` });
-      })
+      this.options = this.students.filter(student => student.isActive).map(student => ({
+        value: student.id,
+        text: `${student.name} ${student.phone}`
+      }));
     });
   }
 
@@ -341,8 +342,6 @@ export class LessonDialogComponent implements OnInit {
       }
     }
   }
-
-
 
   public async updateStudentInfo(): Promise<void> {
     await this.getCostByStudentId();

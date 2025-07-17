@@ -1,4 +1,4 @@
-import { Component, forwardRef, Input, Output, EventEmitter, ElementRef, inject } from '@angular/core';
+import { Component, forwardRef, Input, Output, EventEmitter, ElementRef, inject, OnChanges, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { SelectOption } from '../../app.interfaces';
@@ -17,7 +17,7 @@ import { SelectOption } from '../../app.interfaces';
     },
   ],
 })
-export class SearchSelectComponent implements ControlValueAccessor {
+export class SearchSelectComponent implements ControlValueAccessor, OnChanges {
   private selectedOption: SelectOption | null = null;
 
   @Input()
@@ -31,6 +31,17 @@ export class SearchSelectComponent implements ControlValueAccessor {
   public isOpen: boolean = false;
   public filteredOptions: SelectOption[] = [];
   private elementRef: ElementRef = inject(ElementRef);
+
+  public ngOnChanges(changes: SimpleChanges): void {
+    if (changes['options'] && this.selectedOption) {
+      const matched = this.options.find(opt => opt.value === this.selectedOption?.value);
+      if (matched) {
+        this.selectedOption = matched;
+        this.searchQuery = matched.text;
+      }
+    }
+  }
+
 
   private onChange = (value: string | null) => { };
   private onTouched = () => { };
@@ -46,8 +57,13 @@ export class SearchSelectComponent implements ControlValueAccessor {
     if (option) {
       this.selectedOption = option;
       this.searchQuery = option.text;
+    } else {
+      // options пока нет, сохраняем pendingValue
+      this.selectedOption = { value, text: '' };
+      this.searchQuery = '';
     }
   }
+
 
   public registerOnChange(fn: any): void {
     this.onChange = fn;
@@ -63,7 +79,14 @@ export class SearchSelectComponent implements ControlValueAccessor {
     );
   }
 
-  public selectOption(option: SelectOption): void {
+  public selectOption(option: SelectOption | null): void {
+    if (!option) {
+      this.searchQuery = '';
+      this.selectedOption = null;
+      this.onChange(null);
+      return;
+    }
+
     this.selectedOption = option;
     this.searchQuery = option.text;
     this.isOpen = false;
@@ -82,17 +105,16 @@ export class SearchSelectComponent implements ControlValueAccessor {
 
   public onBlur(): void {
     setTimeout(() => {
+      if (!this.isOpen) return;
+
       const activeElement = document.activeElement;
       if (!this.elementRef.nativeElement.contains(activeElement)) {
         this.isOpen = false;
-        if (
-          this.selectedOption &&
-          !this.options.some((opt) => opt.text === this.searchQuery)
-        ) {
-          this.searchQuery = '';
-          this.onChange(null);
+
+        if (this.selectedOption?.value !== this.searchQuery) {
+          this.searchQuery = this.selectedOption?.text || '';
         }
       }
-    }, 500);
+    }, 200);
   }
 }

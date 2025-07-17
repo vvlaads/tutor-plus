@@ -14,5 +14,5 @@ export const routes: Routes = [
     { path: 'schedule', component: ScheduleComponent, canActivate: [authGuard] },
     { path: 'wait-list', component: WaitListComponent, canActivate: [authGuard] },
     { path: 'student/:id', component: StudentProfileComponent, canActivate: [authGuard] },
-    { path: '**', redirectTo: 'login' }
+    { path: '**', redirectTo: '' }
 ];

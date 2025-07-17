@@ -82,11 +82,16 @@ export class StudentProfileComponent implements OnInit, OnDestroy {
   }
 
   public goBack(): void {
-    if (this.stateService.saved) {
-      this.stateService.saved = false;
+    if (this.stateService.savedLesson) {
+      this.stateService.savedLesson = false;
       this.router.navigate(['/schedule'])
       this.dialogService.openLessonDialog(this.stateService.mode, this.stateService.lesson, this.stateService.checkCollisions);
-    } else {
+    } else if (this.stateService.savedWaitingBlock) {
+      this.stateService.savedWaitingBlock = false;
+      this.router.navigate(['/wait-list'])
+      this.dialogService.openWaitingBlockDialog(this.stateService.mode, this.stateService.waitingBlock);
+    }
+    else {
       this.router.navigate(['/students'])
     }
   }

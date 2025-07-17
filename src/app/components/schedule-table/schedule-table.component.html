@@ -16,6 +16,7 @@
             <div class="time-label">Время:</div>
             <div *ngFor="let dayName of weekDayNames; let i = index" class="dayName" [class.today]="isToday(i)">
                 {{dayName}}, {{weekDates[i].getDate()}} {{monthNames[weekDates[i].getMonth()]}}
+                <span class="wait-list-badge-container" *ngIf="hasWaitList(i)" aria-hidden="true"></span>
             </div>
         </div>
 

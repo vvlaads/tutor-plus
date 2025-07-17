@@ -1,33 +1,165 @@
 .content-wrapper {
     font-family: 'Roboto', sans-serif;
-    font-size: 20px;
+    font-size: 16px;
     padding: 20px;
     transition: all 0.3s ease;
 }
 
-.wait-list-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    font-size: 16px;
-}
-
-.wait-list-table th {
-    background-color: #4299e1;
-    font-weight: 500;
-    color: #e2e8f0;
-    padding: 12px;
-}
-
-.wait-list-table td {
-    border: 1px solid #e2e8f0;
-    padding: 12px;
-}
-
-.button-container.desktop {
-    margin: 20px 0;
+.manager-panel {
     display: flex;
+    flex-direction: row;
+    gap: 10px;
+    width: 100%;
     justify-content: center;
+    padding-bottom: 10px;
+}
+
+.format-button,
+.date-button {
+    font-family: 'Roboto', sans-serif;
+    font-size: 20px;
+    color: rgba(0, 0, 0, 0.5);
+    background-color: #f9f9f9;
+    border: none;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    height: 30px;
+    width: 200px;
+    cursor: pointer;
+}
+
+.format-button:hover,
+.date-button:hover {
+    color: white;
+    background-color: #3498db;
+}
+
+.format-button:active,
+.format-button.active:active,
+.date-button:active {
+    color: white;
+    background-color: #1878b8;
+    transform: scale(0.98);
+}
+
+.format-button.active {
+    background-color: #3498db;
+    color: white;
+}
+
+.format-button.active:hover {
+    color: white;
+    background-color: #1878b8;
+}
+
+.button-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.small-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.small-icon {
+    width: 20px;
+    height: 20px;
+}
+
+.small-button {
+    width: 30px;
+    height: 30px;
+    border: none;
+    background-color: #3498db;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.small-button:hover {
+    background-color: #1878b8;
+}
+
+.small-button:active {
+    background-color: #1878b8;
+    transform: scale(0.98);
+}
+
+.schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.day-header {
+    border: 1px solid #ddd;
+    background-color: #f2f2f2;
+    padding: 8px;
+    text-align: center;
+}
+
+.day-header.today {
+    background-color: #ddd;
+}
+
+.day-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.waiting-block {
+    padding: 8px;
+    background: white;
+    border: 2px solid rgb(0, 0, 0, 0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    box-sizing: border-box;
+    font-size: 14px;
+}
+
+.student-name {
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 14px;
+    display: block;
+    margin-bottom: 6px;
+    position: relative;
+    z-index: 1;
+}
+
+.note {
+    color: #2c3e50;
+    font-size: 14px;
+    line-height: 1.4;
+    display: block;
+    position: relative;
+    z-index: 1;
+}
+
+.add-waiting-block {
+    cursor: pointer;
+    border: 1px solid #ddd;
+    background-color: #ddd;
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.add-waiting-block:hover {
+    opacity: 1;
+}
+
+.add-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.add-button-container {
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -35,77 +167,30 @@
     background: transparent;
 }
 
-.button-container.mobile {
-    bottom: 60px;
-    justify-content: center;
-    position: fixed;
-    margin: 20px 0;
-    left: 0;
-    right: 0;
-    display: flex;
-}
-
-.add-waiting-block-button {
+.add-button {
     width: 280px;
     height: 60px;
     border-radius: 30px;
     border: none;
+    font-family: 'Roboto', sans-serif;
     background: linear-gradient(135deg, #3498db, #2c3e50);
     color: white;
-    font-family: 'Roboto', sans-serif;
     font-size: 16px;
     font-weight: 500;
+    cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    cursor: pointer;
-    box-shadow: 0 4px 12px rgba(41, 128, 185, 0.3);
     transition: all 0.3s ease;
-    padding: 0 25px;
-    position: relative;
-    overflow: hidden;
 }
 
-.add-waiting-block-button:hover {
+.add-button:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(41, 128, 185, 0.4);
 }
 
-.add-waiting-block-button:active {
+.add-button:active {
     transform: translateY(0);
     box-shadow: 0 3px 8px rgba(41, 128, 185, 0.3);
-}
-
-.add-icon {
-    width: 24px;
-    height: 24px;
-    transition: transform 0.3s ease;
-}
-
-.add-waiting-block-button:hover .add-icon {
-    transform: scale(1.1);
-}
-
-.button-text {
-    position: relative;
-    z-index: 1;
-}
-
-.add-waiting-block-button::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 5px;
-    height: 5px;
-    background: rgba(255, 255, 255, 0.5);
-    opacity: 0;
-    border-radius: 100%;
-    transform: scale(1, 1) translate(-50%);
-    transform-origin: 50% 50%;
-}
-
-.add-waiting-block-button:focus:not(:active)::after {
-    animation: ripple 0.6s ease-out;
 }

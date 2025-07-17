@@ -163,7 +163,8 @@
 
 select,
 textarea,
-input {
+input,
+app-search-select {
     max-width: 300px;
     font-family: 'Roboto', sans-serif;
 }

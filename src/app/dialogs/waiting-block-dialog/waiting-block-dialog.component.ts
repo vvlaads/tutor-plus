@@ -9,6 +9,8 @@ import { getErrorMessage } from '../../app.functions';
 import { WaitingBlockService } from '../../services/waiting-block.service';
 import { CommonModule } from '@angular/common';
 import { SearchSelectComponent } from "../../components/search-select/search-select.component";
+import { StateService } from '../../services/state.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-waiting-block-dialog',
@@ -18,6 +20,8 @@ import { SearchSelectComponent } from "../../components/search-select/search-sel
 })
 export class WaitingBlockDialogComponent {
   private dialogRef = inject(MatDialogRef<WaitingBlockDialogComponent>);
+  private stateService = inject(StateService);
+  private router = inject(Router);
   private mode: DialogMode;
   private students: Student[] = [];
 
@@ -61,9 +65,10 @@ export class WaitingBlockDialogComponent {
   private subscribeToStudents(): void {
     this.studentService.students$.subscribe(students => {
       this.students = students;
-      this.students.filter(student => student.isActive == true).forEach(student => {
-        this.options.push({ value: student.id, text: `${student.name} ${student.phone}` });
-      })
+      this.options = this.students.filter(student => student.isActive).map(student => ({
+        value: student.id,
+        text: `${student.name} ${student.phone}`
+      }));
     });
   }
 
@@ -115,7 +120,7 @@ export class WaitingBlockDialogComponent {
   public async delete(): Promise<void> {
     const id = this.data.waitingBlock?.id;
     if (id) {
-      await this.waitingBlockService.deleteWaitingBlock(id);
+      await this.deleteWaitingBlock(id);
     }
   }
 
@@ -149,5 +154,14 @@ export class WaitingBlockDialogComponent {
 
   public getErrorMessage(field: string): string | null {
     return getErrorMessage(this.waitingBlockForm, field);
+  }
+
+  public goToStudent(): void {
+    const id = this.waitingBlockForm.value.studentId;
+    if (id) {
+      this.stateService.saveWaitingBlockForm(this.data.mode, { ...this.convertFormToWaitingBlock(), id: this.data.waitingBlock?.id });
+      this.close();
+      this.router.navigate(['/student', id]);
+    }
   }
 }

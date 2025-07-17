@@ -2,13 +2,14 @@ import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, OnInit,
 import { BLOCK_HEIGHT_IN_PIXELS, BLOCK_WIDTH_PERCENTAGE, HEADER_HEIGHT_IN_PIXELS, LOWER_MONTH_NAMES, MINUTES_IN_HOUR, MONTH_NAMES, SCHEDULE_OBJECT_OPTIONS, TIME_COLUMN_WIDTH_PERCENTAGE, TIMES, WEEKDAY_FULL_NAMES, WEEKDAY_NAMES } from '../../app.constants';
 import { CommonModule } from '@angular/common';
 import { LessonService } from '../../services/lesson.service';
-import { Lesson, Slot, Student, TimeBlock } from '../../app.interfaces';
+import { Lesson, Slot, Student, TimeBlock, WaitingBlock } from '../../app.interfaces';
 import { convertDateToString, convertMinutesToTime, convertStringToDate, convertTimeToMinutes, getHoursFromTime, hasOverlay, isDatesEquals } from '../../functions/dates';
 import { StudentService } from '../../services/student.service';
 import { DialogService } from '../../services/dialog.service';
 import { DialogMode, ScheduleObject } from '../../app.enums';
 import { SlotService } from '../../services/slot.service';
 import { NotificationComponent } from "../notification/notification.component";
+import { WaitingBlockService } from '../../services/waiting-block.service';
 
 @Component({
   selector: 'app-schedule-table',
@@ -20,10 +21,12 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
   private students: Student[] = [];
   private lessons: Lesson[] = [];
   private slots: Slot[] = []
+  private waitingBlocks: WaitingBlock[] = [];
   private dialogService = inject(DialogService);
   private lessonService = inject(LessonService);
   private studentService = inject(StudentService);
   private slotService = inject(SlotService);
+  private waitingBlockService = inject(WaitingBlockService);
 
   public weekDayNames = WEEKDAY_NAMES;
   public monthNames = MONTH_NAMES;
@@ -51,6 +54,7 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
     this.subscribeToLessons();
     this.subscribeToSlots();
     this.subscribeToStudents();
+    this.subscribeToWaitingBlocks();
   }
 
   public ngAfterViewInit(): void {
@@ -84,6 +88,12 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
   private subscribeToStudents(): void {
     this.studentService.students$.subscribe(students => {
       this.students = students;
+    })
+  }
+
+  private subscribeToWaitingBlocks(): void {
+    this.waitingBlockService.waitingBlocks$.subscribe(waitingBlocks => {
+      this.waitingBlocks = waitingBlocks;
     })
   }
 
@@ -286,5 +296,15 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
       top: scrollPosition,
       behavior: 'smooth'
     });
+  }
+
+  public hasWaitList(dayIndex: number): boolean {
+    const date = this.weekDates[dayIndex];
+    for (let block of this.waitingBlocks) {
+      if (isDatesEquals(convertStringToDate(block.date), date)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

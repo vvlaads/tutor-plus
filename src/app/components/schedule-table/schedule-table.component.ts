@@ -10,6 +10,7 @@ import { DialogMode, ScheduleObject } from '../../app.enums';
 import { SlotService } from '../../services/slot.service';
 import { NotificationComponent } from "../notification/notification.component";
 import { WaitingBlockService } from '../../services/waiting-block.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-schedule-table',
@@ -26,6 +27,7 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
   private lessonService = inject(LessonService);
   private studentService = inject(StudentService);
   private slotService = inject(SlotService);
+  private router = inject(Router);
   private waitingBlockService = inject(WaitingBlockService);
 
   public weekDayNames = WEEKDAY_NAMES;
@@ -306,5 +308,10 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
       }
     }
     return false;
+  }
+
+  public openWaitList(dayIndex: number): void {
+    const date = this.weekDates[dayIndex];
+    this.router.navigate(['wait-list']);
   }
 }

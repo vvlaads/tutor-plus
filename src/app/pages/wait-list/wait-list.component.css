@@ -14,8 +14,8 @@
     padding-bottom: 10px;
 }
 
-.format-button,
-.date-button {
+.date-button,
+.back-button {
     font-family: 'Roboto', sans-serif;
     font-size: 20px;
     color: rgba(0, 0, 0, 0.5);
@@ -28,28 +28,17 @@
     cursor: pointer;
 }
 
-.format-button:hover,
-.date-button:hover {
+.date-button:hover,
+.back-button:hover {
     color: white;
     background-color: #3498db;
 }
 
-.format-button:active,
-.format-button.active:active,
-.date-button:active {
+.date-button:active,
+.back-button:active {
     color: white;
     background-color: #1878b8;
     transform: scale(0.98);
-}
-
-.format-button.active {
-    background-color: #3498db;
-    color: white;
-}
-
-.format-button.active:hover {
-    color: white;
-    background-color: #1878b8;
 }
 
 .button-icon {

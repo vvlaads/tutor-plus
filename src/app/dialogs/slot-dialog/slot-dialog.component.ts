@@ -190,7 +190,8 @@ export class SlotDialogComponent {
   }
 
   public convertToLesson(): void {
-    this.dialogService.openLessonDialog(DialogMode.Add, this.convertFormToSlot());
+    const lesson = { ...this.convertFormToSlot(), isRepeat: false, repeatEndDate: null };
+    this.dialogService.openLessonDialog(DialogMode.Add, lesson);
     this.close();
   }
 

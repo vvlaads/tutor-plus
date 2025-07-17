@@ -155,4 +155,8 @@ export class WaitListComponent implements OnInit {
     newDate.setDate(newDate.getDate() + 7);
     this.updateCurrentDate(newDate);
   }
+
+  public goBack(): void {
+    window.history.back();
+  }
 }

@@ -23,4 +23,9 @@ export class StateService {
     this.waitingBlock = waitingBlock;
     this.savedWaitingBlock = true;
   }
+
+  public removedAllFlags(): void {
+    this.savedLesson = false;
+    this.savedWaitingBlock = false;
+  }
 }

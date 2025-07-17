@@ -120,7 +120,12 @@ export class WaitingBlockDialogComponent {
   public async delete(): Promise<void> {
     const id = this.data.waitingBlock?.id;
     if (id) {
-      await this.deleteWaitingBlock(id);
+      let confirmed = false;
+      confirmed = confirm('Вы уверены, что хотите удалить эту очередь на запись?');
+      if (confirmed) {
+        await this.deleteWaitingBlock(id);
+        this.close()
+      }
     }
   }
 

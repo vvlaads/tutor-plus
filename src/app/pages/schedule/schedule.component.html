@@ -1,8 +1,8 @@
 <main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
     <div class="manager-panel">
-        <button class="format-button" [class.active]="oneDayFormat" (click)="setOneDayFormat(true)">Один
+        <button class="format-button" [class.active]="isOneDayFormat()" (click)="setOneDayFormat(true)">Один
             день</button>
-        <button class="format-button" [class.active]="!oneDayFormat" (click)="setOneDayFormat(false)">На
+        <button class="format-button" [class.active]="!isOneDayFormat()" (click)="setOneDayFormat(false)">На
             неделю</button>
         <button class="date-button" (click)="resetCurrentDate()">К сегодня</button>
 
@@ -22,10 +22,10 @@
         </div>
     </div>
 
-    <app-today-lessons-table *ngIf="oneDayFormat" [currentDate]="currentDate"></app-today-lessons-table>
-    <app-schedule-table *ngIf="!oneDayFormat" [currentDate]="currentDate"></app-schedule-table>
+    <app-today-lessons-table *ngIf="isOneDayFormat()" [currentDate]="currentDate"></app-today-lessons-table>
+    <app-schedule-table *ngIf="!isOneDayFormat()" [currentDate]="currentDate"></app-schedule-table>
 
-    <div class="add-button-container" *ngIf="!oneDayFormat">
+    <div class="add-button-container" *ngIf="!isOneDayFormat()">
         <button class="add-button" (click)="addScheduleObject()">
             <img class="button-icon"
                 src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png">

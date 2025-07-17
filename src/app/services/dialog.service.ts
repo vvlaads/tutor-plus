@@ -98,7 +98,7 @@ export class DialogService {
 
   public openCollectionDialog(mode: DialogMode, col: Partial<Collection> | null): MatDialogRef<CollectionDialogComponent, any> {
     const dialogRef = this.dialog.open(CollectionDialogComponent, {
-      width: '1200px',
+      width: '600px',
       maxWidth: '95vw',
       panelClass: 'wide-dialog',
       disableClose: true,

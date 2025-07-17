@@ -16,18 +16,26 @@ import { ScheduleTableComponent } from "../../components/schedule-table/schedule
   styleUrl: './schedule.component.css'
 })
 export class ScheduleComponent {
+  private oneDayFormat = true;
+
   public pageMarginLeftPercentage: number = 0;
-  public oneDayFormat = true;
   public currentDate = new Date();
 
   public constructor(private layoutService: LayoutService, private dialogService: DialogService) {
     this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
       this.pageMarginLeftPercentage = pageMarginLeftPercentage;
     })
+    this.layoutService.oneDayFormat$.subscribe(oneDayFormat => {
+      this.oneDayFormat = oneDayFormat;
+    })
   }
 
   public setOneDayFormat(isOneDayFormat: boolean): void {
-    this.oneDayFormat = isOneDayFormat;
+    this.layoutService.setOneDayFormat(isOneDayFormat);
+  }
+
+  public isOneDayFormat(): boolean {
+    return this.oneDayFormat;
   }
 
   public resetCurrentDate(): void {

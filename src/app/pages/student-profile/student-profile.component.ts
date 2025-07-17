@@ -57,18 +57,7 @@ export class StudentProfileComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private subscribeToLessons(): void {
-    this.lessonService.lessons$.subscribe(() => {
-      this.loadStudent();
-    })
-  }
-
-  private subscribeToStudents(): void {
-    this.studentService.students$.subscribe(() => {
-      this.loadStudent();
-    })
+    this.stateService.removedAllFlags();
   }
 
   public async loadStudent(): Promise<void> {

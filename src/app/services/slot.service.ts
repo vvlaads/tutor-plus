@@ -2,9 +2,10 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, deleteDoc, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Slot } from '../app.interfaces';
-import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
+import { convertStringToDate, convertTimeToMinutes, hasOverlay } from '../functions/dates';
 import { environment } from '../../environments/environment';
 import { DatabaseService } from './database.service';
+import { LessonService } from './lesson.service';
 
 @Injectable({
   providedIn: 'root'
@@ -95,25 +96,65 @@ export class SlotService implements OnDestroy {
     return null;
   }
 
-  public async addSlot(slot: Omit<Slot, 'id'>): Promise<string> {
+  public async addSlot(slot: Omit<Slot, 'id'>): Promise<string | null> {
     const db = this.databaseService.getDatabaseName('slots')
     if (db) {
       const docRef = await addDoc(collection(this.firestore, db), slot);
       return docRef.id;
     }
-    return '';
+    return null;
   }
 
-  public async updateSlot(id: string, changes: Partial<Slot>): Promise<void> {
+  public async updateSlot(id: string, changes: Partial<Slot>): Promise<boolean> {
     const db = this.databaseService.getDatabaseName('slots')
     if (db) {
       await updateDoc(doc(this.firestore, db, id), changes);
+      return true;
     }
+    return false;
   }
 
   public async deleteSlot(id: string): Promise<void> {
     const db = this.databaseService.getDatabaseName('slots')
     if (db) {
+      const slot = await this.getSlotById(id);
+      if (slot) {
+        if (slot.baseSlotId && slot.isRepeat && slot.baseSlotId === id) {
+          const slots = await this.getSlots();
+          const filteredSlots = slots.filter(s => { s.baseSlotId === id && s.isRepeat })
+          const sorted = filteredSlots.sort((a, b) => convertStringToDate(a.date).getTime() - convertStringToDate(b.date).getTime())
+          if (sorted.length > 1) {
+            const newBaseId = sorted[1].id;
+            for (let s of sorted) {
+              this.updateSlot(s.id, { baseSlotId: newBaseId });
+            }
+          }
+        }
+        await deleteDoc(doc(this.firestore, db, id));
+      }
+    }
+  }
+
+  public async deleteThisAndFuturesSlots(id: string): Promise<void> {
+    const db = this.databaseService.getDatabaseName('slots');
+    if (!db) return;
+
+    const slot = await this.getSlotById(id);
+    if (!slot) return;
+
+    if (slot.baseSlotId && slot.isRepeat) {
+      const slots = await this.getSlots();
+      const filteredSlots = slots.filter(s => {
+        return s.baseSlotId === slot.baseSlotId &&
+          s.isRepeat &&
+          convertStringToDate(s.date).getTime() >= convertStringToDate(slot.date).getTime();
+      });
+
+      const deletePromises = filteredSlots.map(s =>
+        deleteDoc(doc(this.firestore, db, s.id))
+      );
+      await Promise.all(deletePromises);
+    } else {
       await deleteDoc(doc(this.firestore, db, id));
     }
   }

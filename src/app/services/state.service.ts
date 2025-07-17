@@ -9,14 +9,12 @@ export class StateService {
   public savedLesson = false;
   public mode: DialogMode = DialogMode.Add;
   public lesson: Partial<Lesson> | null = null;
-  public checkCollisions: boolean = true;
   public savedWaitingBlock = false;
   public waitingBlock: Partial<WaitingBlock> | null = null;
 
-  public saveLessonForm(mode: DialogMode, lesson: Partial<Lesson> | null, checkCollisions: boolean): void {
+  public saveLessonForm(mode: DialogMode, lesson: Partial<Lesson> | null): void {
     this.mode = mode;
     this.lesson = lesson;
-    this.checkCollisions = checkCollisions;
     this.savedLesson = true;
   }
 

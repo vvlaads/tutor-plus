@@ -22,6 +22,7 @@ import { SlotService } from '../../services/slot.service';
 import { SearchSelectComponent } from "../../components/search-select/search-select.component";
 import { Router } from '@angular/router';
 import { StateService } from '../../services/state.service';
+import { ScheduleObjectService } from '../../services/schedule-object.service';
 
 
 @Component({
@@ -33,8 +34,8 @@ import { StateService } from '../../services/state.service';
 export class LessonDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<LessonDialogComponent>);
   private stateService = inject(StateService);
+  private scheduleObjectService = inject(ScheduleObjectService);
   private students: Student[] = []
-  private touchedLessons: Lesson[] = [];
   public isOwlStudent = false;
   public lessonForm: FormGroup;
   public title: string;
@@ -51,7 +52,7 @@ export class LessonDialogComponent implements OnInit {
     private slotService: SlotService,
     private dialogService: DialogService,
     private router: Router,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Partial<Lesson> | null, checkCollisions: boolean }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: DialogMode, lesson: Partial<Lesson> | null }
   ) {
     switch (this.data.mode) {
       case DialogMode.Add:
@@ -110,7 +111,7 @@ export class LessonDialogComponent implements OnInit {
     const lesson = {
       ...lessonValue,
       date: lessonValue.date ? changeDateFormatMinusToDot(lessonValue.date) : null,
-      repeatEndDate: lessonValue.repeatEndDate ? changeDateFormatMinusToDot(lessonValue.repeatEndDate) : null,
+      repeatEndDate: lessonValue.repeatEndDate && lessonValue.isRepeat ? changeDateFormatMinusToDot(lessonValue.repeatEndDate) : null,
       paidByOwl: this.isOwlStudent ? lessonValue.paidByOwl : null
     }
     return lesson;
@@ -134,47 +135,42 @@ export class LessonDialogComponent implements OnInit {
         this.update();
         break;
     }
-    this.close(this.touchedLessons);
+    this.close();
   }
 
   private async add(): Promise<void> {
-    const collisions = [];
     let lesson = this.convertFormToLesson();
-    const collision = await this.checkCollision(lesson, null)
-    if (collision) {
-      alert(`Наложение занятия, добавление отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+    const baseLessonId = await this.scheduleObjectService.addLesson(lesson);
+
+    if (!baseLessonId) {
+      alert(`Наложение занятия, добавление отменено: \n${lesson.date} (${lesson.startTime} - ${lesson.endTime})`);
       return;
     }
-    const baseLessonId = await this.addLesson(lesson);
-    if (baseLessonId) {
-      this.touchedLessons.push({ ...lesson, id: baseLessonId })
-      if (lesson.isRepeat && lesson.repeatEndDate) {
-        lesson.baseLessonId = baseLessonId;
-        this.updateLesson(lesson, baseLessonId);
-        const startDate = convertStringToDate(lesson.date);
-        const endDate = convertStringToDate(lesson.repeatEndDate);
-        const dates = getWeeklyRecurringDates(startDate, endDate);
-        lesson.isPaid = false;
-        for (let date of dates) {
-          lesson.date = convertDateToString(date);
-          const collision = await this.checkCollision(lesson, null)
-          if (collision) {
-            collisions.push(collision);
-            continue;
-          }
-          let id = await this.addLesson(lesson);
-          if (id) {
-            this.touchedLessons.push({ ...lesson, id: id })
-          }
+
+    const collisions: TimeBlock[] = [];
+    if (lesson.isRepeat && lesson.repeatEndDate) {
+      lesson.baseLessonId = baseLessonId;
+      const update = await this.scheduleObjectService.updateLesson(baseLessonId, lesson);
+      if (!update) return;
+      lesson.isPaid = false;
+      const startDate = convertStringToDate(lesson.date);
+      const endDate = convertStringToDate(lesson.repeatEndDate);
+      const dates = getWeeklyRecurringDates(startDate, endDate);
+      for (let date of dates) {
+        lesson.date = convertDateToString(date);
+        let id = await this.scheduleObjectService.addLesson(lesson);
+        if (!id) {
+          collisions.push(lesson);
         }
       }
-    }
-    if (collisions.length > 0) {
-      let line = `Наложение занятиий, добавление отменено:`;
-      for (let collision of collisions) {
-        line += `\n${collision.date} (${collision.startTime} - ${collision.endTime})`
+
+      if (collisions.length > 0) {
+        let line = `Наложение занятиий, добавление отменено:`;
+        for (let collision of collisions) {
+          line += `\n${collision.date} (${collision.startTime} - ${collision.endTime})`
+        }
+        alert(line)
       }
-      alert(line)
     }
   }
 
@@ -182,25 +178,19 @@ export class LessonDialogComponent implements OnInit {
     const lesson = this.convertFormToLesson();
     const id = this.data.lesson?.id;
     if (id) {
-      const collision = await this.checkCollision(lesson, id)
-      if (collision) {
-        alert(`Наложение занятия, изменение отменено: \n${collision.date} (${collision.startTime} - ${collision.endTime})`);
+      const result = await this.scheduleObjectService.updateLesson(id, lesson);
+      if (!result) {
+        alert(`Наложение занятия, изменение отменено: \n${lesson.date} (${lesson.startTime} - ${lesson.endTime})`);
         return;
       }
-      if (!lesson.isRepeat) {
-        lesson.baseLessonId = null;
-        lesson.repeatEndDate = null;
-      }
-      this.updateLesson(lesson, id);
-      this.touchedLessons.push({ ...lesson, id: id })
     }
   }
 
   public delete(): void {
-    let currentLesson = this.convertFormToLesson();
-    if (this.data.lesson?.id) {
-      const id = this.data.lesson.id;
+    const id = this.data.lesson?.id;
+    if (id) {
       let confirmed = false;
+      let currentLesson = this.convertFormToLesson();
       if (currentLesson.isRepeat) {
         const dialogRef = this.dialogService.openChoiceDialog(REPEAT_LESSON_OPTIONS);
         dialogRef.afterClosed().subscribe(async result => {
@@ -208,19 +198,15 @@ export class LessonDialogComponent implements OnInit {
             case 'ONE':
               confirmed = confirm("Вы уверены, что хотите удалить это занятие");
               if (confirmed) {
-                this.changeBaseLesson(id);
-                this.deleteLesson(id);
-                this.close(null);
+                this.lessonService.deleteLesson(id);
+                this.close();
               }
               break;
             case 'FUTURE':
               confirmed = confirm("Вы уверены, что хотите удалить это и будущие занятие");
               if (confirmed) {
-                const lessons = await this.lessonService.getFutureRepeatedLessons(id);
-                for (let lesson of lessons) {
-                  this.deleteLesson(lesson.id);
-                }
-                this.close(null);
+                this.lessonService.deleteThisAndFuturesLessons(id);
+                this.close();
               }
               break;
           }
@@ -228,72 +214,15 @@ export class LessonDialogComponent implements OnInit {
       } else {
         confirmed = confirm("Вы уверены, что хотите удалить это занятие");
         if (confirmed) {
-          this.deleteLesson(id);
-          this.close(null);
+          this.lessonService.deleteLesson(id);
+          this.close();
         }
       }
     }
   }
 
-  private async changeBaseLesson(id: string): Promise<void> {
-    const lessons = await this.lessonService.getFutureRepeatedLessons(id);
-    if (this.data.lesson?.baseLessonId === id && lessons.length > 1) {
-      const newId = lessons[1].id;
-      for (let lesson of lessons) {
-        this.updateLesson({ baseLessonId: newId }, lesson.id);
-      }
-    }
-  }
-
-  private async addLesson(lesson: Omit<Lesson, 'id'>): Promise<string | null> {
-    const id = await this.lessonService.addLesson(lesson).catch(error => {
-      console.error('Ошибка при добавлении:', error);
-      return null;
-    });
-    return id;
-  }
-
-  private updateLesson(lesson: Partial<Lesson>, id: string): void {
-    this.lessonService.updateLesson(id, lesson).catch(error => {
-      console.error('Ошибка при обновлении:', error);
-    });
-  }
-
-  private deleteLesson(id: string): void {
-    this.lessonService.deleteLesson(id).catch(error => {
-      console.error('Ошибка при удалении:', error);
-    })
-  }
-
-  public close(result: Lesson[] | null): void {
-    this.dialogRef.close(result);
-  }
-
-  private async checkCollision(lesson: Omit<Lesson, 'id'>, id: string | null): Promise<TimeBlock | null> {
-    const lessons = await this.lessonService.getLessons();
-    const startLesson = convertTimeToMinutes(lesson.startTime);
-    const endLesson = convertTimeToMinutes(lesson.endTime);
-    for (let l of lessons) {
-      const start = convertTimeToMinutes(l.startTime);
-      const end = convertTimeToMinutes(l.endTime);
-      if (id && id === l.id) { continue; }
-      if (l.date === lesson.date && ((startLesson >= start && startLesson < end) || (endLesson > start && endLesson <= end))) {
-        return { date: l.date, startTime: l.startTime, endTime: l.endTime };
-      }
-    }
-
-    if (this.data.checkCollisions) {
-      const slots = await this.slotService.getSlots();
-      for (let s of slots) {
-        const start = convertTimeToMinutes(s.startTime);
-        const end = convertTimeToMinutes(s.endTime);
-        if (s.date === lesson.date && ((startLesson >= start && startLesson < end) || (endLesson > start && endLesson <= end))) {
-          this.slotService.deleteSlot(s.id);
-        }
-      }
-    }
-
-    return null;
+  public close(): void {
+    this.dialogRef.close();
   }
 
   public isEditMode(): boolean {
@@ -376,8 +305,8 @@ export class LessonDialogComponent implements OnInit {
   public goToStudent(): void {
     const id = this.lessonForm.value.studentId;
     if (id) {
-      this.stateService.saveLessonForm(this.data.mode, { ...this.convertFormToLesson(), id: this.data.lesson?.id }, this.data.checkCollisions);
-      this.close(null);
+      this.stateService.saveLessonForm(this.data.mode, { ...this.convertFormToLesson(), id: this.data.lesson?.id });
+      this.close();
       this.router.navigate(['/student', id]);
     }
   }

@@ -2,7 +2,7 @@ import { inject, Injectable, OnDestroy } from '@angular/core';
 import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc, query } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Lesson } from '../app.interfaces';
-import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
+import { convertStringToDate, convertTimeToMinutes, hasOverlay } from '../functions/dates';
 import { DatabaseService } from './database.service';
 
 @Injectable({
@@ -166,25 +166,65 @@ export class LessonService implements OnDestroy {
     return null;
   }
 
-  public async addLesson(lesson: Omit<Lesson, 'id'>): Promise<string> {
+  public async addLesson(lesson: Omit<Lesson, 'id'>): Promise<string | null> {
     const db = this.databaseService.getDatabaseName('lessons')
     if (db) {
       const docRef = await addDoc(collection(this.firestore, db), lesson);
       return docRef.id;
     }
-    return '';
+    return null;
   }
 
-  public async updateLesson(id: string, changes: Partial<Lesson>): Promise<void> {
+  public async updateLesson(id: string, changes: Partial<Lesson>): Promise<boolean> {
     const db = this.databaseService.getDatabaseName('lessons')
     if (db) {
       await updateDoc(doc(this.firestore, db, id), changes);
+      return true;
     }
+    return false;
   }
 
   public async deleteLesson(id: string): Promise<void> {
     const db = this.databaseService.getDatabaseName('lessons')
     if (db) {
+      const lesson = await this.getLessonById(id);
+      if (lesson) {
+        if (lesson.baseLessonId && lesson.isRepeat && lesson.baseLessonId === id) {
+          const lessons = await this.getLessons();
+          const filteredLessons = lessons.filter(l => { l.baseLessonId === id && l.isRepeat })
+          const sorted = filteredLessons.sort((a, b) => convertStringToDate(a.date).getTime() - convertStringToDate(b.date).getTime())
+          if (sorted.length > 1) {
+            const newBaseId = sorted[1].id;
+            for (let l of sorted) {
+              this.updateLesson(l.id, { baseLessonId: newBaseId });
+            }
+          }
+        }
+        await deleteDoc(doc(this.firestore, db, id));
+      }
+    }
+  }
+
+  public async deleteThisAndFuturesLessons(id: string): Promise<void> {
+    const db = this.databaseService.getDatabaseName('lessons');
+    if (!db) return;
+
+    const lesson = await this.getLessonById(id);
+    if (!lesson) return;
+
+    if (lesson.baseLessonId && lesson.isRepeat) {
+      const lessons = await this.getLessons();
+      const filteredLessons = lessons.filter(l => {
+        return l.baseLessonId === lesson.baseLessonId &&
+          l.isRepeat &&
+          convertStringToDate(l.date).getTime() >= convertStringToDate(lesson.date).getTime();
+      });
+
+      const deletePromises = filteredLessons.map(l =>
+        deleteDoc(doc(this.firestore, db, l.id))
+      );
+      await Promise.all(deletePromises);
+    } else {
       await deleteDoc(doc(this.firestore, db, id));
     }
   }

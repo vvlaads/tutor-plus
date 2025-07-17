@@ -85,7 +85,7 @@ export class StudentProfileComponent implements OnInit, OnDestroy {
     if (this.stateService.savedLesson) {
       this.stateService.savedLesson = false;
       this.router.navigate(['/schedule'])
-      this.dialogService.openLessonDialog(this.stateService.mode, this.stateService.lesson, this.stateService.checkCollisions);
+      this.dialogService.openLessonDialog(this.stateService.mode, this.stateService.lesson);
     } else if (this.stateService.savedWaitingBlock) {
       this.stateService.savedWaitingBlock = false;
       this.router.navigate(['/wait-list'])

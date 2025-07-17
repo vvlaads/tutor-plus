@@ -31,7 +31,7 @@ export class DialogService {
     return dialogRef;
   }
 
-  public openLessonDialog(mode: DialogMode, lesson: Partial<Lesson> | null, checkCollisions: boolean = true): MatDialogRef<LessonDialogComponent, any> {
+  public openLessonDialog(mode: DialogMode, lesson: Partial<Lesson> | null): MatDialogRef<LessonDialogComponent, any> {
     const dialogRef = this.dialog.open(LessonDialogComponent, {
       width: '1200px',
       maxWidth: '95vw',
@@ -39,8 +39,7 @@ export class DialogService {
       disableClose: true,
       data: {
         mode: mode,
-        lesson: lesson,
-        checkCollisions: checkCollisions
+        lesson: lesson
       }
     });
     return dialogRef;

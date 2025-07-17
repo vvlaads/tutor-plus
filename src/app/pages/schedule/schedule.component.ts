@@ -25,13 +25,10 @@ export class ScheduleComponent {
     this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {
       this.pageMarginLeftPercentage = pageMarginLeftPercentage;
     })
-    this.layoutService.oneDayFormat$.subscribe(oneDayFormat => {
-      this.oneDayFormat = oneDayFormat;
-    })
   }
 
   public setOneDayFormat(isOneDayFormat: boolean): void {
-    this.layoutService.setOneDayFormat(isOneDayFormat);
+    this.oneDayFormat = isOneDayFormat;
   }
 
   public isOneDayFormat(): boolean {

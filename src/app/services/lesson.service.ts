@@ -1,5 +1,5 @@
 import { inject, Injectable, OnDestroy } from '@angular/core';
-import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc } from '@angular/fire/firestore';
+import { addDoc, collection, doc, Firestore, getDoc, getDocs, onSnapshot, updateDoc, deleteDoc, query } from '@angular/fire/firestore';
 import { BehaviorSubject, Observable, of, Subject, switchMap, takeUntil } from 'rxjs';
 import { Lesson } from '../app.interfaces';
 import { convertStringToDate, convertTimeToMinutes } from '../functions/dates';
@@ -42,15 +42,15 @@ export class LessonService implements OnDestroy {
 
   private createCollectionListener(dbName: string): Observable<Lesson[]> {
     return new Observable<Lesson[]>(subscriber => {
-      const unsubscribe = onSnapshot(
-        collection(this.firestore, dbName),
-        snapshot => {
+      const q = query(collection(this.firestore, dbName));
+      const unsubscribe = onSnapshot(q, {
+        next: snapshot => {
           const lessons = snapshot.docs.map(doc => this.createLesson(doc));
           subscriber.next(lessons);
         },
-        error => console.error('Ошибка загрузки уроков:', error)
-      );
-      return () => unsubscribe();
+        error: err => console.error('Ошибка загрузки уроков:', err)
+      });
+      return unsubscribe;
     });
   }
 
@@ -59,24 +59,20 @@ export class LessonService implements OnDestroy {
     const prevLessonsMap = new Map<string, Lesson>();
     const nextLessonsMap = new Map<string, Lesson>();
 
+    // Группировка уроков по studentId
     const lessonsByStudent = lessons.reduce((acc, lesson) => {
-      if (!acc.has(lesson.studentId)) {
-        acc.set(lesson.studentId, []);
-      }
+      if (!acc.has(lesson.studentId)) acc.set(lesson.studentId, []);
       acc.get(lesson.studentId)?.push(lesson);
       return acc;
     }, new Map<string, Lesson[]>());
 
+    // Для каждого студента находим ближайшие уроки
     lessonsByStudent.forEach((studentLessons, studentId) => {
       const prevLesson = this.findPrevLesson(studentLessons, now);
-      if (prevLesson) {
-        prevLessonsMap.set(studentId, prevLesson);
-      }
-
       const nextLesson = this.findNextLesson(studentLessons, now);
-      if (nextLesson) {
-        nextLessonsMap.set(studentId, nextLesson);
-      }
+
+      if (prevLesson) prevLessonsMap.set(studentId, prevLesson);
+      if (nextLesson) nextLessonsMap.set(studentId, nextLesson);
     });
 
     this.prevLessonsSubject.next(prevLessonsMap);

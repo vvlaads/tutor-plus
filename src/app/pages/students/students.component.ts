@@ -56,15 +56,19 @@ export class StudentsComponent implements OnInit {
     this.subscribeToLayoutChanges();
     this.subscribeToStudents();
     this.subscribeToLessons();
+    this.lessonService.loadLessons();
   }
 
   private subscribeToLessons(): void {
     this.lessonService.prevLessons$.subscribe(prevLessons => {
       this.prevLessons = prevLessons;
-    })
+      this.isPrevLessonsLoading = false;
+    });
+
     this.lessonService.nextLessons$.subscribe(nextLessons => {
       this.nextLessons = nextLessons;
-    })
+      this.isNextLessonsLoading = false;
+    });
   }
 
   public getPrevLessonDate(lesson: Lesson | null | undefined): string {
@@ -106,10 +110,21 @@ export class StudentsComponent implements OnInit {
     this.students.sort((a, b) => a.name.localeCompare(b.name));
 
     this.applySearchFilter();
-    this.students.forEach(async student => {
-      this.unpaidLessonsCount.set(student.id, await this.getUnpaidLessonsCount(student))
-      this.unpaidOwlLessonsCount.set(student.id, await this.getUnpaidOwlLessonsCount(student))
-    })
+
+    // Обновляем занятия только для видимых студентов
+    await this.updateLessonsForFilteredStudents();
+  }
+
+  private async updateLessonsForFilteredStudents(): Promise<void> {
+    this.unpaidLessonsCount = new Map();
+    this.unpaidOwlLessonsCount = new Map();
+
+    for (const student of this.filteredStudents) {
+      this.unpaidLessonsCount.set(student.id, await this.getUnpaidLessonsCount(student));
+      this.unpaidOwlLessonsCount.set(student.id, await this.getUnpaidOwlLessonsCount(student));
+    }
+
+    // Данные о занятиях будут приходить через подписку
   }
 
   public setActiveFormat(isActive: boolean): void {

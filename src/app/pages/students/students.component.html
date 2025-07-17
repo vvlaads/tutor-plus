@@ -44,25 +44,15 @@
                 <div class="student-block-lessons">
                     <p>
                         Последнее занятие:
-                        <ng-container *ngIf="isPrevLessonsLoading; else prevLessonLoaded">
-                            <span class="loading-text">Загрузка...</span>
-                        </ng-container>
-                        <ng-template #prevLessonLoaded>
-                            <span class="student-value" [class.no-data]="!prevLessons.get(student.id)">
-                                {{ getPrevLessonDate(prevLessons.get(student.id)) }}
-                            </span>
-                        </ng-template>
+                        <span class="student-value" [class.no-data]="!prevLessons.get(student.id)">
+                            {{ isPrevLessonsLoading ? 'Загрузка...' : getPrevLessonDate(prevLessons.get(student.id)) }}
+                        </span>
                     </p>
                     <p>
                         Следующее занятие:
-                        <ng-container *ngIf="isNextLessonsLoading; else nextLessonLoaded">
-                            <span class="loading-text">Загрузка...</span>
-                        </ng-container>
-                        <ng-template #nextLessonLoaded>
-                            <span class="student-value" [class.no-data]="!nextLessons.get(student.id)">
-                                {{ getNextLessonDate(nextLessons.get(student.id)) }}
-                            </span>
-                        </ng-template>
+                        <span class="student-value" [class.no-data]="!nextLessons.get(student.id)">
+                            {{ isNextLessonsLoading ? 'Загрузка...' : getNextLessonDate(nextLessons.get(student.id)) }}
+                        </span>
                     </p>
                 </div>
             </div>

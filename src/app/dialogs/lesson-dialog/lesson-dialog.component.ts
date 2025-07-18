@@ -23,6 +23,7 @@ import { SearchSelectComponent } from "../../components/search-select/search-sel
 import { Router } from '@angular/router';
 import { StateService } from '../../services/state.service';
 import { ScheduleObjectService } from '../../services/schedule-object.service';
+import { DeviceService } from '../../services/device.service';
 
 
 @Component({
@@ -35,6 +36,9 @@ export class LessonDialogComponent implements OnInit {
   private dialogRef = inject(MatDialogRef<LessonDialogComponent>);
   private stateService = inject(StateService);
   private scheduleObjectService = inject(ScheduleObjectService);
+  private deviceService = inject(DeviceService);
+
+  public deviceType$ = this.deviceService.deviceType$;
   private students: Student[] = []
   public isOwlStudent = false;
   public lessonForm: FormGroup;

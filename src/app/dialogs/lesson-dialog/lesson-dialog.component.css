@@ -1,5 +1,6 @@
 .form-container {
     width: 1200px;
+    max-width: 95vw;
     margin: 0 auto;
     padding: 24px;
     box-sizing: border-box;
@@ -42,6 +43,7 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
+    width: 100%;
 }
 
 .form-row {
@@ -58,6 +60,19 @@
     margin: 0;
 }
 
+.form-label-mobile {
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+    margin: 0;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 40%;
+}
+
 .form-input,
 .form-textarea {
     padding: 10px 14px;
@@ -69,6 +84,18 @@
     background-color: #f8fafc;
     color: #1a202c;
 }
+
+.form-input-mobile {
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    flex-grow: 1;
+    box-sizing: border-box;
+    width: auto;
+}
+
 
 .form-input:focus,
 .form-textarea:focus {
@@ -84,9 +111,24 @@
     font-family: inherit;
 }
 
+.form-select {
+    width: auto;
+    font-size: 20px;
+}
+
+.form-select-mobile {
+    width: auto;
+    font-size: 14px;
+}
+
 .input-with-suffix {
     position: relative;
     flex-grow: 1;
+}
+
+.input-with-suffix-mobile {
+    display: flex;
+    flex-direction: row;
 }
 
 .input-suffix {
@@ -98,6 +140,11 @@
 .student-cost-info {
     margin-left: 156px;
     font-size: 20px;
+    color: #4a5568;
+}
+
+.student-cost-info-mobile {
+    font-size: 14px;
     color: #4a5568;
 }
 
@@ -178,6 +225,21 @@ app-search-select {
     border-top: 1px solid #e2e8f0;
 }
 
+.form-actions-mobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.unsave-buttons {
+    display: flex;
+    flex-direction: column;
+}
+
 .button {
     flex: 1;
     max-width: 300px;
@@ -186,6 +248,18 @@ app-search-select {
     font-weight: 500;
     cursor: pointer;
     font-size: 20px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.button-mobile {
+    width: 30%;
+    max-width: 300px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 16px;
     transition: all 0.3s ease;
     text-align: center;
 }
@@ -235,6 +309,13 @@ app-search-select {
 }
 
 .delete-button {
+    background-color: #fff5f5;
+    color: #e53e3e;
+    border: 1px solid #fed7d7;
+}
+
+.delete-button-mobile {
+    height: 10px;
     background-color: #fff5f5;
     color: #e53e3e;
     border: 1px solid #fed7d7;

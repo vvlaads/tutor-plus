@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LayoutService } from '../../services/layout.service';
 import { DialogMode, ScheduleObject } from '../../app.enums';
@@ -7,6 +7,7 @@ import { TodayLessonsTableComponent } from "../../components/today-lessons-table
 import { DialogService } from '../../services/dialog.service';
 import { convertStringToDate } from '../../functions/dates';
 import { ScheduleTableComponent } from "../../components/schedule-table/schedule-table.component";
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   standalone: true,
@@ -20,6 +21,9 @@ export class ScheduleComponent {
 
   public pageMarginLeftPercentage: number = 0;
   public currentDate = new Date();
+  private deviceService = inject(DeviceService);
+
+  public deviceType$ = this.deviceService.deviceType$;
 
   public constructor(private layoutService: LayoutService, private dialogService: DialogService) {
     this.layoutService.pageMarginLeftPercentage$.subscribe(pageMarginLeftPercentage => {

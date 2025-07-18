@@ -1,28 +1,32 @@
 <div class="schedule-table-container">
     <div class="before-table">
-        <div class="date-info">
+        <div class="date-info" [class.mobile]="(deviceType$ | async) === 'mobile'">
             <span class="year">{{currentDate.getFullYear()}} </span>
             <span class="current-week" *ngIf="isCurrentWeek()">Текущая неделя</span>
         </div>
 
         <div class="windows-manager">
-            <button class="window-button" (click)="changeVisibilityOfSlots()">{{changeVisibilityTitle}}</button>
-            <button class="window-button" (click)="copySlots()">Копировать окна</button>
+            <button class="window-button" (click)="changeVisibilityOfSlots()"
+                [class.mobile]="(deviceType$ | async) === 'mobile'">{{changeVisibilityTitle}}</button>
+            <button class="window-button" (click)="copySlots()"
+                [class.mobile]="(deviceType$ | async) === 'mobile'">Копировать окна</button>
         </div>
     </div>
 
     <div class="table-container" #tableContainer>
         <div class="grid-header" [style.height.px]="headerHeight">
-            <div class="time-label">Время:</div>
-            <div *ngFor="let dayName of weekDayNames; let i = index" class="dayName" [class.today]="isToday(i)">
+            <div class="time-label">{{(deviceType$ | async) === 'mobile'? '':'Время:'}}</div>
+            <div *ngFor="let dayName of weekDayNames; let i = index" class="dayName" [class.today]="isToday(i)"
+                [class.mobile]="(deviceType$ | async) === 'mobile'">
                 {{dayName}}, {{weekDates[i].getDate()}} {{monthNames[weekDates[i].getMonth()]}}
-                <span class="wait-list-badge-container" *ngIf="hasWaitList(i)" aria-hidden="true"
-                    (click)="openWaitList(i)"></span>
+                <span class="wait-list-badge-container" *ngIf="hasWaitList(i) && (deviceType$ | async) 
+                !== 'mobile'" aria-hidden="true" (click)="openWaitList(i)"></span>
             </div>
         </div>
 
         <div class="grid-body">
-            <div *ngFor="let time of times; let rowIndex = index" class="time-value" [style.grid-row]="rowIndex + 1">
+            <div *ngFor="let time of times; let rowIndex = index" class="time-value" [style.grid-row]="rowIndex + 1"
+                [class.mobile]="(deviceType$ | async) === 'mobile'">
                 {{time}}
             </div>
 
@@ -36,6 +40,7 @@
             </ng-container>
 
             <div *ngFor="let lesson of currentWeekLessons" class="lesson"
+                [class.mobile]="(deviceType$ | async) === 'mobile'"
                 [style.background-color]="getStudentByLesson(lesson)?.color"
                 [style.left]="getTimeBlockLeftPosition(lesson) + '%'" [style.top.px]="getTimeBlockTopPosition(lesson)"
                 [style.width]="blockWidthPercentage + '%'" [style.height.px]="getTimeBlockHeight(lesson)"
@@ -43,9 +48,10 @@
                 <div class="lesson-content">
                     <div class="lesson-time">{{lesson.startTime}} - {{lesson.hasRealEndTime? lesson.realEndTime:
                         lesson.endTime}}</div>
-                    <div class="lesson-student-name">{{getStudentByLesson(lesson)?.name}}</div>
+                    <div class="lesson-student-name" *ngIf="(deviceType$ | async) === 'desktop'">
+                        {{getStudentByLesson(lesson)?.name}}</div>
                 </div>
-                <div class="lesson-badges">
+                <div class="lesson-badges" [class.mobile]="(deviceType$ | async) === 'mobile'">
                     <span class="paid-badge" [class.paid]="lesson.isPaid">
                         {{lesson.isPaid ? '✓' : '₽'}}
                     </span>
@@ -55,6 +61,7 @@
             </div>
             <ng-container *ngIf="slotsIsVisible">
                 <div *ngFor="let slot of currentWeekSlots" class="slot"
+                    [class.mobile]="(deviceType$ | async) === 'mobile'"
                     [style.left]="getTimeBlockLeftPosition(slot) + '%'" [style.top.px]="getTimeBlockTopPosition(slot)"
                     [style.width]="blockWidthPercentage + '%'" [style.height.px]="getTimeBlockHeight(slot)"
                     (click)="openSlot(slot)">
@@ -63,7 +70,7 @@
                 </div>
             </ng-container>
         </div>
-        <div class="spacing"></div>
+        <div class="spacing" [class.mobile]="(deviceType$ | async) === 'mobile'"></div>
     </div>
     <app-notification #notification></app-notification>
 </div>

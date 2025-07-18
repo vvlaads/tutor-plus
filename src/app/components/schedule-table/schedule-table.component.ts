@@ -11,6 +11,7 @@ import { SlotService } from '../../services/slot.service';
 import { NotificationComponent } from "../notification/notification.component";
 import { WaitingBlockService } from '../../services/waiting-block.service';
 import { Router } from '@angular/router';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-schedule-table',
@@ -29,6 +30,8 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
   private slotService = inject(SlotService);
   private router = inject(Router);
   private waitingBlockService = inject(WaitingBlockService);
+  private deviceService = inject(DeviceService);
+  public deviceType$ = this.deviceService.deviceType$;
 
   public weekDayNames = WEEKDAY_NAMES;
   public monthNames = MONTH_NAMES;

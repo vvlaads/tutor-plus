@@ -2,9 +2,9 @@
     <span class="form-title">{{title}}</span>
     <div class="form-content">
         <form [formGroup]="studentForm" class="student-form" (ngSubmit)="submit()">
-            <div [ngSwitch]="(deviceType$ | async) === 'mobile'">
-                <div *ngSwitchCase="true">
-                    <div class="input-column">
+            <div [ngSwitch]="(deviceType$ | async)">
+                <div *ngSwitchCase="'mobile'">
+                    <div class=" input-column">
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="input-name" class="form-label-mobile">Имя:</label>
@@ -41,10 +41,10 @@
                         <div class="form-group">
                             <div class="form-row">
                                 <label for="input-cost" class="form-label-mobile">Стоимость за час:</label>
-                                <div class="input-with-symbol">
+                                <div class="input-with-symbol-mobile">
                                     <input formControlName="cost" id="input-cost" class="form-input-mobile"
                                         placeholder="1000" type="number">
-                                    <span class="currency-symbol">₽</span>
+                                    <span class="currency-symbol-mobile">₽</span>
                                 </div>
                             </div>
 
@@ -211,7 +211,7 @@
                             </div>
                         </div>
 
-                        <div class="form-actions">
+                        <div class="form-actions-mobile">
                             <button type="submit" class="submit-button">
                                 {{submitMessage}}
                             </button>

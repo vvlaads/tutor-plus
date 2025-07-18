@@ -6,6 +6,10 @@
     transition: all 0.3s ease;
 }
 
+.content-wrapper.mobile {
+    padding: 0;
+}
+
 .manager-panel {
     display: flex;
     flex-direction: row;
@@ -13,6 +17,7 @@
     width: 100%;
     justify-content: center;
 }
+
 
 .format-button,
 .date-button {
@@ -27,6 +32,12 @@
     width: 200px;
     cursor: pointer;
 }
+
+.manager-panel.mobile .format-button,
+.manager-panel.mobile .date-button {
+    font-size: 12px;
+}
+
 
 .format-button:hover,
 .date-button:hover {
@@ -91,10 +102,20 @@
 
 .add-button-container {
     position: fixed;
+    z-index: 1000;
     bottom: 20px;
     right: 20px;
+}
+
+.add-button-container.mobile {
+    position: fixed;
     z-index: 1000;
-    background: transparent;
+    bottom: 60px;
+    right: 0;
+    left: 0;
+    margin: 20px 0;
+    justify-content: center;
+    display: flex;
 }
 
 .add-button {

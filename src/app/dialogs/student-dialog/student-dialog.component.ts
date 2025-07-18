@@ -11,6 +11,7 @@ import { allowedValuesValidator, parentValidator, phoneNumberValidator, stopDate
 import { CustomSelectComponent } from '../../components/custom-select/custom-select.component';
 import { changeDateFormatDotToMinus, changeDateFormatMinusToDot } from '../../functions/dates';
 import { Router } from '@angular/router';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-student-dialog',
@@ -21,8 +22,9 @@ import { Router } from '@angular/router';
 export class StudentDialogComponent {
   private dialogRef = inject(MatDialogRef<StudentDialogComponent>);
   private router = inject(Router);
+  private deviceService = inject(DeviceService);
   private mode: DialogMode;
-
+  public deviceType$ = this.deviceService.deviceType$;
   public studentForm: FormGroup;
   public title: string;
   public submitMessage: string;

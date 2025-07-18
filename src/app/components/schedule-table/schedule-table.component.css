@@ -199,6 +199,10 @@
     white-space: normal;
 }
 
+.lesson.mobile .lesson-student-name {
+    font-size: 8px;
+}
+
 .lesson-badges {
     width: 15%;
     display: flex;

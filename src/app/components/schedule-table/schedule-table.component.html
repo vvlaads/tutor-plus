@@ -48,10 +48,11 @@
                 <div class="lesson-content">
                     <div class="lesson-time">{{lesson.startTime}} - {{lesson.hasRealEndTime? lesson.realEndTime:
                         lesson.endTime}}</div>
-                    <div class="lesson-student-name" *ngIf="(deviceType$ | async) === 'desktop'">
+                    <div class="lesson-student-name">
                         {{getStudentByLesson(lesson)?.name}}</div>
                 </div>
-                <div class="lesson-badges" [class.mobile]="(deviceType$ | async) === 'mobile'">
+                <div class="lesson-badges" [class.mobile]="(deviceType$ | async) === 'mobile'"
+                    *ngIf="(deviceType$ | async) === 'desktop'">
                     <span class="paid-badge" [class.paid]="lesson.isPaid">
                         {{lesson.isPaid ? '✓' : '₽'}}
                     </span>

@@ -1,5 +1,5 @@
 <main class="collections-container" [style.margin-left.%]="pageMarginLeftPercentage">
-    <h1 class="collections-title">Текущие коллекции</h1>
+    <h1 class="collections-title">Мои коллекции</h1>
 
     <div class="collections-grid">
         <div *ngFor="let col of collections" class="collection-card" (click)="openCollection(col)"
@@ -14,6 +14,15 @@
                     alt="Добавить коллекцию">
                 <span class="add-collection-label">Добавить коллекцию</span>
             </div>
+        </div>
+    </div>
+
+    <h1 class="collections-title" *ngIf="invitedCollections.length>0">Доступные мне</h1>
+
+    <div class="collections-grid">
+        <div *ngFor="let col of invitedCollections" class="collection-card" (click)="openCollection(col)"
+            [class.current]="isCurrent(col)">
+            <span class="collection-name">{{col.name}}</span>
         </div>
     </div>
 </main>

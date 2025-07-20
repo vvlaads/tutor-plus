@@ -41,7 +41,9 @@ export class CollectionDialogComponent {
     }
 
     this.collectionForm = this.fb.group({
-      name: [data.collection?.name, [Validators.required]]
+      name: [data.collection?.name, [Validators.required]],
+      guests: [data.collection?.guests || []],
+      newGuest: ['', [Validators.email]]
     });
   }
 
@@ -54,13 +56,12 @@ export class CollectionDialogComponent {
   }
 
   private convertFormToCollection(): Omit<Collection, 'id'> {
-    const collectionValue = this.collectionForm.value;
-    const collection = {
-      ...collectionValue,
+    return {
+      name: this.collectionForm.value.name,
+      guests: this.collectionForm.value.guests,
       userId: this.userId,
-      createAt: this.data.collection?.createAt ? this.data.collection.createAt : new Date()
-    }
-    return collection;
+      createAt: this.data.collection?.createAt || new Date()
+    };
   }
 
   public submit(): void {
@@ -130,6 +131,21 @@ export class CollectionDialogComponent {
 
   public close(): void {
     this.dialogRef.close();
+  }
+
+  public addGuest(): void {
+    const newGuest = this.collectionForm.get('newGuest')?.value;
+    if (newGuest && this.collectionForm.get('newGuest')?.valid) {
+      const guests = [...this.collectionForm.get('guests')?.value, newGuest];
+      this.collectionForm.get('guests')?.setValue(guests);
+      this.collectionForm.get('newGuest')?.reset();
+    }
+  }
+
+  public removeGuest(index: number): void {
+    const guests = [...this.collectionForm.get('guests')?.value];
+    guests.splice(index, 1);
+    this.collectionForm.get('guests')?.setValue(guests);
   }
 
   public canDelete(): boolean {

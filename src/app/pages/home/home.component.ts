@@ -7,7 +7,7 @@ import { Collection } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
 import { DialogService } from '../../services/dialog.service';
 import { CollectionOption, DialogMode } from '../../app.enums';
-import { COLLECTIONS_OPTIONS, MAX_COLLECTIONS_COUNT } from '../../app.constants';
+import { ADMIN_COLLECTIONS_OPTIONS, GUEST_COLLECTIONS_OPTIONS, MAX_COLLECTIONS_COUNT } from '../../app.constants';
 
 @Component({
   selector: 'app-home',
@@ -19,6 +19,7 @@ export class HomeComponent implements OnInit {
   public pageMarginLeftPercentage = 0;
   private user: User | null = null;
   public collections: Collection[] = [];
+  public invitedCollections: Collection[] = [];
   private dialogService = inject(DialogService)
   public currentCollection: Collection | null = null;
 
@@ -39,7 +40,10 @@ export class HomeComponent implements OnInit {
     })
     this.collectionService.currentCollection$.subscribe(currentCollection => {
       this.currentCollection = currentCollection;
-      console.log('home', currentCollection);
+    })
+
+    this.collectionService.invitedCollections$.subscribe(invitedCollections => {
+      this.invitedCollections = invitedCollections;
     })
   }
 
@@ -56,7 +60,8 @@ export class HomeComponent implements OnInit {
   }
 
   public openCollection(col: Collection): void {
-    const dialogRef = this.dialogService.openChoiceDialog(COLLECTIONS_OPTIONS);
+    let options = col.userId === this.user?.uid ? ADMIN_COLLECTIONS_OPTIONS : GUEST_COLLECTIONS_OPTIONS;
+    const dialogRef = this.dialogService.openChoiceDialog(options);
     dialogRef.afterClosed().subscribe(result => {
       switch (result) {
         case CollectionOption.SELECT:

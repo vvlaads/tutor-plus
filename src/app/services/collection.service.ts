@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, combineLatest, map } from 'rxjs';
 import { Collection } from '../app.interfaces';
 import { Firestore, addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, updateDoc, query, where } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
@@ -11,13 +11,23 @@ import { UserInfoService } from './user-info.service';
 export class CollectionService implements OnDestroy {
   private unsubscribe!: () => void;
   private collectionsSubject = new BehaviorSubject<Collection[]>([]);
+  private invitedCollectionsSubject = new BehaviorSubject<Collection[]>([]);
   private currentCollectionSubject = new BehaviorSubject<Collection | null>(null);
   private userId = '';
 
   public collections$ = this.collectionsSubject.asObservable();
+  public invitedCollections$ = this.invitedCollectionsSubject.asObservable();
   public currentCollection$ = this.currentCollectionSubject.asObservable();
 
-  public constructor(
+  // Комбинированный поток всех доступных коллекций
+  public allCollections$ = combineLatest([
+    this.collections$,
+    this.invitedCollections$
+  ]).pipe(
+    map(([collections, invited]) => [...collections, ...invited])
+  );
+
+  constructor(
     private firestore: Firestore,
     private authService: AuthService,
     private userInfoService: UserInfoService
@@ -29,11 +39,13 @@ export class CollectionService implements OnDestroy {
       } else {
         this.userId = '';
         this.collectionsSubject.next([]);
+        this.invitedCollectionsSubject.next([]);
+        this.currentCollectionSubject.next(null);
       }
     });
   }
 
-  public ngOnDestroy(): void {
+  ngOnDestroy(): void {
     this.stopListening();
   }
 
@@ -41,16 +53,39 @@ export class CollectionService implements OnDestroy {
     if (!this.userId) return;
 
     const collectionsRef = collection(this.firestore, 'collections');
+
+    // Запрос для собственных коллекций
     const userCollectionsQuery = query(collectionsRef, where('userId', '==', this.userId));
 
     this.unsubscribe = onSnapshot(userCollectionsQuery, {
-      next: (snapshot) => {
+      next: async (snapshot) => {
         const collections = snapshot.docs.map(this.createCollection);
         this.collectionsSubject.next(collections);
-        this.loadCurrentCollection();
+        await this.loadInvitedCollections();
+        await this.loadCurrentCollection();
       },
       error: (err) => console.error('Ошибка загрузки:', err)
     });
+  }
+
+  private async loadInvitedCollections(): Promise<void> {
+    if (!this.userId) return;
+
+    const userInfo = await this.userInfoService.getUserInfoById(this.userId);
+    if (!userInfo?.email) return;
+
+    const collectionsRef = collection(this.firestore, 'collections');
+    const invitedQuery = query(
+      collectionsRef,
+      where('guests', 'array-contains', userInfo.email)
+    );
+
+    const snapshot = await getDocs(invitedQuery);
+    const invitedCollections = snapshot.docs
+      .map(this.createCollection)
+      .filter(collection => collection.userId !== this.userId);
+
+    this.invitedCollectionsSubject.next(invitedCollections);
   }
 
 
@@ -71,20 +106,42 @@ export class CollectionService implements OnDestroy {
     };
   }
 
-  public async loadCurrentCollection(): Promise<void> {
+  private async loadCurrentCollection(): Promise<void> {
     const userInfo = await this.userInfoService.getUserInfoById(this.userId);
-    if (userInfo) {
-      const collectionId = userInfo.currentCollection;
-      if (collectionId) {
-        const collection = await this.getCollectionById(collectionId);
-        this.currentCollectionSubject.next(collection);
-      }
+    if (!userInfo?.currentCollection) return;
+
+    // Ищем среди всех доступных коллекций
+    const allCollections = [
+      ...this.collectionsSubject.getValue(),
+      ...this.invitedCollectionsSubject.getValue()
+    ];
+
+    const currentCollection = allCollections.find(
+      col => col.id === userInfo.currentCollection
+    );
+
+    if (currentCollection) {
+      this.currentCollectionSubject.next(currentCollection);
+    } else {
+      // Если коллекция не найдена, сбрасываем текущую
+      await this.userInfoService.updateUserInfo(this.userId, { currentCollection: null });
+      this.currentCollectionSubject.next(null);
     }
   }
 
   public async setCurrentCollection(collection: Collection): Promise<void> {
-    this.currentCollectionSubject.next(collection);
-    this.userInfoService.updateUserInfo(this.userId, { currentCollection: collection.id });
+    // Проверяем доступ к коллекции
+    const allCollections = [
+      ...this.collectionsSubject.getValue(),
+      ...this.invitedCollectionsSubject.getValue()
+    ];
+
+    if (allCollections.some(c => c.id === collection.id)) {
+      this.currentCollectionSubject.next(collection);
+      await this.userInfoService.updateUserInfo(this.userId, { currentCollection: collection.id });
+    } else {
+      console.warn('Попытка выбрать недоступную коллекцию');
+    }
   }
 
   public async loadCollections(): Promise<void> {
@@ -101,6 +158,23 @@ export class CollectionService implements OnDestroy {
     const snapshot = await getDocs(userCollectionsQuery);
     const collections = snapshot.docs.map(this.createCollection);
     return collections;
+  }
+
+  public async getInvitedCollections(): Promise<Collection[]> {
+    if (!this.userId) return [];
+    const userInfo = await this.userInfoService.getUserInfoById(this.userId);
+    if (!userInfo?.email) return [];
+
+    const collectionsRef = collection(this.firestore, 'collections');
+    const invitedQuery = query(
+      collectionsRef,
+      where('guests', 'array-contains', userInfo.email)
+    );
+
+    const snapshot = await getDocs(invitedQuery);
+    return snapshot.docs
+      .map(this.createCollection)
+      .filter(collection => collection.userId !== this.userId);
   }
 
   public async getCollectionById(id: string): Promise<Collection | null> {

@@ -65,9 +65,13 @@ export const SCHEDULE_OBJECT_OPTIONS = [
     { value: ScheduleObject.Lesson, text: "Добавить занятие" }
 ]
 
-export const COLLECTIONS_OPTIONS = [
+export const ADMIN_COLLECTIONS_OPTIONS = [
     { value: CollectionOption.SELECT, text: "Выбрать" },
     { value: CollectionOption.EDIT, text: "Изменить" }
+]
+
+export const GUEST_COLLECTIONS_OPTIONS = [
+    { value: CollectionOption.SELECT, text: "Выбрать" },
 ]
 
 export const MAX_COLLECTIONS_COUNT = 6;

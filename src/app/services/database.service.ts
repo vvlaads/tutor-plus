@@ -25,30 +25,39 @@ export class DatabaseService {
   );
 
   public constructor() {
-    this.authService.currentUser$.subscribe(currentuser => {
-      this.user = currentuser;
-    })
+    this.authService.currentUser$.subscribe(currentUser => {
+      this.user = currentUser;
+    });
     this.collectionService.currentCollection$.subscribe(currentCollection => {
       this.collection = currentCollection;
-    })
+    });
   }
 
-
   public getDatabaseName(serviceType: ServiceType): string | null {
-    const user = this.user;
-    const collection = this.collection;
-    return user && collection
-      ? `${serviceType}-${user.uid}-${collection.id}`
-      : null;
+    if (!this.user || !this.collection) return null;
+
+    if (this.user.uid === this.collection.userId) {
+      return `${serviceType}-${this.collection.userId}-${this.collection.id}`;
+    }
+    else {
+      return `${serviceType}-${this.collection.userId}-${this.collection.id}`;
+    }
   }
 
   public getDatabaseStream(serviceType: ServiceType): Observable<string | null> {
     return this.currentDatabase$.pipe(
       map(data => {
-        return data
-          ? `${serviceType}-${data.user.uid}-${data.collection.id}`
-          : null;
+        if (!data) return null;
+        return `${serviceType}-${data.collection.userId}-${data.collection.id}`;
       })
     );
+  }
+
+  public getCollectionOwnerId(): string | null {
+    return this.collection?.userId || null;
+  }
+
+  public isCurrentUserOwner(): boolean {
+    return !!this.user && !!this.collection && this.user.uid === this.collection.userId;
   }
 }

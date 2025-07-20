@@ -8,7 +8,7 @@ import { UserInfo } from '../app.interfaces';
 export class UserInfoService {
   private firestore = inject(Firestore);
 
-  public async addUserInfo(userInfo: UserInfo): Promise<string> {
+  public async setUserInfo(userInfo: UserInfo): Promise<string> {
     await setDoc(doc(this.firestore, 'users', userInfo.id), userInfo);
     return userInfo.id;
   }
@@ -26,7 +26,8 @@ export class UserInfoService {
     const data = doc.data();
     return {
       id: doc.id,
-      currentCollection: data.currentCollection
+      currentCollection: data.currentCollection,
+      email: data.email
     };
   }
 }

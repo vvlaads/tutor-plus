@@ -27,11 +27,7 @@ export class AuthService {
       const result = await signInWithPopup(this.auth, provider);
       const user = result.user;
       if (user) {
-        const id = user.uid;
-        const exist = await this.userInfoService.getUserInfoById(id);
-        if (!exist) {
-          await this.userInfoService.addUserInfo({ id: id, currentCollection: null });
-        }
+        await this.userInfoService.setUserInfo({ id: user.uid, currentCollection: null, email: user.email });
       }
       this.router.navigate(['']);
     } catch (error) {

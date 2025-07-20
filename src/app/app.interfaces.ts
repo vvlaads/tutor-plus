@@ -83,4 +83,5 @@ export interface Collection {
 export interface UserInfo {
     id: string;
     currentCollection: string | null;
+    email: string | null;
 }

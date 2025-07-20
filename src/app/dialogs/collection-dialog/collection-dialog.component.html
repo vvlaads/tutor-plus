@@ -13,6 +13,32 @@
                             {{ getErrorMessage('name') }}
                         </div>
                     </div>
+
+                    <div class="form-group">
+                        <div class="form-row">
+                            <label class="form-label">Гости (email):</label>
+                            <div class="guests-container">
+                                <div class="guest-input-container">
+                                    <input formControlName="newGuest" class="form-input"
+                                        placeholder="Добавить email гостя">
+                                    <button type="button" (click)="addGuest()" class="add-guest-button">+</button>
+                                </div>
+                                <div *ngIf="formSubmitted && collectionForm.get('newGuest')?.errors"
+                                    class="error-message">
+                                    Введите корректный email
+                                </div>
+
+                                <div class="guest-list">
+                                    <div *ngFor="let guest of collectionForm.get('guests')?.value; let i = index"
+                                        class="guest-item">
+                                        <span>{{guest}}</span>
+                                        <button type="button" (click)="removeGuest(i)"
+                                            class="remove-guest-button">×</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 

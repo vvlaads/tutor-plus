@@ -91,7 +91,7 @@ export class LessonService implements OnDestroy {
       .filter(lesson => !!lesson.date && !!lesson.startTime)
       .map(lesson => ({
         lesson,
-        timestamp: this.getLessonTimestamp(lesson)
+        timestamp: this.getEndLessonTimestamp(lesson)
       }));
 
     if (lessonsWithTimestamps.length === 0) return null;

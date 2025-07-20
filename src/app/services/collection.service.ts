@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 import { Collection } from '../app.interfaces';
 import { Firestore, addDoc, collection, deleteDoc, doc, getDoc, getDocs, onSnapshot, updateDoc, query, where } from '@angular/fire/firestore';
 import { AuthService } from './auth.service';
+import { UserInfoService } from './user-info.service';
 
 @Injectable({
   providedIn: 'root'
@@ -11,14 +12,15 @@ export class CollectionService implements OnDestroy {
   private unsubscribe!: () => void;
   private collectionsSubject = new BehaviorSubject<Collection[]>([]);
   private currentCollectionSubject = new BehaviorSubject<Collection | null>(null);
+  private userId = '';
 
   public collections$ = this.collectionsSubject.asObservable();
   public currentCollection$ = this.currentCollectionSubject.asObservable();
-  private userId = '';
 
   public constructor(
     private firestore: Firestore,
-    private authService: AuthService
+    private authService: AuthService,
+    private userInfoService: UserInfoService
   ) {
     this.authService.currentUser$.subscribe(currentUser => {
       if (currentUser) {
@@ -45,11 +47,12 @@ export class CollectionService implements OnDestroy {
       next: (snapshot) => {
         const collections = snapshot.docs.map(this.createCollection);
         this.collectionsSubject.next(collections);
-        this.updateCurrentCollection(collections);
+        this.loadCurrentCollection();
       },
       error: (err) => console.error('Ошибка загрузки:', err)
     });
   }
+
 
   private stopListening(): void {
     if (this.unsubscribe) {
@@ -63,35 +66,25 @@ export class CollectionService implements OnDestroy {
       id: doc.id,
       name: data.name,
       userId: data.userId,
-      createAt: data.createAt?.toDate() || new Date(),
-      isSelected: data.isSelected || false
+      createAt: data.createAt?.toDate(),
+      guests: data.guests
     };
   }
 
-  private updateCurrentCollection(collections: Collection[]): void {
-    if (collections.length === 0) {
-      this.currentCollectionSubject.next(null);
-      return;
-    }
-
-    const selectedCollection = collections.find(col => col.isSelected);
-
-    if (selectedCollection) {
-      this.currentCollectionSubject.next(selectedCollection);
-    } else {
-      this.currentCollectionSubject.next(null);
+  public async loadCurrentCollection(): Promise<void> {
+    const userInfo = await this.userInfoService.getUserInfoById(this.userId);
+    if (userInfo) {
+      const collectionId = userInfo.currentCollection;
+      if (collectionId) {
+        const collection = await this.getCollectionById(collectionId);
+        this.currentCollectionSubject.next(collection);
+      }
     }
   }
 
   public async setCurrentCollection(collection: Collection): Promise<void> {
     this.currentCollectionSubject.next(collection);
-    const collections = await this.getCollections();
-    for (let col of collections) {
-      await this.updateCollection(col.id, { isSelected: false });
-      if (col.id === collection.id) {
-        await this.updateCollection(col.id, { isSelected: true });
-      }
-    }
+    this.userInfoService.updateUserInfo(this.userId, { currentCollection: collection.id });
   }
 
   public async loadCollections(): Promise<void> {
@@ -107,7 +100,6 @@ export class CollectionService implements OnDestroy {
     const userCollectionsQuery = query(collectionsRef, where('userId', '==', this.userId));
     const snapshot = await getDocs(userCollectionsQuery);
     const collections = snapshot.docs.map(this.createCollection);
-    this.updateCurrentCollection(collections);
     return collections;
   }
 

@@ -314,13 +314,6 @@ app-search-select {
     border: 1px solid #fed7d7;
 }
 
-.delete-button-mobile {
-    height: 10px;
-    background-color: #fff5f5;
-    color: #e53e3e;
-    border: 1px solid #fed7d7;
-}
-
 .delete-button:hover {
     background-color: #fff5f5;
     border-color: #feb2b2;

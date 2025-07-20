@@ -27,7 +27,7 @@ export class HomeComponent implements OnInit {
     authService.currentUser$.subscribe(currentUser => { this.user = currentUser });
   }
 
-  public ngOnInit(): void {
+  public async ngOnInit(): Promise<void> {
     this.subscribeToCollections();
   }
 
@@ -39,6 +39,7 @@ export class HomeComponent implements OnInit {
     })
     this.collectionService.currentCollection$.subscribe(currentCollection => {
       this.currentCollection = currentCollection;
+      console.log('home', currentCollection);
     })
   }
 
@@ -51,7 +52,7 @@ export class HomeComponent implements OnInit {
   }
 
   public isCurrent(col: Collection): boolean {
-    return col === this.currentCollection;
+    return this.currentCollection?.id === col.id;
   }
 
   public openCollection(col: Collection): void {

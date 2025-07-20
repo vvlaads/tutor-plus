@@ -77,5 +77,10 @@ export interface Collection {
     name: string;
     userId: string;
     createAt: Date;
-    isSelected: boolean;
+    guests: string[];
+}
+
+export interface UserInfo {
+    id: string;
+    currentCollection: string | null;
 }

@@ -1,18 +1,21 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Auth, GoogleAuthProvider, signInWithPopup, User, signOut } from '@angular/fire/auth';
-import { doc, Firestore, setDoc } from '@angular/fire/firestore';
 import { Router } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import { UserInfoService } from './user-info.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
+  private auth = inject(Auth);
+  private router = inject(Router);
+  private userInfoService = inject(UserInfoService);
   private currentUserSubject = new BehaviorSubject<User | null>(null);
 
   public currentUser$ = this.currentUserSubject.asObservable();
 
-  public constructor(private auth: Auth, private router: Router, private firestore: Firestore) {
+  public constructor() {
     this.auth.onAuthStateChanged(user => {
       this.currentUserSubject.next(user);
     });
@@ -24,15 +27,11 @@ export class AuthService {
       const result = await signInWithPopup(this.auth, provider);
       const user = result.user;
       if (user) {
-        const userRef = doc(this.firestore, `users/${user.uid}`);
-        await setDoc(userRef, {
-          uid: user.uid,
-          email: user.email,
-          displayName: user.displayName,
-          photoURL: user.photoURL,
-          role: 'user',
-          createAt: new Date()
-        }, { merge: true })
+        const id = user.uid;
+        const exist = await this.userInfoService.getUserInfoById(id);
+        if (!exist) {
+          await this.userInfoService.addUserInfo({ id: id, currentCollection: null });
+        }
       }
       this.router.navigate(['']);
     } catch (error) {

@@ -1,0 +1,19 @@
+<div class="search-filter-container">
+    <div class="search-container">
+        <input type="text" [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Поиск..." class="search-input">
+    </div>
+
+    <div class="filter-container">
+        <button (click)="toggleDropdown()" class="filter-button">
+            {{ selectedFilterText }}
+            <span class="material-icons arrow">{{ isDropdownOpen ? 'arrow_drop_up' : 'arrow_drop_down' }}</span>
+        </button>
+
+        <div *ngIf="isDropdownOpen" class="dropdown-menu">
+            <div *ngFor="let option of filterOptions" (click)="onFilterSelect(option.value)" class="dropdown-item"
+                [class.active]="selectedFilter === option.value">
+                {{ option.text }}
+            </div>
+        </div>
+    </div>
+</div>

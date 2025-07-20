@@ -86,7 +86,7 @@ hr {
     display: flex;
 }
 
-app-search {
+app-search-filter {
     width: 80%;
 }
 
@@ -191,6 +191,19 @@ app-search {
 .divider {
     height: 1px;
     background: #000;
+}
+
+.no-students {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    border: none;
+    color: rgba(0, 0, 0, 0.5);
+    padding: 0 15px;
+    border: 1px solid #e0e0e0;
+    height: 30vh;
+    justify-content: center;
 }
 
 .button-container.desktop {

@@ -1,7 +1,17 @@
+.today-lessons-table-container {
+    height: 90vh;
+    overflow-y: auto;
+    position: relative;
+}
+
 .before-table {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background-color: white;
     padding-top: 8px;
     padding-bottom: 8px;
 }
@@ -40,12 +50,18 @@
     transform: scale(0.98);
 }
 
-
 .today-lessons-table {
     width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     font-size: 16px;
+}
+
+.table-header {
+    position: sticky;
+    top: 46px;
+    z-index: 10;
+    background: white;
 }
 
 .today-lessons-table th {

@@ -238,12 +238,14 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
 
   public copySlots(): void {
     let result = ``;
-    const monday = new Date(this.weekDates[0]);
-    const sunday = new Date(this.weekDates[6]);
-    const today = new Date();
+    let monday = new Date(this.weekDates[0]);
+    monday.setHours(0, 0, 0, 0);
+    let sunday = new Date(this.weekDates[6]);
+    sunday.setHours(0, 0, 0, 0);
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
     let nextWeekToday = new Date(today);
     nextWeekToday.setDate(today.getDate() + 7);
-
     if (monday.getTime() <= today.getTime() && today.getTime() <= sunday.getTime()) {
       result += 'На этой неделе есть время:\n';
     } else if (monday.getTime() <= nextWeekToday.getTime() && nextWeekToday.getTime() <= sunday.getTime()) {

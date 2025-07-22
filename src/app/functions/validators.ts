@@ -40,7 +40,7 @@ export function repeatDateRangeValidator(): ValidatorFn {
             if (date && startDate) {
                 date = changeDateFormatMinusToDot(date);
                 startDate = changeDateFormatMinusToDot(startDate);
-                if (convertStringToDate(date).getTime() <= convertStringToDate(startDate).getTime()) {
+                if (convertStringToDate(date).getTime() < convertStringToDate(startDate).getTime()) {
                     return { repeatEndDateInvalid: true };
                 }
             }

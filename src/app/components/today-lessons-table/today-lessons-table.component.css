@@ -1,6 +1,7 @@
 .today-lessons-table-container {
     height: 90vh;
-    overflow-y: auto;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
     position: relative;
 }
 
@@ -14,6 +15,10 @@
     background-color: white;
     padding-top: 8px;
     padding-bottom: 8px;
+}
+
+.date-info.mobile {
+    font-size: 14px;
 }
 
 .date {
@@ -55,6 +60,12 @@
     border-collapse: separate;
     border-spacing: 0;
     font-size: 16px;
+    font-weight: 600;
+    width: 100vw;
+}
+
+.today-lessons-table.mobile {
+    font-size: 12px;
 }
 
 .table-header {
@@ -80,22 +91,24 @@
     padding: 12px;
 }
 
-.time-start-cell {
-    font-size: 24px;
-    font-weight: bolder;
+.today-lessons-table.mobile th,
+.today-lessons-table.mobile td {
+    padding: 4px 2px;
+    word-break: normal;
 }
 
+.time-start-cell,
 .time-end-cell {
     font-size: 24px;
-    font-weight: bolder;
 }
 
-.time-distance-cell {
-    font-weight: 600;
+.time-start-cell.mobile,
+.time-end-cell.mobile {
+    font-size: 14px;
 }
 
-.time-distance-cell.not-default {
-    font-weight: 600;
+.time-distance-cell.mobile {
+    font-size: 10px;
 }
 
 .not-default {
@@ -104,15 +117,17 @@
 }
 
 .student-cell {
-    font-weight: 600;
     text-align: center;
 }
 
 .student-name-in-cell {
-    font-weight: 600;
     font-size: 20px;
     text-align: left;
     display: block;
+}
+
+.student-name-in-cell.mobile {
+    font-size: 12px;
 }
 
 .note {
@@ -120,14 +135,6 @@
     font-weight: 500;
     font-style: italic;
     color: red;
-}
-
-.communication-cell {
-    font-weight: 600;
-}
-
-.platform-cell {
-    font-weight: 600;
 }
 
 .break-row {
@@ -140,6 +147,7 @@
     padding: 8px;
     background-color: #cecece;
     color: #232323;
+    font-weight: 500;
 }
 
 @media print {

@@ -1,6 +1,6 @@
 <div class="today-lessons-table-container">
     <div class="before-table">
-        <div class="date-info">
+        <div class="date-info" [class.mobile]="(deviceType$ | async) === 'mobile'">
             <span class="date">{{getFormattedDate(currentDate)}} </span>
             <span class="current-day" *ngIf="isToday()">Сегодня</span>
         </div>
@@ -11,7 +11,7 @@
         </div>
     </div>
 
-    <table class="today-lessons-table" id="schedule-table">
+    <table class="today-lessons-table" id="schedule-table" [class.mobile]="(deviceType$ | async) === 'mobile'">
         <thead>
             <tr class="table-header">
                 <th class="time-start-column">Начало</th>
@@ -25,16 +25,20 @@
         <tbody>
             <ng-container *ngFor="let lesson of oneDayLessons; let i = index">
                 <tr class="lesson-info-row">
-                    <td class="time-start-cell">{{lesson.startTime}}</td>
-                    <td class="time-end-cell">{{lesson.hasRealEndTime ? lesson.realEndTime: lesson.endTime}}
+                    <td class="time-start-cell" [class.mobile]="(deviceType$ | async) === 'mobile'">{{lesson.startTime}}
                     </td>
-                    <td class="time-distance-cell" [class.not-default]="notDefaultTime(lesson)">
+                    <td class="time-end-cell" [class.mobile]="(deviceType$ | async) === 'mobile'">
+                        {{lesson.hasRealEndTime ? lesson.realEndTime: lesson.endTime}}
+                    </td>
+                    <td class="time-distance-cell" [class.mobile]="(deviceType$ | async) === 'mobile'"
+                        [class.not-default]="notDefaultTime(lesson)">
                         {{ lesson.hasRealEndTime? getRealTimeDifference(lesson)
                         :getTimeDifference(lesson.startTime, lesson.endTime)}}
                         мин
                     </td>
                     <td class="student-cell">
-                        <span class="student-name-in-cell">{{getStudentByLesson(lesson)?.name}}</span>
+                        <span class="student-name-in-cell"
+                            [class.mobile]="(deviceType$ | async) === 'mobile'">{{getStudentByLesson(lesson)?.name}}</span>
                         <br />
                         <span class="note">{{lesson.note}}</span>
                     </td>

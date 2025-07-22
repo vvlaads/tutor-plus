@@ -157,6 +157,9 @@ export class LessonDialogComponent implements OnInit {
       const update = await this.scheduleObjectService.updateLesson(baseLessonId, lesson);
       if (!update) return;
       lesson.isPaid = false;
+      if (this.isOwlStudent) {
+        lesson.paidByOwl = false;
+      }
       const startDate = convertStringToDate(lesson.date);
       const endDate = convertStringToDate(lesson.repeatEndDate);
       const dates = getWeeklyRecurringDates(startDate, endDate);

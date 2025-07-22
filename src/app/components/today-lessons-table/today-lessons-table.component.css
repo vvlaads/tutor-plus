@@ -1,7 +1,6 @@
 .today-lessons-table-container {
     height: 90vh;
-    overflow: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
     position: relative;
 }
 
@@ -61,7 +60,6 @@
     border-spacing: 0;
     font-size: 16px;
     font-weight: 600;
-    width: 100vw;
 }
 
 .today-lessons-table.mobile {
@@ -148,6 +146,10 @@
     background-color: #cecece;
     color: #232323;
     font-weight: 500;
+}
+
+.spacing {
+    height: 200px;
 }
 
 @media print {

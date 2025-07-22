@@ -5,7 +5,7 @@
             <span class="current-day" *ngIf="isToday()">Сегодня</span>
         </div>
 
-        <div class="function-manager">
+        <div class="function-manager" *ngIf="(deviceType$ | async) === 'desktop'">
             <button class="function-button" (click)="print()">Печать</button>
             <button class="function-button" (click)="export()">Экспорт</button>
         </div>
@@ -13,7 +13,7 @@
 
     <table class="today-lessons-table" id="schedule-table" [class.mobile]="(deviceType$ | async) === 'mobile'">
         <thead>
-            <tr class="table-header">
+            <tr class="table-header" [class.mobile]="(deviceType$ | async) === 'mobile'">
                 <th class="time-start-column">Начало</th>
                 <th class="time-end-column">Конец</th>
                 <th class="time-distance-column">Время</th>
@@ -40,7 +40,7 @@
                         <span class="student-name-in-cell"
                             [class.mobile]="(deviceType$ | async) === 'mobile'">{{getStudentByLesson(lesson)?.name}}</span>
                         <br />
-                        <span class="note">{{lesson.note}}</span>
+                        <span class="note" [class.mobile]="(deviceType$ | async) === 'mobile'">{{lesson.note}}</span>
                     </td>
                     <td class="communication-cell"
                         [style.background-color]="getAppColor(getStudentByLesson(lesson)?.communication)">
@@ -57,5 +57,11 @@
             </ng-container>
         </tbody>
     </table>
+    <div class="after-table">
+        <div class="function-manager" *ngIf="(deviceType$ | async) === 'mobile'">
+            <button class="function-button" (click)="print()">Печать</button>
+            <button class="function-button" (click)="export()">Экспорт</button>
+        </div>
+    </div>
     <div class="spacing"></div>
 </div>

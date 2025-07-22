@@ -18,6 +18,7 @@
 
 .date-info.mobile {
     font-size: 14px;
+    height: 20px;
 }
 
 .date {
@@ -71,6 +72,10 @@
     top: 46px;
     z-index: 10;
     background: white;
+}
+
+.table-header.mobile {
+    top: 36px;
 }
 
 .today-lessons-table th {
@@ -146,6 +151,17 @@
     background-color: #cecece;
     color: #232323;
     font-weight: 500;
+}
+
+.note.mobile {
+    font-size: 10px;
+}
+
+.after-table {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin-top: 20px;
 }
 
 .spacing {

@@ -11,7 +11,8 @@ export const MAX_LESSON_DURATION = 5;
 export const MILLISECONDS_IN_SECOND = 1000;
 
 export const PHONE_NUMBER_LENGTH = 11;
-export const VISIBLE_LESSONS_COUNT = 3;
+export const DESKTOP_VISIBLE_LESSONS_COUNT = 3;
+export const MOBILE_VISIBLE_LESSONS_COUNT = 1;
 export const BLOCK_HEIGHT_IN_PIXELS = 60;
 export const HEADER_HEIGHT_IN_PIXELS = 30;
 export const BLOCK_WIDTH_PERCENTAGE = 13;

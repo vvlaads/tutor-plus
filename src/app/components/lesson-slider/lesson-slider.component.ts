@@ -3,9 +3,10 @@ import { Lesson } from '../../app.interfaces';
 import { CommonModule } from '@angular/common';
 import { DialogMode } from '../../app.enums';
 import { LessonService } from '../../services/lesson.service';
-import { VISIBLE_LESSONS_COUNT } from '../../app.constants';
 import { DialogService } from '../../services/dialog.service';
 import { convertStringToDate } from '../../functions/dates';
+import { DeviceService } from '../../services/device.service';
+import { DESKTOP_VISIBLE_LESSONS_COUNT, MOBILE_VISIBLE_LESSONS_COUNT } from '../../app.constants';
 
 @Component({
   selector: 'app-lesson-slider',
@@ -20,6 +21,9 @@ export class LessonSliderComponent implements OnInit {
   private prevLessons: Map<string, Lesson> = new Map();
   private lessonService = inject(LessonService);
   private dialogService = inject(DialogService);
+  private deviceService = inject(DeviceService);
+  public deviceType$ = this.deviceService.deviceType$;
+  public visibleLessonsCount = 0;
 
   @Input()
   public studentId: string = '';
@@ -27,6 +31,18 @@ export class LessonSliderComponent implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     await this.subscribeToLessons();
+    this.deviceType$.subscribe(deviceType => {
+      switch (deviceType) {
+        case 'mobile':
+          this.visibleLessonsCount = MOBILE_VISIBLE_LESSONS_COUNT;
+          break;
+        case 'desktop':
+          this.visibleLessonsCount = DESKTOP_VISIBLE_LESSONS_COUNT;
+          break;
+        default:
+          this.visibleLessonsCount = DESKTOP_VISIBLE_LESSONS_COUNT;
+      }
+    })
     this.findStartPos();
   }
 
@@ -43,7 +59,7 @@ export class LessonSliderComponent implements OnInit {
   private findStartPos(): void {
     const prevLesson = this.prevLessons.get(this.studentId);
     if (prevLesson) {
-      for (let i = 0; i <= this.lessons.length - VISIBLE_LESSONS_COUNT; i++) {
+      for (let i = 0; i <= this.lessons.length - this.visibleLessonsCount; i++) {
         this.currentPosition = i;
         if (this.lessons[i].id === prevLesson.id) {
           break;
@@ -72,13 +88,13 @@ export class LessonSliderComponent implements OnInit {
   }
 
   public canSlideRight(): boolean {
-    return this.currentPosition < this.lessons.length - VISIBLE_LESSONS_COUNT;
+    return this.currentPosition < this.lessons.length - this.visibleLessonsCount;
   }
 
   private updateVisibleLessons(): void {
     this.visibleLessons = this.lessons.slice(
       this.currentPosition,
-      this.currentPosition + VISIBLE_LESSONS_COUNT
+      this.currentPosition + this.visibleLessonsCount
     );
   }
 

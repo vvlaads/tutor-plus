@@ -43,9 +43,7 @@ export class StudentsComponent implements OnInit {
   public unpaidOwlLessonsCount: Map<string, number> = new Map();
   public filterOptions: SelectOption[] = [
     { value: 'all', text: 'Все' },
-    { value: 'paid', text: 'Оплачены' },
     { value: 'unpaid', text: 'Неоплачены' },
-    { value: 'paidByOwl', text: 'Оплачены по сове' },
     { value: 'unpaidByOwl', text: 'Неоплачены по сове' },
     { value: 'noNextLessons', text: 'Нет Следующего занятия' }
   ];
@@ -159,17 +157,10 @@ export class StudentsComponent implements OnInit {
 
   private applyCurrentFilter(students: Student[]): Student[] {
     switch (this.currentFilter) {
-      case 'paid':
-        return students.filter(s => this.unpaidLessonsCount.get(s.id) === 0);
       case 'unpaid':
         return students.filter(s => {
           const unpaidLessons = this.unpaidLessonsCount.get(s.id);
           return unpaidLessons && unpaidLessons > 0;
-        });
-      case 'paidByOwl':
-        return students.filter(s => {
-          const unpaidOwlLessons = this.unpaidOwlLessonsCount.get(s.id);
-          return s.from === 'Сова' && unpaidOwlLessons === 0;
         });
       case 'unpaidByOwl':
         return students.filter(s => {

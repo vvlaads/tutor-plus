@@ -7,6 +7,7 @@ import { Collection } from '../../app.interfaces';
 import { getErrorMessage } from '../../app.functions';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-collection-dialog',
@@ -16,7 +17,9 @@ import { CommonModule } from '@angular/common';
 })
 export class CollectionDialogComponent {
   private dialogRef = inject(MatDialogRef<CollectionDialogComponent>);
+  private deviceService = inject(DeviceService);
 
+  public deviceType$ = this.deviceService.deviceType$;
   public collectionForm: FormGroup;
   public title: string;
   public submitMessage: string;

@@ -90,7 +90,7 @@ export class StudentDialogComponent {
       ...studentValue,
       stopDate: studentValue.stopDate ? changeDateFormatMinusToDot(studentValue.stopDate) : null,
       phone: studentValue.phone ? clearPhoneNumber(studentValue.phone) : null,
-      parentPhone: studentValue.hasParent ? clearPhoneNumber(studentValue.phone) : null
+      parentPhone: studentValue.parentPhone ? clearPhoneNumber(studentValue.parentPhone) : null
     }
     return student;
   }

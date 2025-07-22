@@ -110,6 +110,10 @@
     margin: 32px 0;
 }
 
+.student-lessons {
+    width: 100%;
+}
+
 .student-info,
 .parent-info,
 .stopped {
@@ -239,6 +243,17 @@
     background: transparent;
 }
 
+.lesson-button-container.mobile {
+    position: fixed;
+    z-index: 1000;
+    bottom: 60px;
+    right: 0;
+    left: 0;
+    margin: 20px 0;
+    justify-content: center;
+    display: flex;
+}
+
 .lesson-button {
     width: 280px;
     height: 60px;
@@ -314,4 +329,98 @@
 
 .green {
     color: #28a745;
+}
+
+.manager-panel-mobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+}
+
+.back-button.mobile,
+.edit-button.mobile {
+    width: 45%;
+}
+
+.profile-header-mobile {
+    width: 100%;
+    display: block;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.student-name.mobile {
+    font-size: 18px;
+}
+
+.statistics.mobile {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+.student-info-mobile,
+.parent-info-mobile,
+.stopped-mobile {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    gap: 10px;
+}
+
+.stopped-mobile,
+.parent-info-mobile,
+.cost-block.mobile {
+    margin-top: 20px;
+}
+
+.info-item.mobile {
+    display: grid;
+    grid-template-columns: 50% 50%;
+}
+
+.info-label.mobile {
+    font-size: 14px;
+    width: auto;
+}
+
+.info-value.mobile {
+    font-size: 14px;
+    width: auto;
+}
+
+.cost-title.mobile {
+    font-size: 18px;
+}
+
+.cost-amount.mobile {
+    font-size: 20px;
+}
+
+.value-icon.mobile {
+    width: 24px;
+    height: 24px;
+}
+
+.note-block.mobile {
+    font-size: 16px;
+}
+
+.spacing {
+    height: 200px;
+}
+
+.stat-value.mobile {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.stat-label.mobile {
+    font-size: 18px;
 }

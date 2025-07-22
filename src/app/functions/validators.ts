@@ -115,11 +115,6 @@ export function parentValidator(): ValidatorFn {
                 return { invalidParentName: true };
             }
 
-            const phone = control.get('parentPhone')?.value;
-            if (!phone) {
-                return { invalidParentPhone: true };
-            }
-
             const communication = control.get('parentCommunication')?.value;
             if (!communication) {
                 return { invalidParentCommunication: true };

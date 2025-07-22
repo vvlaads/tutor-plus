@@ -1,173 +1,339 @@
 <main class="content-wrapper" [style.margin-left.%]="pageMarginLeftPercentage">
     <div *ngIf="student" class="profile-container">
-        <div class="sticky-button">
-            <button class="back-button" (click)="goBack()"> <img
-                    src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png"
-                    class="button-icon">
-                <span class="button-content">Назад</span>
-            </button>
-        </div>
-
-
-        <div class="profile-header">
-            <h2 class="student-name">{{ student.name }}</h2>
-            <div class="actions">
-                <button class="edit-button" (click)="updateStudent()">
-                    <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png"
-                        class="button-icon">
-                    <span class="button-content">Изменить</span>
-                </button>
-            </div>
-        </div>
-
-        <div class="statistics">
-            <div class="statistics-info">
-                <span class="info-label stat-label">Итого проведено:</span>
-                <span class="info-value stat-value"> {{ prevLessonsCount }} </span>
-            </div>
-            <div class="statistics-info">
-                <span class="info-label stat-label">Неоплачено уроков:</span>
-                <span class="info-value stat-value" [class.red]="unpaidLessonsCount>0"> {{ unpaidLessonsCount }}
-                </span>
-            </div>
-            <div class="statistics-info">
-                <span class="info-label stat-label">Предоплачено уроков:</span>
-                <span class="info-value  stat-value" [class.green]="prepaidLessonsCount>0"> {{ prepaidLessonsCount }}
-                </span>
-            </div>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="student-lessons">
-            <app-lesson-slider [studentId]="student.id"></app-lesson-slider>
-        </div>
-
-        <div class="divider"></div>
-
-        <div class="student-info">
-            <div class="info-column">
-                <div class="info-item">
-                    <span class="info-label">Телефон:</span>
-                    <span class="info-value phone">{{ student.phone ? formatPhoneNumber(student.phone):
-                        'Отсутствует'}}</span>
+        <div [ngSwitch]="(deviceType$ | async)">
+            <div *ngSwitchCase="'mobile'">
+                <div class="manager-panel-mobile">
+                    <button class="back-button mobile" (click)="goBack()">
+                        <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png"
+                            class="button-icon">
+                        <span class="button-content">Назад</span>
+                    </button>
+                    <button class="edit-button mobile" (click)="updateStudent()">
+                        <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png"
+                            class="button-icon">
+                        <span class="button-content">Изменить</span>
+                    </button>
+                </div>
+                <div class="profile-header-mobile">
+                    <span class="student-name mobile">{{ student.name }}</span>
                 </div>
 
-                <div class="info-item">
-                    <span class="info-label">Предмет:</span>
-                    <span class="info-value subject">{{ student.subject }}</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Цвет:</span>
-                    <svg class="color-preview" viewBox="0 0 24 24">
-                        <circle cx="12" cy="12" r="10" [attr.fill]="student.color || '#ffffff'" />
-                    </svg>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label">Статус:</span>
-                    <span class="info-value status" [class.active]="student.isActive"
-                        [class.inactive]="!student.isActive">
-                        {{ student.isActive ? 'Активный' : 'Завершенный' }}
-                    </span>
-                </div>
-            </div>
-
-            <div class="info-column">
-                <div class="info-item">
-                    <span class="info-label">Способ связи:</span>
-                    <div class="info-value with-icon">
-                        <img class="value-icon" [src]="getCommunicationIcon(student.communication)" alt="Communication">
-                        <span>{{ student.communication }}</span>
+                <div class="statistics mobile">
+                    <div class="statistics-info">
+                        <span class="info-label stat-label mobile">Итого проведено:</span>
+                        <span class="info-value stat-value mobile"> {{ prevLessonsCount }} </span>
+                    </div>
+                    <div class="statistics-info">
+                        <span class="info-label stat-label mobile">Неоплачено уроков:</span>
+                        <span class="info-value stat-value mobile" [class.red]="unpaidLessonsCount>0"> {{
+                            unpaidLessonsCount }}
+                        </span>
+                    </div>
+                    <div class="statistics-info">
+                        <span class="info-label stat-label mobile">Предоплачено уроков:</span>
+                        <span class="info-value  stat-value mobile" [class.green]="prepaidLessonsCount>0"> {{
+                            prepaidLessonsCount }}
+                        </span>
                     </div>
                 </div>
 
-                <div class="info-item">
-                    <span class="info-label">Платформа:</span>
-                    <div class="info-value with-icon">
-                        <img class="value-icon" [src]="getPlatformIcon(student.platform)" alt="Platform">
-                        <span>{{ student.platform }}</span>
+
+                <div class="divider"></div>
+
+                <div class="student-lessons">
+                    <!-- <app-lesson-slider [studentId]="student.id"></app-lesson-slider> -->
+                    slider
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="student-info-mobile">
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Телефон:</span>
+                        <span class="info-value mobile phone">{{ student.phone ? formatPhoneNumber(student.phone):
+                            'Отсутствует'}}</span>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Предмет:</span>
+                        <span class="info-value mobile subject">{{ student.subject }}</span>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Цвет:</span>
+                        <svg class="color-preview" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" [attr.fill]="student.color || '#ffffff'" />
+                        </svg>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Статус:</span>
+                        <span class="info-value mobile status" [class.active]="student.isActive"
+                            [class.inactive]="!student.isActive">
+                            {{ student.isActive ? 'Активный' : 'Завершенный' }}
+                        </span>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Способ связи:</span>
+                        <div class="info-value mobile with-icon">
+                            <img class="value-icon mobile" [src]="getCommunicationIcon(student.communication)"
+                                alt="Communication">
+                            <span>{{ student.communication }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Платформа:</span>
+                        <div class="info-value mobile with-icon">
+                            <img class="value-icon mobile" [src]="getPlatformIcon(student.platform)" alt="Platform">
+                            <span>{{ student.platform }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Откуда пришел:</span>
+                        <div class="info-value mobile with-icon">
+                            <img class="value-icon mobile" [src]="getFromIcon(student.from)" alt="Source">
+                            <span>{{ student.from }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item mobile" *ngIf="student.note">
+                        <span class="info-label mobile">Примечание:</span>
+                        <span class="note-block mobile">{{ student.note }}</span>
                     </div>
                 </div>
 
-                <div class="info-item">
-                    <span class="info-label">Откуда пришел:</span>
-                    <div class="info-value with-icon">
-                        <img class="value-icon" [src]="getFromIcon(student.from)" alt="Source">
-                        <span>{{ student.from }}</span>
+                <div class="parent-info-mobile" *ngIf="student.hasParent">
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Имя родителя:</span>
+                        <span class="info-value mobile parentName">{{ student.parentName }}</span>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile parent-label">Телефон родителя:</span>
+                        <span class="info-value mobile phone">{{ student.parentPhone ?
+                            formatPhoneNumber(student.parentPhone): 'Отсутствует' }}</span>
+                    </div>
+
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Где общаемся с родителем:</span>
+                        <div class="info-value mobile with-icon">
+                            <img class="value-icon mobile" *ngIf="student.parentCommunication"
+                                [src]="getCommunicationIcon(student.parentCommunication)">
+                            <span>{{ student.parentCommunication }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Кто оплачивает:</span>
+                        <span class="info-value mobile paidByStudent">
+                            {{ student.paidByStudent ? 'Студент':'Родитель' }}
+                        </span>
                     </div>
                 </div>
 
-                <div class="info-item" *ngIf="student.note">
-                    <span class="info-label">Примечание:</span>
-                    <span class="note-block">{{ student.note }}</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="parent-info" *ngIf="student.hasParent">
-            <div class="info-column">
-                <div class="info-item">
-                    <span class="info-label">Имя родителя:</span>
-                    <span class="info-value parentName">{{ student.parentName }}</span>
-                </div>
-
-                <div class="info-item">
-                    <span class="info-label parent-label">Телефон родителя:</span>
-                    <span class="info-value phone">{{ student.parentPhone ?
-                        formatPhoneNumber(student.parentPhone): null }}</span>
-                </div>
-            </div>
-
-            <div class="info-column">
-                <div class="info-item">
-                    <span class="info-label">Где общаемся с родителем:</span>
-                    <div class="info-value with-icon">
-                        <img class="value-icon" *ngIf="student.parentCommunication"
-                            [src]="getCommunicationIcon(student.parentCommunication)">
-                        <span>{{ student.parentCommunication }}</span>
+                <div class="stopped-mobile" *ngIf="student.isStopped">
+                    <div class="info-item mobile">
+                        <span class="info-label mobile">Приостановлен до:</span>
+                        <span class="info-value mobile stopDate">{{ student.stopDate }}</span>
                     </div>
                 </div>
 
-                <div class="info-item">
-                    <span class="info-label">Кто оплачивает:</span>
-                    <span class="info-value paidByStudent">{{ student.paidByStudent ? 'Студент':'Родитель' }}</span>
+                <div class="cost-block mobile">
+                    <h3 class="cost-title mobile">Стоимость часа:</h3>
+                    <div class="cost-amount mobile">{{ student.cost }} ₽</div>
+                </div>
+
+                <div class="delete-button-container">
+                    <button class="delete-button" (click)="deleteStudent(student.id)">
+                        <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
+                            class="button-icon delete-icon">
+                        <span class="button-content">Удалить</span>
+                    </button>
+                </div>
+
+                <div class="spacing"></div>
+            </div>
+
+
+
+            <div *ngSwitchDefault>
+                <div class="sticky-button">
+                    <button class="back-button" (click)="goBack()"> <img
+                            src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png"
+                            class="button-icon">
+                        <span class="button-content">Назад</span>
+                    </button>
+                </div>
+
+
+                <div class="profile-header">
+                    <h2 class="student-name">{{ student.name }}</h2>
+                    <div class="actions">
+                        <button class="edit-button" (click)="updateStudent()">
+                            <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Pencil.png"
+                                class="button-icon">
+                            <span class="button-content">Изменить</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="statistics">
+                    <div class="statistics-info">
+                        <span class="info-label stat-label">Итого проведено:</span>
+                        <span class="info-value stat-value"> {{ prevLessonsCount }} </span>
+                    </div>
+                    <div class="statistics-info">
+                        <span class="info-label stat-label">Неоплачено уроков:</span>
+                        <span class="info-value stat-value" [class.red]="unpaidLessonsCount>0"> {{ unpaidLessonsCount }}
+                        </span>
+                    </div>
+                    <div class="statistics-info">
+                        <span class="info-label stat-label">Предоплачено уроков:</span>
+                        <span class="info-value  stat-value" [class.green]="prepaidLessonsCount>0"> {{
+                            prepaidLessonsCount }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="student-lessons">
+                    <app-lesson-slider [studentId]="student.id"></app-lesson-slider>
+                </div>
+
+                <div class="divider"></div>
+
+                <div class="student-info">
+                    <div class="info-column">
+                        <div class="info-item">
+                            <span class="info-label">Телефон:</span>
+                            <span class="info-value phone">{{ student.phone ? formatPhoneNumber(student.phone):
+                                'Отсутствует'}}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Предмет:</span>
+                            <span class="info-value subject">{{ student.subject }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Цвет:</span>
+                            <svg class="color-preview" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" [attr.fill]="student.color || '#ffffff'" />
+                            </svg>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Статус:</span>
+                            <span class="info-value status" [class.active]="student.isActive"
+                                [class.inactive]="!student.isActive">
+                                {{ student.isActive ? 'Активный' : 'Завершенный' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="info-column">
+                        <div class="info-item">
+                            <span class="info-label">Способ связи:</span>
+                            <div class="info-value with-icon">
+                                <img class="value-icon" [src]="getCommunicationIcon(student.communication)"
+                                    alt="Communication">
+                                <span>{{ student.communication }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Платформа:</span>
+                            <div class="info-value with-icon">
+                                <img class="value-icon" [src]="getPlatformIcon(student.platform)" alt="Platform">
+                                <span>{{ student.platform }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Откуда пришел:</span>
+                            <div class="info-value with-icon">
+                                <img class="value-icon" [src]="getFromIcon(student.from)" alt="Source">
+                                <span>{{ student.from }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item" *ngIf="student.note">
+                            <span class="info-label">Примечание:</span>
+                            <span class="note-block">{{ student.note }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="parent-info" *ngIf="student.hasParent">
+                    <div class="info-column">
+                        <div class="info-item">
+                            <span class="info-label">Имя родителя:</span>
+                            <span class="info-value parentName">{{ student.parentName }}</span>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label parent-label">Телефон родителя:</span>
+                            <span class="info-value phone">{{ student.parentPhone ?
+                                formatPhoneNumber(student.parentPhone): 'Отсутствует' }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-column">
+                        <div class="info-item">
+                            <span class="info-label">Где общаемся с родителем:</span>
+                            <div class="info-value with-icon">
+                                <img class="value-icon" *ngIf="student.parentCommunication"
+                                    [src]="getCommunicationIcon(student.parentCommunication)">
+                                <span>{{ student.parentCommunication }}</span>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <span class="info-label">Кто оплачивает:</span>
+                            <span class="info-value paidByStudent">{{ student.paidByStudent ? 'Студент':'Родитель'
+                                }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stopped" *ngIf="student.isStopped">
+                    <span class="info-label">Приостановлен до:</span>
+                    <div class="info-value">
+                        <span class="info-value stopDate">{{ student.stopDate }}</span>
+                    </div>
+                </div>
+
+                <div class="cost-block">
+                    <h3 class="cost-title">Стоимость часа:</h3>
+                    <div class="cost-amount">{{ student.cost }} ₽</div>
+                </div>
+
+                <div class="delete-button-container">
+                    <button class="delete-button" (click)="deleteStudent(student.id)">
+                        <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
+                            class="button-icon delete-icon">
+                        <span class="button-content">Удалить</span>
+                    </button>
                 </div>
             </div>
-        </div>
-
-        <div class="stopped" *ngIf="student.isStopped">
-            <span class="info-label">Приостановлен до:</span>
-            <div class="info-value">
-                <span class="info-value stopDate">{{ student.stopDate }}</span>
-            </div>
-        </div>
-
-        <div class="cost-block">
-            <h3 class="cost-title">Стоимость часа:</h3>
-            <div class="cost-amount">{{ student.cost }} ₽</div>
-        </div>
-
-        <div class="delete-button-container">
-            <button class="delete-button" (click)="deleteStudent(student.id)">
-                <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Bucket.png"
-                    class="button-icon delete-icon">
-                <span class="button-content">Удалить</span>
-            </button>
         </div>
     </div>
 
+    <div *ngIf="!student" class="empty-state">
+        <p>Нет данных о студенте</p>
+    </div>
 
-    <div class="lesson-button-container">
+
+    <div class="lesson-button-container" [class.mobile]="(deviceType$|async)==='mobile'">
         <button class="lesson-button floating-button" (click)="addLesson()">
             <img src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Plus%20Icon.png"
                 class="lesson-icon">
             <span>Добавить занятие</span>
         </button>
-    </div>
-
-    <div *ngIf="!student" class="empty-state">
-        <p>Нет данных о студенте</p>
     </div>
 </main>

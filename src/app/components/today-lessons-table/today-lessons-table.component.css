@@ -1,5 +1,5 @@
 .today-lessons-table-container {
-    height: 90vh;
+    height: calc(100vh - 30px);
     overflow-y: auto;
     position: relative;
 }

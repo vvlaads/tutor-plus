@@ -1,5 +1,5 @@
 .schedule-table-container {
-    height: 90vh;
+    height: calc(100vh - 30px);
     width: 100%;
 }
 

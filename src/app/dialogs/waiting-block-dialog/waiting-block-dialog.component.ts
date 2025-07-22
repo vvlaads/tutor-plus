@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 import { SearchSelectComponent } from "../../components/search-select/search-select.component";
 import { StateService } from '../../services/state.service';
 import { Router } from '@angular/router';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-waiting-block-dialog',
@@ -21,10 +22,12 @@ import { Router } from '@angular/router';
 export class WaitingBlockDialogComponent {
   private dialogRef = inject(MatDialogRef<WaitingBlockDialogComponent>);
   private stateService = inject(StateService);
+  private deviceService = inject(DeviceService);
   private router = inject(Router);
   private mode: DialogMode;
   private students: Student[] = [];
 
+  public deviceType$ = this.deviceService.deviceType$;
   public waitingBlockForm: FormGroup;
   public title: string;
   public submitMessage: string;

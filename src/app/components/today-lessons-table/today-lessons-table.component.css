@@ -2,6 +2,7 @@
     height: calc(100vh - 30px);
     overflow-y: auto;
     position: relative;
+    width: 100%;
 }
 
 .before-table {
@@ -76,6 +77,7 @@
 
 .table-header.mobile {
     top: 36px;
+    font-size: 8px;
 }
 
 .today-lessons-table th {
@@ -131,6 +133,11 @@
 
 .student-name-in-cell.mobile {
     font-size: 12px;
+}
+
+.communication-cell.mobile,
+.platform-cell.mobile {
+    font-size: 8px;
 }
 
 .note {

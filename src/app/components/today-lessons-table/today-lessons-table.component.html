@@ -42,10 +42,10 @@
                         <br />
                         <span class="note" [class.mobile]="(deviceType$ | async) === 'mobile'">{{lesson.note}}</span>
                     </td>
-                    <td class="communication-cell"
+                    <td class="communication-cell" [class.mobile]="(deviceType$ | async) === 'mobile'"
                         [style.background-color]="getAppColor(getStudentByLesson(lesson)?.communication)">
                         {{getStudentByLesson(lesson)?.communication}}</td>
-                    <td class="platform-cell"
+                    <td class="platform-cell" [class.mobile]="(deviceType$ | async) === 'mobile'"
                         [style.background-color]="getAppColor(getStudentByLesson(lesson)?.platform)">
                         {{getStudentByLesson(lesson)?.platform}}</td>
                 </tr>

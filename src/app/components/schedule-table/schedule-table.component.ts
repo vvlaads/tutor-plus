@@ -236,7 +236,8 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
     this.dialogService.openSlotDialog(DialogMode.Edit, slot);
   }
 
-  public copySlots(): void {
+  public async copySlots(): Promise<void> {
+    await this.slotService.cleanupOldSlots();
     let result = ``;
     let monday = new Date(this.weekDates[0]);
     monday.setHours(0, 0, 0, 0);
@@ -282,6 +283,7 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   public changeVisibilityOfSlots(): void {
+    this.slotService.cleanupOldSlots();
     this.slotsIsVisible = !this.slotsIsVisible;
     if (this.slotsIsVisible) {
       this.changeVisibilityTitle = 'Скрыть окна';

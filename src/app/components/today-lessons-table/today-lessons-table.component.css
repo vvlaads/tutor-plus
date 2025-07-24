@@ -121,13 +121,13 @@
     background-color: #ffbdbd;
 }
 
-.student-cell {
+td,
+.student-name-in-cell {
     text-align: center;
 }
 
 .student-name-in-cell {
     font-size: 20px;
-    text-align: left;
     display: block;
 }
 

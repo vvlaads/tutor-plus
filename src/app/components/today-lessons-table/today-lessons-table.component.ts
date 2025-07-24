@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { StudentService } from '../../services/student.service';
 import * as XLSX from 'xlsx';
 import { DAYS_IN_WEEK, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES } from '../../app.constants';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-today-lessons-table',
@@ -16,10 +17,12 @@ import { DAYS_IN_WEEK, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MIN
 export class TodayLessonsTableComponent implements OnInit, OnChanges {
   private lessonService = inject(LessonService);
   private studentService = inject(StudentService);
+  private deviceService = inject(DeviceService);
   private lessons: Lesson[] = [];
   private students: Student[] = [];
 
   public oneDayLessons: Lesson[] = [];
+  public deviceType$ = this.deviceService.deviceType$;
 
   @Input()
   public currentDate: Date = new Date();

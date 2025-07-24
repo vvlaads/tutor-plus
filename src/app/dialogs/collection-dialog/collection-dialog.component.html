@@ -2,58 +2,114 @@
     <span class="form-title">{{title}}</span>
     <div class="form-content">
         <form [formGroup]="collectionForm" class="collection-form" (ngSubmit)="submit()">
-            <div class="input-columns">
-                <div class="input-column">
-                    <div class="form-group">
-                        <div class="form-row">
-                            <label for="input-name" class="form-label">Название:</label>
-                            <input formControlName="name" id="input-name" class="form-input">
+            <div [ngSwitch]="(deviceType$ | async)">
+                <div *ngSwitchCase="'mobile'">
+                    <div class="input-column">
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label for="input-name" class="form-label-mobile">Название:</label>
+                                <input formControlName="name" id="input-name" class="form-input-mobile">
+                            </div>
+                            <div *ngIf="formSubmitted && collectionForm.get('name')?.errors" class="error-message">
+                                {{ getErrorMessage('name') }}
+                            </div>
                         </div>
-                        <div *ngIf="formSubmitted && collectionForm.get('name')?.errors" class="error-message">
-                            {{ getErrorMessage('name') }}
+
+                        <div class="form-group">
+                            <div class="form-row">
+                                <label class="form-label-mobile">Гости (email):</label>
+                                <div class="guests-container">
+                                    <div class="guest-input-container">
+                                        <input formControlName="newGuest" class="form-input-mobile"
+                                            placeholder="Добавить email гостя">
+                                        <button type="button" (click)="addGuest()" class="add-guest-button">+</button>
+                                    </div>
+                                    <div *ngIf="formSubmitted && collectionForm.get('newGuest')?.errors"
+                                        class="error-message">
+                                        Введите корректный email
+                                    </div>
+
+                                    <div class="guest-list">
+                                        <div *ngFor="let guest of collectionForm.get('guests')?.value; let i = index"
+                                            class="guest-item">
+                                            <span>{{guest}}</span>
+                                            <button type="button" (click)="removeGuest(i)"
+                                                class="remove-guest-button">×</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions-mobile">
+                            <button type="submit" class="button-mobile submit-button">
+                                {{submitMessage}}
+                            </button>
+                            <button type="button" (click)="close()" class="button-mobile cancel-button">
+                                Отмена
+                            </button>
+                            <button type="button" (click)="delete()" class="button-mobile delete-button"
+                                *ngIf="canDelete()">
+                                Удалить
+                            </button>
                         </div>
                     </div>
-
-                    <div class="form-group">
-                        <div class="form-row">
-                            <label class="form-label">Гости (email):</label>
-                            <div class="guests-container">
-                                <div class="guest-input-container">
-                                    <input formControlName="newGuest" class="form-input"
-                                        placeholder="Добавить email гостя">
-                                    <button type="button" (click)="addGuest()" class="add-guest-button">+</button>
+                </div>
+                <div *ngSwitchDefault>
+                    <div class="input-columns">
+                        <div class="input-column">
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <label for="input-name" class="form-label">Название:</label>
+                                    <input formControlName="name" id="input-name" class="form-input">
                                 </div>
-                                <div *ngIf="formSubmitted && collectionForm.get('newGuest')?.errors"
-                                    class="error-message">
-                                    Введите корректный email
+                                <div *ngIf="formSubmitted && collectionForm.get('name')?.errors" class="error-message">
+                                    {{ getErrorMessage('name') }}
                                 </div>
+                            </div>
 
-                                <div class="guest-list">
-                                    <div *ngFor="let guest of collectionForm.get('guests')?.value; let i = index"
-                                        class="guest-item">
-                                        <span>{{guest}}</span>
-                                        <button type="button" (click)="removeGuest(i)"
-                                            class="remove-guest-button">×</button>
+                            <div class="form-group">
+                                <div class="form-row">
+                                    <label class="form-label">Гости (email):</label>
+                                    <div class="guests-container">
+                                        <div class="guest-input-container">
+                                            <input formControlName="newGuest" class="form-input"
+                                                placeholder="Добавить email гостя">
+                                            <button type="button" (click)="addGuest()"
+                                                class="add-guest-button">+</button>
+                                        </div>
+                                        <div *ngIf="formSubmitted && collectionForm.get('newGuest')?.errors"
+                                            class="error-message">
+                                            Введите корректный email
+                                        </div>
+
+                                        <div class="guest-list">
+                                            <div *ngFor="let guest of collectionForm.get('guests')?.value; let i = index"
+                                                class="guest-item">
+                                                <span>{{guest}}</span>
+                                                <button type="button" (click)="removeGuest(i)"
+                                                    class="remove-guest-button">×</button>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div class="form-actions">
-                <button type="submit" class="button submit-button">
-                    {{submitMessage}}
-                </button>
-                <button type="button" (click)="close()" class="button cancel-button">
-                    Отмена
-                </button>
-                <button type="button" (click)="delete()" class="button delete-button" *ngIf="canDelete()">
-                    Удалить
-                </button>
+                    <div class="form-actions">
+                        <button type="submit" class="button submit-button">
+                            {{submitMessage}}
+                        </button>
+                        <button type="button" (click)="close()" class="button cancel-button">
+                            Отмена
+                        </button>
+                        <button type="button" (click)="delete()" class="button delete-button" *ngIf="canDelete()">
+                            Удалить
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
-
 </div>

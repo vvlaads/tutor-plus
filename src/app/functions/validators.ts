@@ -40,7 +40,7 @@ export function repeatDateRangeValidator(): ValidatorFn {
             if (date && startDate) {
                 date = changeDateFormatMinusToDot(date);
                 startDate = changeDateFormatMinusToDot(startDate);
-                if (convertStringToDate(date).getTime() <= convertStringToDate(startDate).getTime()) {
+                if (convertStringToDate(date).getTime() < convertStringToDate(startDate).getTime()) {
                     return { repeatEndDateInvalid: true };
                 }
             }
@@ -113,11 +113,6 @@ export function parentValidator(): ValidatorFn {
             const name = control.get('parentName')?.value;
             if (!name) {
                 return { invalidParentName: true };
-            }
-
-            const phone = control.get('parentPhone')?.value;
-            if (!phone) {
-                return { invalidParentPhone: true };
             }
 
             const communication = control.get('parentCommunication')?.value;

@@ -1,12 +1,13 @@
 <div class="slider-wrapper">
-    <button class="slide-button left-button" (click)="slideLeft()" [disabled]="!canSlideLeft()"
-        [class.disabled]="!canSlideLeft()">
+    <button class="slide-button left-button" [class.mobile]="(deviceType$|async)==='mobile'" (click)="slideLeft()"
+        [disabled]="!canSlideLeft()" [class.disabled]="!canSlideLeft()">
         <img class="button-icon"
             src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Left%20Arrow.png">
     </button>
 
     <div class="lessons-container">
-        <div *ngFor="let lesson of visibleLessons" class="lesson-block" (click)="openLessonDialog(lesson)">
+        <div *ngFor="let lesson of visibleLessons" class="lesson-block" (click)="openLessonDialog(lesson)"
+            [class.mobile]="(deviceType$|async)==='mobile'">
             <p class="lesson-date">Дата: {{ lesson.date }}</p>
             <p class="lesson-cost">Стоимость: {{ lesson.cost }} ₽</p>
             <p class="lesson-payment">
@@ -18,8 +19,8 @@
         </div>
     </div>
 
-    <button class="slide-button right-button" (click)="slideRight()" [disabled]="!canSlideRight()"
-        [class.disabled]="!canSlideRight()">
+    <button class="slide-button right-button" [class.mobile]="(deviceType$|async)==='mobile'" (click)="slideRight()"
+        [disabled]="!canSlideRight()" [class.disabled]="!canSlideRight()">
         <img class="button-icon"
             src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Right%20Arrow.png">
     </button>

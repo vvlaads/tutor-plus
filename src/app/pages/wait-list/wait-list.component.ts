@@ -8,6 +8,7 @@ import { WaitingBlockService } from '../../services/waiting-block.service';
 import { convertDateToString, convertStringToDate, convertTimeToMinutes, isDatesEquals } from '../../functions/dates';
 import { DialogMode } from '../../app.enums';
 import { StudentService } from '../../services/student.service';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-wait-list',
@@ -19,9 +20,11 @@ export class WaitListComponent implements OnInit {
   private dialogService = inject(DialogService);
   private waitingBlockService = inject(WaitingBlockService);
   private studentService = inject(StudentService);
+  private deviceService = inject(DeviceService);
   private waitingBlocks: WaitingBlock[] = []
   private students: Student[] = [];
 
+  public deviceType$ = this.deviceService.deviceType$;
   public pageMarginLeftPercentage: number = 0;
   public blockHeight = 150;
   public weekDayNames = WEEKDAY_NAMES;

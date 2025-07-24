@@ -12,6 +12,7 @@ import { formatPhoneNumber } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
 import { StateService } from '../../services/state.service';
 import { Subject, takeUntil } from 'rxjs';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-student-profile',
@@ -22,6 +23,7 @@ import { Subject, takeUntil } from 'rxjs';
 export class StudentProfileComponent implements OnInit, OnDestroy {
   private dialogService = inject(DialogService);
   private stateService = inject(StateService);
+  private deviceService = inject(DeviceService);
   public student: Student | null = null;
   public pageMarginLeftPercentage: number = 0;
   public platformOptions: SelectOptionWithIcon[] = PLATFORM_OPTIONS;
@@ -32,6 +34,7 @@ export class StudentProfileComponent implements OnInit, OnDestroy {
   public prepaidLessonsCount: number = 0;
   public formatPhoneNumber = formatPhoneNumber;
   private destroy$ = new Subject<void>();
+  public deviceType$ = this.deviceService.deviceType$;
 
   public constructor(private route: ActivatedRoute,
     private studentService: StudentService,

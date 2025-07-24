@@ -1,5 +1,6 @@
 .form-container {
     width: 900px;
+    max-width: 95vw;
     margin: 0 auto;
     padding: 24px;
     box-sizing: border-box;
@@ -52,6 +53,19 @@
     margin: 0;
 }
 
+.form-label-mobile {
+    color: #4a5568;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: right;
+    margin: 0;
+    line-height: normal;
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 40%;
+}
+
 .form-input,
 .form-textarea {
     padding: 10px 14px;
@@ -62,6 +76,17 @@
     flex-grow: 1;
     background-color: #f8fafc;
     color: #1a202c;
+}
+
+.form-input-mobile {
+    padding: 6px 8px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    flex-grow: 1;
+    box-sizing: border-box;
+    width: auto;
 }
 
 .form-input:focus,
@@ -86,10 +111,25 @@ app-search-select {
     font-family: 'Roboto', sans-serif;
 }
 
+.form-select-mobile {
+    width: auto;
+    font-size: 14px;
+}
+
 .form-actions {
     display: flex;
     justify-content: center;
     gap: 50px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.form-actions-mobile {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 10px;
     margin-top: 30px;
     padding-top: 20px;
     border-top: 1px solid #e2e8f0;
@@ -103,6 +143,18 @@ app-search-select {
     font-weight: 500;
     cursor: pointer;
     font-size: 20px;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.button-mobile {
+    width: 30%;
+    max-width: 300px;
+    padding: 6px 10px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 16px;
     transition: all 0.3s ease;
     text-align: center;
 }

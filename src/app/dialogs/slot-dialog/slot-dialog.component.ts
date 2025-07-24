@@ -12,6 +12,7 @@ import { correctYearValidator, realEndTimeRangeValidator, repeatDateRangeValidat
 import { REPEAT_SLOT_OPTIONS } from '../../app.constants';
 import { LessonService } from '../../services/lesson.service';
 import { ScheduleObjectService } from '../../services/schedule-object.service';
+import { DeviceService } from '../../services/device.service';
 
 @Component({
   selector: 'app-slot-dialog',
@@ -21,13 +22,15 @@ import { ScheduleObjectService } from '../../services/schedule-object.service';
 })
 export class SlotDialogComponent {
   private dialogRef = inject(MatDialogRef<SlotDialogComponent>);
-  private mode: DialogMode = DialogMode.Add;
+  private deviceService = inject(DeviceService);
   private scheduleObjectService = inject(ScheduleObjectService);
+  private mode: DialogMode = DialogMode.Add;
 
-  public slotForm: FormGroup;
   public title: string;
+  public slotForm: FormGroup;
   public submitMessage: string;
   public formSubmitted = false;
+  public deviceType$ = this.deviceService.deviceType$;
 
   public constructor(
     private fb: FormBuilder,

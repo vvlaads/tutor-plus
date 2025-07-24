@@ -9,7 +9,6 @@ import { ChoiceDialogComponent } from '../dialogs/choice-dialog/choice-dialog.co
 import { FindDateDialogComponent } from '../dialogs/find-date-dialog/find-date-dialog.component';
 import { WaitingBlockDialogComponent } from '../dialogs/waiting-block-dialog/waiting-block-dialog.component';
 import { CollectionDialogComponent } from '../dialogs/collection-dialog/collection-dialog.component';
-import { collection } from 'firebase/firestore';
 
 @Injectable({
   providedIn: 'root'

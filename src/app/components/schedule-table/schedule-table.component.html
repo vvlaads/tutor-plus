@@ -60,6 +60,7 @@
                         src="https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png">
                 </div>
             </div>
+
             <ng-container *ngIf="slotsIsVisible">
                 <div *ngFor="let slot of currentWeekSlots" class="slot"
                     [class.mobile]="(deviceType$ | async) === 'mobile'"

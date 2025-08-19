@@ -168,7 +168,7 @@ export class ScheduleTableComponent implements OnInit, OnChanges, AfterViewInit 
     const start = convertTimeToMinutes(timeBlock.startTime);
     const end = convertTimeToMinutes(timeBlock.endTime);
     const duration = end - start;
-    return duration * this.blockHeight / MINUTES_IN_HOUR;
+    return duration * (this.blockHeight - 1) / MINUTES_IN_HOUR;
   }
 
   public getTimeBlockLeftPosition(timeBlock: TimeBlock): number {

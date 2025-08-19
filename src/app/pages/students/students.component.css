@@ -188,6 +188,11 @@ app-search-filter {
     color: #cc0d0d;
 }
 
+.stopped {
+    color: #8b7b1e;
+    font-weight: 500;
+}
+
 .divider {
     height: 1px;
     background: #000;

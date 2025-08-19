@@ -74,6 +74,7 @@ export class StudentsComponent implements OnInit {
   }
 
   private subscribeToStudents(): void {
+    this.studentService.updateStudents();
     this.studentService.students$.subscribe(students => {
       this.allStudents = students;
       this.applyFilters();
@@ -183,8 +184,15 @@ export class StudentsComponent implements OnInit {
     }
   }
 
-  public getNextLessonDate(lesson: Lesson | null | undefined): string {
-    if (!lesson) return 'Не назначено';
+  public getNextLessonDate(student: Student): string {
+    let lesson = this.nextLessons.get(student.id)
+    if (!lesson) {
+      if (student.isStopped) {
+        return `Приостановлен до ${student.stopDate}`
+      }
+      return 'Не назначено';
+    }
+
     try {
       return lesson.date ? lesson.date : 'Дата не указана';
     } catch {

@@ -130,4 +130,18 @@ export class StudentService implements OnDestroy {
       }
     }
   }
+
+  public async updateStudents(): Promise<void> {
+    const students = await this.getStudents();
+    let today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let student of students) {
+      if (student.stopDate) {
+        const stopDate = convertStringToDate(student.stopDate);
+        if (student.isStopped && stopDate.getTime() <= today.getTime()) {
+          await this.updateStudent(student.id, { isStopped: false, stopDate: null });
+        }
+      }
+    }
+  }
 }

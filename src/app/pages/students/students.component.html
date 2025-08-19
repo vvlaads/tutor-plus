@@ -52,8 +52,9 @@
                     </p>
                     <p>
                         Следующее занятие:
-                        <span class="student-value" [class.no-data]="!nextLessons.get(student.id)">
-                            {{ isNextLessonsLoading ? 'Загрузка...' : getNextLessonDate(nextLessons.get(student.id)) }}
+                        <span class="student-value" [class.no-data]="!nextLessons.get(student.id)"
+                            [class.stopped]="student.isStopped">
+                            {{ isNextLessonsLoading ? 'Загрузка...' : getNextLessonDate(student) }}
                         </span>
                     </p>
                 </div>

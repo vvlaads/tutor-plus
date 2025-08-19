@@ -169,7 +169,7 @@ export class StudentsComponent implements OnInit {
           return s.from === 'Сова' && unpaidOwlLessons && unpaidOwlLessons > 0;
         });
       case 'noNextLessons':
-        return students.filter(s => !this.nextLessons.get(s.id));
+        return students.filter(s => !this.nextLessons.get(s.id) && !s.isStopped);
       default:
         return students;
     }

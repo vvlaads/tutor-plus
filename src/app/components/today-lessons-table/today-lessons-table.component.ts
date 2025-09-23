@@ -5,7 +5,7 @@ import { convertDateToString, convertStringToDate, convertTimeToMinutes, isDates
 import { CommonModule } from '@angular/common';
 import { StudentService } from '../../services/student.service';
 import * as XLSX from 'xlsx';
-import { DAYS_IN_WEEK, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MINUTES_IN_HOUR, MONTH_NAMES } from '../../app.constants';
+import { APP_COLORS, DAYS_IN_WEEK, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MINUTES_IN_HOUR } from '../../app.constants';
 import { DeviceService } from '../../services/device.service';
 
 @Component({
@@ -112,23 +112,10 @@ export class TodayLessonsTableComponent implements OnInit, OnChanges {
   }
 
   public getAppColor(appName: string | undefined): string {
-    if (appName) {
-      switch (appName) {
-        case 'WhatsApp':
-          return 'rgb(141, 255, 147)';
-        case 'Telegram':
-          return 'rgb(141, 238, 255)';
-        case 'Zoom':
-          return 'rgb(24, 143, 154)';
-        case 'Profi':
-          return 'rgb(255, 165, 171)';
-        case 'Дома':
-          return 'rgb(255, 165, 171)';
-        case 'Teams':
-          return 'rgb(207, 144, 255)';
-      }
+    if (appName && appName in APP_COLORS) {
+      return APP_COLORS[appName as keyof typeof APP_COLORS];
     }
-    return 'rgb(255,255,255)'
+    return 'rgb(255,255,255)';
   }
 
   public isToday(): boolean {

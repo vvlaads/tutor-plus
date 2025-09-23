@@ -82,3 +82,13 @@ export const ADMIN_COLLECTIONS_OPTIONS = [
 export const GUEST_COLLECTIONS_OPTIONS = [
     { value: CollectionOption.SELECT, text: "Выбрать" },
 ]
+
+export const APP_COLORS = {
+    'WhatsApp': 'rgb(141, 255, 147)',
+    'Telegram': 'rgb(141, 238, 255)',
+    'Zoom': 'rgb(24, 143, 154)',
+    'Profi': 'rgb(255, 165, 171)',
+    'Дома': 'rgb(255, 165, 171)',
+    'Teams': 'rgb(207, 144, 255)',
+    'Яндекс Телемост': 'rgba(250, 255, 200, 1)',
+} as const;

@@ -47,6 +47,7 @@ export const PLATFORM_OPTIONS = [
     { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
     { value: 'Telegram', text: 'Telegram', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telegram%20Icon.png' },
     { value: 'WhatsApp', text: 'WhatsApp', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Whatsapp%20Icon.png' },
+    { value: 'Яндекс Телемост', text: 'Яндекс Телемост', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telemost%20Icon.png' },
     { value: 'Дома', text: 'Дома', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Home%20Icon%20Black.png' },
     { value: 'У ученика', text: 'У ученика', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Graduation%20Cap.png' }
 ];

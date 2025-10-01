@@ -116,7 +116,7 @@ export class LessonDialogComponent implements OnInit {
       ...lessonValue,
       date: lessonValue.date ? changeDateFormatMinusToDot(lessonValue.date) : null,
       repeatEndDate: lessonValue.repeatEndDate && lessonValue.isRepeat ? changeDateFormatMinusToDot(lessonValue.repeatEndDate) : null,
-      paidByOwl: this.isOwlStudent ? lessonValue.paidByOwl : null
+      paidByOwl: this.isOwlStudent ? (lessonValue.paidByOwl || false) : null
     }
     return lesson;
   }

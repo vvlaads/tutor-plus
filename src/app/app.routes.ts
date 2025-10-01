@@ -6,13 +6,14 @@ import { authGuard } from './guards/auth.guard';
 import { StudentProfileComponent } from './pages/student-profile/student-profile.component';
 import { HomeComponent } from './pages/home/home.component';
 import { WaitListComponent } from './pages/wait-list/wait-list.component';
+import { redirectIfAuthGuard } from './guards/redirect-if-auth.guard';
 
 export const routes: Routes = [
-    { path: 'login', component: LoginComponent },
-    { path: '', component: HomeComponent, canActivate: [authGuard] },
+    { path: 'login', component: LoginComponent, canActivate: [redirectIfAuthGuard] },
+    { path: 'home', component: HomeComponent, canActivate: [authGuard] },
     { path: 'students', component: StudentsComponent, canActivate: [authGuard] },
     { path: 'schedule', component: ScheduleComponent, canActivate: [authGuard] },
     { path: 'wait-list', component: WaitListComponent, canActivate: [authGuard] },
     { path: 'student/:id', component: StudentProfileComponent, canActivate: [authGuard] },
-    { path: '**', redirectTo: '' }
+    { path: '**', redirectTo: 'schedule' }
 ];

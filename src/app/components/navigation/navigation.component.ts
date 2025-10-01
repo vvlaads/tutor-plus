@@ -64,7 +64,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   public redirectToTarget(target: string): void {
     switch (target) {
-      case '':
+      case 'home':
         this.selectedSection = Section.Home;
         break;
       case 'students':
@@ -86,7 +86,7 @@ export class NavigationComponent implements OnInit, OnDestroy {
 
   public targetIsSelected(target: string): boolean {
     switch (target) {
-      case '':
+      case 'home':
         return this.selectedSection === Section.Home;
       case 'students':
         return this.selectedSection === Section.Students;

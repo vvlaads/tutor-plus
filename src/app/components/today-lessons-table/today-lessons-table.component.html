@@ -2,7 +2,8 @@
     <div class="before-table">
         <div class="date-info" [class.mobile]="(deviceType$ | async) === 'mobile'">
             <span class="date">{{getFormattedDate(currentDate)}} </span>
-            <span class="current-day" *ngIf="isToday()">Сегодня</span>
+            <span class="current-day" *ngIf="isToday()">Сегодня </span>
+            <span class="weekday">({{getWeekday(currentDate)}})</span>
         </div>
 
         <div class="function-manager" *ngIf="(deviceType$ | async) === 'desktop'">

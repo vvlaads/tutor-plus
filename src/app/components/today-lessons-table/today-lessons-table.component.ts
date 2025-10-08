@@ -5,7 +5,7 @@ import { convertDateToString, convertStringToDate, convertTimeToMinutes, isDates
 import { CommonModule } from '@angular/common';
 import { StudentService } from '../../services/student.service';
 import * as XLSX from 'xlsx';
-import { APP_COLORS, DAYS_IN_WEEK, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MINUTES_IN_HOUR } from '../../app.constants';
+import { APP_COLORS, DAYS_IN_WEEK, HOURS_IN_DAY, LOWER_MONTH_NAMES, MAX_LESSON_DURATION, MINUTES_IN_HOUR, WEEKDAY_NAMES } from '../../app.constants';
 import { DeviceService } from '../../services/device.service';
 
 @Component({
@@ -126,6 +126,15 @@ export class TodayLessonsTableComponent implements OnInit, OnChanges {
     const dateName = date.getDate();
     const monthName = LOWER_MONTH_NAMES[date.getMonth()];
     return `${dateName} ${monthName}`;
+  }
+
+  public getWeekday(date: Date): string {
+    let dayNumber = date.getDay();
+    dayNumber -= 1;
+    if (dayNumber < 0) {
+      dayNumber += 7;
+    }
+    return WEEKDAY_NAMES[dayNumber];
   }
 
   public print(): void {

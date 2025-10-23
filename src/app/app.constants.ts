@@ -39,7 +39,8 @@ export const COMMUNICATION_OPTIONS = [
     { value: 'Teams', text: 'Teams', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MicrosoftTeams%20Icon.png' },
     { value: 'Profi', text: 'Profi', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Profi%20Icon.png' },
     { value: 'Авито', text: 'Авито', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Avito%20Icon.png' },
-    { value: 'Телефон', text: 'Телефон', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' }
+    { value: 'Телефон', text: 'Телефон', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' },
+    { value: 'Сова', text: 'Сова', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png' }
 ];
 
 export const PLATFORM_OPTIONS = [

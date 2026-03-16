@@ -40,7 +40,8 @@ export const COMMUNICATION_OPTIONS = [
     { value: 'Profi', text: 'Profi', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Profi%20Icon.png' },
     { value: 'Авито', text: 'Авито', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Avito%20Icon.png' },
     { value: 'Телефон', text: 'Телефон', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Phone%20Icon.png' },
-    { value: 'Сова', text: 'Сова', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png' }
+    { value: 'Сова', text: 'Сова', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/owl.png' },
+    { value: 'MAX', text: 'MAX', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MAX.png' }
 ];
 
 export const PLATFORM_OPTIONS = [
@@ -50,7 +51,8 @@ export const PLATFORM_OPTIONS = [
     { value: 'WhatsApp', text: 'WhatsApp', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Whatsapp%20Icon.png' },
     { value: 'Яндекс Телемост', text: 'Яндекс Телемост', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Telemost%20Icon.png' },
     { value: 'Дома', text: 'Дома', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Home%20Icon%20Black.png' },
-    { value: 'У ученика', text: 'У ученика', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Graduation%20Cap.png' }
+    { value: 'У ученика', text: 'У ученика', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/Graduation%20Cap.png' },
+    { value: 'MAX', text: 'MAX', icon: 'https://raw.githubusercontent.com/vvlaads/tutor-plus-resources/main/MAX.png' }
 ];
 
 export const FROM_OPTIONS = [
@@ -91,5 +93,6 @@ export const APP_COLORS = {
     'Profi': 'rgb(255, 165, 171)',
     'Дома': 'rgb(255, 165, 171)',
     'Teams': 'rgb(207, 144, 255)',
-    'Яндекс Телемост': 'rgba(250, 255, 200, 1)',
+    'Яндекс Телемост': 'rgb(250, 255, 200)',
+    'MAX': 'rgb(151, 95, 255)'
 } as const;

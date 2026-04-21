@@ -10,9 +10,16 @@
         </button>
 
         <div *ngIf="isDropdownOpen" class="dropdown-menu">
-            <div *ngFor="let option of filterOptions" (click)="onFilterSelect(option.value)" class="dropdown-item"
-                [class.active]="selectedFilter === option.value">
-                {{ option.text }}
+            <div *ngFor="let group of filterGroups">
+                <div class="group-label">{{ group.label }}</div>
+
+                <div *ngFor="let option of group.options"
+                    (click)="onFilterSelect(group.key, option.value)"
+                    class="dropdown-item"
+                    [class.active]="selectedFilter[group.key] === option.value">
+
+                    {{ option.text }}
+                </div>
             </div>
         </div>
     </div>

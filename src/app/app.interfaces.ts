@@ -72,6 +72,20 @@ export interface SelectOption {
     text: string;
 }
 
+export type FilterValue = string | boolean | null;
+
+export interface FilterOption {
+    value: FilterValue;
+    text: string;
+}
+
+export interface SelectedFilter {
+    communication: string;
+    isPaid: boolean | null;
+    paidByOwl: boolean | null;
+    hasNextLesson: boolean | null;
+};
+
 export interface Collection {
     id: string;
     name: string;

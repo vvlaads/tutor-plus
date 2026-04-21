@@ -4,7 +4,7 @@ import { LayoutService } from '../../services/layout.service';
 import { Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
-import { Lesson, SelectOption, Student } from '../../app.interfaces';
+import { Lesson, SelectedFilter, SelectOption, Student } from '../../app.interfaces';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
@@ -28,7 +28,12 @@ export class StudentsComponent implements OnInit {
   private allStudents: Student[] = [];
   private activeFormat = true;
   private searchQuery = '';
-  private currentFilter: string = 'all';
+  private currentFilter: SelectedFilter = {
+    communication: 'all',
+    isPaid: null,
+    paidByOwl: null,
+    hasNextLesson: null,
+  };
 
   public deviceType$ = this.deviceService.deviceType$;
   public pageMarginLeftPercentage: number = 0;
@@ -41,12 +46,6 @@ export class StudentsComponent implements OnInit {
   public nextLessons = new Map<string, Lesson>();
   public unpaidLessonsCount: Map<string, number> = new Map();
   public unpaidOwlLessonsCount: Map<string, number> = new Map();
-  public filterOptions: SelectOption[] = [
-    { value: 'all', text: 'Все' },
-    { value: 'unpaid', text: 'Неоплачены' },
-    { value: 'unpaidByOwl', text: 'Неоплачены по сове' },
-    { value: 'noNextLessons', text: 'Нет Следующего занятия' }
-  ];
 
   public ngOnInit(): void {
     this.subscribeToLayoutChanges();
@@ -103,8 +102,8 @@ export class StudentsComponent implements OnInit {
     this.applyFilters();
   }
 
-  public handleFilter(value: string): void {
-    this.currentFilter = value;
+  public handleFilter(filters: SelectedFilter): void {
+    this.currentFilter = filters;
     this.applyFilters();
   }
 
@@ -116,9 +115,49 @@ export class StudentsComponent implements OnInit {
 
       await this.updateCounters(filtered);
 
-      if (this.currentFilter !== 'all') {
-        filtered = this.applyCurrentFilter(filtered);
-      }
+      filtered = filtered.filter(student => {
+        // Фильтр по переписке
+        if (this.currentFilter.communication !== 'all' &&
+          student.communication !== this.currentFilter.communication) {
+          return false;
+        }
+
+        // Фильтр по оплате
+        if (this.currentFilter.isPaid !== null) {
+          const unpaid = this.unpaidLessonsCount.get(student.id) || 0;
+
+          if (this.currentFilter.isPaid && unpaid > 0) {
+            return false; // хотим оплаченных, но есть долги
+          }
+
+          if (!this.currentFilter.isPaid && unpaid === 0) {
+            return false; // хотим неоплаченных, но всё оплачено
+          }
+        }
+
+        // Фильтр оплаты по сове
+        if (this.currentFilter.paidByOwl) {
+          const unpaid = this.unpaidOwlLessonsCount.get(student.id) || 0;
+
+          if (this.currentFilter.paidByOwl && unpaid > 0) {
+            return false;
+          }
+
+          if (!this.currentFilter.paidByOwl && unpaid === 0) {
+            return false;
+          }
+        }
+
+        // Фильтр по следующему уроку
+        if (this.currentFilter.hasNextLesson) {
+          const nextLessons = this.nextLessons.get(student.id) && !student.isStopped;
+          if (this.nextLessons && this.currentFilter.hasNextLesson) {
+            return false;
+          }
+        }
+
+        return true;
+      });
 
       if (this.searchQuery) {
         filtered = filtered.filter(s =>
@@ -156,24 +195,24 @@ export class StudentsComponent implements OnInit {
     return lessons.length;
   }
 
-  private applyCurrentFilter(students: Student[]): Student[] {
-    switch (this.currentFilter) {
-      case 'unpaid':
-        return students.filter(s => {
-          const unpaidLessons = this.unpaidLessonsCount.get(s.id);
-          return unpaidLessons && unpaidLessons > 0;
-        });
-      case 'unpaidByOwl':
-        return students.filter(s => {
-          const unpaidOwlLessons = this.unpaidOwlLessonsCount.get(s.id);
-          return s.from === 'Сова' && unpaidOwlLessons && unpaidOwlLessons > 0;
-        });
-      case 'noNextLessons':
-        return students.filter(s => !this.nextLessons.get(s.id) && !s.isStopped);
-      default:
-        return students;
-    }
-  }
+  // private applyCurrentFilter(students: Student[]): Student[] {
+  //   switch (this.currentFilter) {
+  //     case 'unpaid':
+  //       return students.filter(s => {
+  //         const unpaidLessons = this.unpaidLessonsCount.get(s.id);
+  //         return unpaidLessons && unpaidLessons > 0;
+  //       });
+  //     case 'unpaidByOwl':
+  //       return students.filter(s => {
+  //         const unpaidOwlLessons = this.unpaidOwlLessonsCount.get(s.id);
+  //         return s.from === 'Сова' && unpaidOwlLessons && unpaidOwlLessons > 0;
+  //       });
+  //     case 'noNextLessons':
+  //       return students.filter(s => !this.nextLessons.get(s.id) && !s.isStopped);
+  //     default:
+  //       return students;
+  //   }
+  // }
 
   public getPrevLessonDate(lesson: Lesson | null | undefined): string {
     if (!lesson) return 'Отсутствует';

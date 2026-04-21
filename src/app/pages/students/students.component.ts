@@ -4,7 +4,7 @@ import { LayoutService } from '../../services/layout.service';
 import { Router } from '@angular/router';
 import { StudentService } from '../../services/student.service';
 import { DialogMode } from '../../app.enums';
-import { Lesson, SelectedFilter, SelectOption, Student } from '../../app.interfaces';
+import { Lesson, SelectedFilter, Student } from '../../app.interfaces';
 import { LessonService } from '../../services/lesson.service';
 import { formatPhoneNumber } from '../../app.functions';
 import { DialogService } from '../../services/dialog.service';
@@ -137,6 +137,12 @@ export class StudentsComponent implements OnInit {
 
         // Фильтр оплаты по сове
         if (this.currentFilter.paidByOwl !== null) {
+          const isOwlStudent = student.communication === 'Сова';
+
+          if (!isOwlStudent) {
+            return false;
+          }
+
           const unpaid = this.unpaidOwlLessonsCount.get(student.id) || 0;
 
           if (this.currentFilter.paidByOwl && unpaid > 0) {

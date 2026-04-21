@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FilterOption, SelectedFilter } from '../../app.interfaces';
+import { COMMUNICATION_OPTIONS } from '../../app.constants';
 
 @Component({
   selector: 'app-search-filter',
@@ -21,13 +22,10 @@ export class SearchFilterComponent {
         label: 'Переписка',
         options: [
           { value: 'all', text: 'Все' },
-          { value: 'Telegram', text: 'Telegram' },
-          { value: 'WhatsApp', text: 'WhatsApp' },
-          { value: 'Teams', text: 'Teams' },
-          { value: 'Profi', text: 'Profi' },
-          { value: 'Авито', text: 'Авито' },
-          { value: 'Телефон', text: 'Телефон' },
-          { value: 'Сова', text: 'Сова' }
+          ...COMMUNICATION_OPTIONS.map(o => ({
+            value: o.value,
+            text: o.text
+          }))
         ]
       },
       {
@@ -73,13 +71,17 @@ export class SearchFilterComponent {
   };
   public isDropdownOpen: boolean = false;
 
+  constructor(private elementRef: ElementRef) { }
+
   onSearch(): void {
     this.searchChange.emit(this.searchQuery);
   }
 
   onFilterSelect<K extends keyof SelectedFilter>(key: K, value: SelectedFilter[K]): void {
-    this.selectedFilter[key] = value;
-    this.isDropdownOpen = false;
+    this.selectedFilter = {
+      ...this.selectedFilter,
+      [key]: value
+    };
     this.filterChange.emit(this.selectedFilter);
   }
 
@@ -109,5 +111,14 @@ export class SearchFilterComponent {
       return parts[0];
     }
     return parts.length ? `Фильтры (${parts.length})` : 'Фильтр';
+  }
+
+  @HostListener('document:click', ['$event'])
+  onClickOutside(event: MouseEvent): void {
+    const clickedInside = this.elementRef.nativeElement.contains(event.target);
+
+    if (!clickedInside) {
+      this.isDropdownOpen = false;
+    }
   }
 }

@@ -136,7 +136,7 @@ export class StudentsComponent implements OnInit {
         }
 
         // Фильтр оплаты по сове
-        if (this.currentFilter.paidByOwl) {
+        if (this.currentFilter.paidByOwl !== null) {
           const unpaid = this.unpaidOwlLessonsCount.get(student.id) || 0;
 
           if (this.currentFilter.paidByOwl && unpaid > 0) {
@@ -149,9 +149,14 @@ export class StudentsComponent implements OnInit {
         }
 
         // Фильтр по следующему уроку
-        if (this.currentFilter.hasNextLesson) {
-          const nextLessons = this.nextLessons.get(student.id) && !student.isStopped;
-          if (this.nextLessons && this.currentFilter.hasNextLesson) {
+        if (this.currentFilter.hasNextLesson !== null) {
+          const hasNext = !!this.nextLessons.get(student.id) && !student.isStopped;
+
+          if (this.currentFilter.hasNextLesson && !hasNext) {
+            return false;
+          }
+
+          if (!this.currentFilter.hasNextLesson && hasNext) {
             return false;
           }
         }

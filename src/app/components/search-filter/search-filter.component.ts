@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, EventEmitter, HostListener, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FilterOption, SelectedFilter } from '../../app.interfaces';
 import { COMMUNICATION_OPTIONS } from '../../app.constants';
@@ -63,12 +63,7 @@ export class SearchFilterComponent {
   public searchQuery: string = '';
 
 
-  public selectedFilter: SelectedFilter = {
-    isPaid: null,
-    paidByOwl: null,
-    communication: 'all',
-    hasNextLesson: null,
-  };
+  @Input() selectedFilter!: SelectedFilter;
   public isDropdownOpen: boolean = false;
 
   constructor(private elementRef: ElementRef) { }
@@ -78,15 +73,36 @@ export class SearchFilterComponent {
   }
 
   onFilterSelect<K extends keyof SelectedFilter>(key: K, value: SelectedFilter[K]): void {
-    this.selectedFilter = {
+    this.filterChange.emit({
       ...this.selectedFilter,
       [key]: value
-    };
-    this.filterChange.emit(this.selectedFilter);
+    });
   }
 
   toggleDropdown(): void {
     this.isDropdownOpen = !this.isDropdownOpen;
+  }
+
+  get hasActiveFilters(): boolean {
+    return (
+      this.selectedFilter.communication !== 'all' ||
+      this.selectedFilter.isPaid !== null ||
+      this.selectedFilter.paidByOwl !== null ||
+      this.selectedFilter.hasNextLesson !== null
+    );
+  }
+
+  resetFilters(event: MouseEvent): void {
+    event.stopPropagation(); // важно — чтобы dropdown не открывался/закрывался
+
+    this.selectedFilter = {
+      communication: 'all',
+      isPaid: null,
+      paidByOwl: null,
+      hasNextLesson: null,
+    };
+
+    this.filterChange.emit(this.selectedFilter);
   }
 
   get selectedFilterText(): string {

@@ -21,6 +21,12 @@
                     {{ option.text }}
                 </div>
             </div>
+
+            <div class="dropdown-footer" *ngIf="hasActiveFilters">
+                <button class="reset-button" (click)="resetFilters($event)">
+                    Сбросить фильтры
+                </button>
+            </div>
         </div>
     </div>
 </div>

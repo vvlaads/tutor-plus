@@ -28,7 +28,7 @@ export class StudentsComponent implements OnInit {
   private allStudents: Student[] = [];
   private activeFormat = true;
   private searchQuery = '';
-  private currentFilter: SelectedFilter = {
+  public currentFilter: SelectedFilter = {
     communication: 'all',
     isPaid: null,
     paidByOwl: null,
@@ -48,6 +48,12 @@ export class StudentsComponent implements OnInit {
   public unpaidOwlLessonsCount: Map<string, number> = new Map();
 
   public ngOnInit(): void {
+    const saved = localStorage.getItem('students_filter');
+
+    if (saved) {
+      this.currentFilter = JSON.parse(saved);
+    }
+
     this.subscribeToLayoutChanges();
     this.subscribeToStudents();
     this.subscribeToLessons();
@@ -104,6 +110,12 @@ export class StudentsComponent implements OnInit {
 
   public handleFilter(filters: SelectedFilter): void {
     this.currentFilter = filters;
+
+    localStorage.setItem(
+      'students_filter',
+      JSON.stringify(filters)
+    );
+
     this.applyFilters();
   }
 

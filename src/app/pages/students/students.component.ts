@@ -168,13 +168,17 @@ export class StudentsComponent implements OnInit {
 
         // Фильтр по следующему уроку
         if (this.currentFilter.hasNextLesson !== null) {
-          const hasNext = !!this.nextLessons.get(student.id) && !student.isStopped;
+          const hasNextLesson = !!this.nextLessons.get(student.id);
 
-          if (this.currentFilter.hasNextLesson && !hasNext) {
+          if (student.isStopped) {
             return false;
           }
 
-          if (!this.currentFilter.hasNextLesson && hasNext) {
+          if (this.currentFilter.hasNextLesson && !hasNextLesson) {
+            return false;
+          }
+
+          if (!this.currentFilter.hasNextLesson && hasNextLesson) {
             return false;
           }
         }
